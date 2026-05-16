@@ -3,12 +3,15 @@
 import fs from "node:fs";
 import path from "node:path";
 import { updateAllFeeds } from "../backend/aggregator.js";
-import feedsData from "../backend/feeds.json" assert { type: "json" };
 
 export default async function handler(req, res) {
   try {
+    // Load feeds.json manually (Vercel-safe)
+    const feedsPath = path.join(process.cwd(), "backend", "feeds.json");
+    const feedsData = JSON.parse(fs.readFileSync(feedsPath, "utf8"));
     const FEEDS = feedsData.feeds;
 
+    // Process feeds
     const apps = await updateAllFeeds(FEEDS);
 
     const output = {
@@ -16,10 +19,14 @@ export default async function handler(req, res) {
       apps
     };
 
-    const filePath = path.join(process.cwd(), "data", "apps.json");
-    fs.writeFileSync(filePath, JSON.stringify(output, null, 2));
+    // Save to /data/apps.json
+    const outputPath = path.join(process.cwd(), "data", "apps.json");
+    fs.writeFileSync(outputPath, JSON.stringify(output, null, 2));
 
-    return res.status(200).json({ success: true, count: apps.length });
+    return res.status(200).json({
+      success: true,
+      count: apps.length
+    });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
