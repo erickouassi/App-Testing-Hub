@@ -1,0 +1,9 @@
+{
+  "name": "app-testing-hub",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "vercel build"
+  }
+}
