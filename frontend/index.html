@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>App Testing Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/frontend/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="logo">App Testing Hub</div>
+    <div class="subtitle">Find apps that need testers. No accounts. No tracking.</div>
+  </header>
+
+  <main class="main">
+    <section class="filters" id="filters"></section>
+
+    <section class="apps-container" id="apps-container">
+      <div class="loading" id="loading">Loading apps…</div>
+      <div class="empty hidden" id="empty">No apps found.</div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Local-only: your saves, favorites, and joined status stay on this device.</span>
+  </footer>
+
+  <script type="module" src="/frontend/app.js"></script>
+</body>
+</html>
