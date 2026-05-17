@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Developer Guidelines — App Testing Hub</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="app-page-container">
+  <h1>Developer Guidelines</h1>
+  <p>Last updated: <strong><span id="year"></span></strong></p>
+
+  <h2>1. Feed Requirements</h2>
+  <p>Your RSS feed must:</p>
+  <ul>
+    <li>Be valid XML</li>
+    <li>Contain exactly one &lt;item&gt;</li>
+    <li>Use the AppHub namespaces</li>
+    <li>Include platform, version, status, and testing links</li>
+    <li>Include a valid pubDate</li>
+  </ul>
+
+  <h2>2. Allowed Status Values</h2>
+  <ul>
+    <li>open-testing</li>
+    <li>closed-testing</li>
+    <li>testing-completed</li>
+    <li>expired</li>
+    <li>not-started</li>
+    <li>internal</li>
+    <li>invite-only</li>
+    <li>marketplace</li>
+    <li>pre-registration</li>
+  </ul>
+
+  <h2>3. Feed Submission</h2>
+  <p>
+    Submit your feed URL via GitHub pull request or email.
+    Once approved, it will be added to <code>feeds.json</code>.
+  </p>
+
+  <h2>4. Removal Policy</h2>
+  <p>
+    Feeds may be removed if they are invalid, broken, misleading, or violate guidelines.
+  </p>
+</div>
+
+<footer class="site-footer">
+  <p><small>👉 This website contains ads and may earn commissions from clicks or purchases.</small></p>
+  <p>© <span id="year"></span> | <a href="developer-guidelines.html">Developer Guidelines</a> | Made by <a href="https://erickouassi.com/" target="_blank">Eric</a> with 🙏🏽.</p>
+</footer>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>

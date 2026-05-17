@@ -2,32 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>App • App Testing Hub</title>
+  <title>App Details</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="header">
-    <div class="header-top">
-      <div>
-        <div class="logo">App Testing Hub</div>
-        <div class="subtitle">App details</div>
-      </div>
-      <div class="header-meta">
-        <a href="/" class="btn btn-ghost">← Back to list</a>
-      </div>
-    </div>
+  <header class="site-header">
+    <h1>App Details</h1>
+    <a href="index.html" class="btn btn-ghost">← Back to apps</a>
   </header>
 
-  <main class="main">
-    <section style="grid-column: 1 / -1;">
-      <div id="app-page-container" class="apps-container"></div>
+  <main class="layout-single">
+    <section id="app-page-container" class="app-page-container">
+      <div class="loading">Loading app…</div>
     </section>
   </main>
-
-  <footer class="footer">
-    Built for Google Closed Testing • App Testing Hub
-  </footer>
 
   <script src="app-page.js"></script>
 </body>

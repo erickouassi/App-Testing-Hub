@@ -7,20 +7,14 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="header">
-    <div class="header-top">
-      <div>
-        <div class="logo">App Testing Hub</div>
-        <div class="subtitle">Curated Google Closed Testing campaigns</div>
-      </div>
-      <div class="header-meta">
-        <span id="last-updated">Last updated: —</span>
-        <button id="refresh-btn" class="btn btn-primary">🔄 Refresh apps</button>
-      </div>
-    </div>
+  <header class="site-header">
+    <h1>App Testing Hub</h1>
+    <p class="subtitle">Android closed testing marketplace</p>
+    <div id="last-updated" class="last-updated"></div>
+    <button id="refresh-btn" class="btn btn-ghost">🔄 Refresh apps</button>
   </header>
 
-  <main class="main">
+  <main class="layout">
     <aside class="filters">
       <div class="filters-title">
         Filters <span id="apps-count-label">(0 apps)</span>
@@ -28,28 +22,50 @@
 
       <div class="filter-group">
         <div class="filter-label">Platform</div>
-        <div class="filter-chips" id="platform-filters">
-          <button class="filter-chip active" data-platform="all">All</button>
-          <button class="filter-chip" data-platform="Android">Android</button>
-          <button class="filter-chip" data-platform="iOS">iOS</button>
-          <button class="filter-chip" data-platform="Web">Web</button>
+        <div class="filter-chips">
+          <span class="filter-chip active">Android only</span>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-label">Your activity</div>
+        <div class="filter-chips" id="activity-filters">
+          <button class="filter-chip active" data-filter="all">All</button>
+          <button class="filter-chip" data-filter="saved">Saved</button>
+          <button class="filter-chip" data-filter="favorites">Favorites</button>
+          <button class="filter-chip" data-filter="likes">Liked</button>
+          <button class="filter-chip" data-filter="joined">Joined</button>
+          <button class="filter-chip" data-filter="completed">Completed</button>
         </div>
       </div>
     </aside>
 
-    <section>
+    <section class="apps-section">
       <div id="apps-loading" class="loading">Loading apps…</div>
-      <div id="apps-empty" class="empty hidden">No apps found for this filter.</div>
-      <div id="apps-container" class="apps-container"></div>
+      <div id="apps-empty" class="empty hidden">No apps found.</div>
+      <div id="apps-container" class="apps-grid"></div>
     </section>
   </main>
 
-  <footer class="footer">
-    Built for Google Closed Testing • App Testing Hub
-  </footer>
+ <footer class="site-footer">
+  <p><small>👉 This website contains ads and may earn commissions from clicks or purchases.</small></p>
+  <p>
+    © <span id="year"></span> |
+    <a href="terms-of-service.html">Terms of Service</a> |
+    <a href="privacy-policy.html">Privacy Policy</a> |
+    <a href="developer-guidelines.html">Developer Guidelines</a> |
+    <a href="about.html">About</a> |
+    Made by <a href="https://erickouassi.com/" target="_blank">Eric</a> with 🙏🏽.
+  </p>
+</footer>
 
-  <!-- Details modal -->
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+
+
   <div id="details-modal" class="modal hidden">
+    <div class="modal-backdrop" onclick="closeModal()"></div>
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal()">✕</button>
       <div id="modal-body"></div>

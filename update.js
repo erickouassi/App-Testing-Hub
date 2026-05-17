@@ -1,23 +1,70 @@
 import { parseStringPromise } from "xml2js";
 
+// External feed list
+const FEEDS_URL = "https://app-testing-hub.vercel.app/feeds.json";
+
+/* ------------------------------
+   Load Approved Feeds
+------------------------------ */
+async function getApprovedFeeds() {
+  try {
+    const res = await fetch(FEEDS_URL);
+    const data = await res.json();
+    return data.approvedFeeds || [];
+  } catch (err) {
+    console.error("❌ Error loading feeds.json:", err);
+    return [];
+  }
+}
+
+/* ------------------------------
+   Utility Functions
+------------------------------ */
+function countDaysSince(pubDate) {
+  if (!pubDate) return 0;
+  const published = new Date(pubDate);
+  const now = new Date();
+  const diff = now - published;
+  return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+}
+
+function calculateDaysLeft(daysInTesting, testingDuration) {
+  return Math.max(0, testingDuration - daysInTesting);
+}
+
+function autoStatus(daysInTesting, daysLeft, developerStatus) {
+  if (developerStatus) return developerStatus;
+
+  if (daysInTesting <= 0) return "not-started";
+  if (daysLeft <= 0) return "testing-completed";
+  return "open-testing";
+}
+
+/* ------------------------------
+   MAIN: updateAllFeeds()
+------------------------------ */
 export async function updateAllFeeds() {
   console.log("🚀 updateAllFeeds() started");
 
-  const feeds = [
-    "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/refs/heads/main/appfeed.xml"
-  ];
+  const feeds = await getApprovedFeeds();
 
-  console.log("📡 Feeds to fetch:", feeds);
+  if (!feeds.length) {
+    console.log("⚠️ No feeds found in feeds.json");
+    return { apps: [] };
+  }
 
   const apps = [];
 
   for (const url of feeds) {
     console.log("🔵 Fetching:", url);
 
-    const xml = await fetch(url).then(r => r.text());
-
-    console.log("🟣 XML length:", xml.length);
-    console.log("🟣 First 200 chars of XML:\n", xml.substring(0, 200));
+    let xml;
+    try {
+      xml = await fetch(url).then(r => r.text());
+    } catch (err) {
+      console.log("❌ Fetch error:", err);
+      continue;
+    }
 
     let json;
     try {
@@ -37,77 +84,122 @@ export async function updateAllFeeds() {
       continue;
     }
 
-    console.log("🟡 Parsed JSON:", JSON.stringify(json).substring(0, 300));
-
     const item = json?.rss?.channel?.item;
     if (!item) {
       console.log("❌ No <item> found in feed");
       continue;
     }
 
-   const title = item.title || "";
-const description = item.description || "";
-const platform = item.platform || "";
-const version = item.version || "";
-const testLink = item.testLink || "";
-const groupLink = item.groupLink || "";
+    /* ------------------------------
+       Extract Core Fields
+    ------------------------------ */
+    const title = item.title || "";
+    const description = item.description || "";
+    const platformRaw = (item.platform || "").toLowerCase();
 
-const slug = title
-  .toLowerCase()
-  .replace(/[^a-z0-9]+/g, "-")
-  .replace(/^-|-$/g, "");
+    // Android-only filtering
+    if (platformRaw && platformRaw !== "android") {
+      console.log("⏭ Skipping non-Android app:", title, platformRaw);
+      continue;
+    }
 
-console.log("🟢 Extracted:", {
-  title,
-  description,
-  platform,
-  version,
-  groupLink,
-  testLink,
-  slug
-});
+    const platform = "Android";
+    const version = item.version || "";
+    const groupLink = item.groupLink || "";
+    const testLink = item.testLink || "";
+    const pubDate = item.pubDate || "";
+    const testingDuration = parseInt(item.testingDuration || "14", 10);
+    const developerStatus = item.status || "";
+    const groupMembers = parseInt(item.groupMembers || "0", 10);
 
-apps.push({
-  title,
-  description,
-  platform,
-  version,
-  groupLink,
-  testLink,
-  slug
-});
+    /* ------------------------------
+       Extract Metadata Arrays
+    ------------------------------ */
+    const languages = Array.isArray(item.languages?.language)
+      ? item.languages.language
+      : item.languages?.language
+      ? [item.languages.language]
+      : [];
 
+    const countries = Array.isArray(item.countries?.country)
+      ? item.countries.country
+      : item.countries?.country
+      ? [item.countries.country]
+      : [];
 
-  }
+    const requirements = Array.isArray(item.requirements?.requirement)
+      ? item.requirements.requirement
+      : item.requirements?.requirement
+      ? [item.requirements.requirement]
+      : [];
 
-  console.log("✅ Final apps:", apps);
-  return apps;
-}
+    /* ------------------------------
+       Compute Testing Progress
+    ------------------------------ */
+    const daysInTesting = countDaysSince(pubDate);
+    const daysLeft = calculateDaysLeft(daysInTesting, testingDuration);
+    const status =
+      autoStatus(daysInTesting, daysLeft, developerStatus) ||
+      "active-testing";
 
+    /* ------------------------------
+       Slug
+    ------------------------------ */
+    const slug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
 
+    console.log("🟢 Extracted:", {
+      title,
+      platform,
+      version,
+      groupLink,
+      testLink,
+      pubDate,
+      testingDuration,
+      daysInTesting,
+      daysLeft,
+      status,
+      groupMembers,
+      slug,
+      languages,
+      countries,
+      requirements
+    });
 
-/*export async function updateAllFeeds() {
-  const feeds = [
-    "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/refs/heads/main/appfeed.xml"
-  ];
-
-  const apps = [];
-
-  for (const url of feeds) {
-    const xml = await fetch(url).then(r => r.text());
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(xml, "application/xml");
-
-    const item = doc.querySelector("item");
-
+    /* ------------------------------
+       Push Final App Object
+    ------------------------------ */
     apps.push({
-      title: item.querySelector("title")?.textContent || "Untitled",
-      description: item.querySelector("description")?.textContent || "",
-      platform: item.querySelector("app\\:platform")?.textContent || "",
-      version: item.querySelector("app\\:version")?.textContent || ""
+      title,
+      description,
+      platform,
+      version,
+      groupLink,
+      testLink,
+      pubDate,
+      testingDuration,
+      daysInTesting,
+      daysLeft,
+      status,
+      groupMembers,
+      slug,
+      languages,
+      countries,
+      requirements
     });
   }
 
-  return apps;
+  /* ------------------------------
+     Final Payload
+  ------------------------------ */
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    apps
+  };
+
+  console.log("✅ Final apps:", apps);
+
+  return payload;
 }
-*/
