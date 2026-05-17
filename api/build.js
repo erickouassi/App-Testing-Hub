@@ -1,9 +1,8 @@
-// api/build.js
-
 import { updateAllFeeds } from "../update.js";
 
 export default async function handler(req, res) {
-  // ✅ Allow cross‑origin requests for local testing
+  console.log("🔥 /api/build was called");
+
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -21,7 +20,6 @@ export default async function handler(req, res) {
     const repoName = "App-Testing-Hub";
     const filePath = "apps.json";
 
-    // Get existing file SHA
     const existing = await fetch(
       `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`,
       {
@@ -34,7 +32,6 @@ export default async function handler(req, res) {
 
     const sha = existing.sha;
 
-    // Commit new file
     const commitRes = await fetch(
       `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`,
       {
