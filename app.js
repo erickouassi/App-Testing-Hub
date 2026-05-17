@@ -24,14 +24,33 @@ function setEmpty(isEmpty) {
   emptyEl.classList.toggle("hidden", !isEmpty);
 }
 
-function joinTest(url) {
-  if (!url) {
+/*  
+  SMART GOOGLE CLOSED TESTING FLOW  
+  - Always open Google Group first  
+  - Then optionally open testLink  
+*/
+function joinTest(app) {
+  const groupLink = app.groupLink?.trim();
+  const testLink = app.testLink?.trim();
+
+  if (!groupLink) {
     alert("This app requires joining the Google Group first. No group link found.");
     return;
   }
-  window.open(url, "_blank");
-}
 
+  // Step 1: Open Google Group
+  window.open(groupLink, "_blank");
+
+  // Step 2: After joining, offer to open the test link
+  if (testLink) {
+    setTimeout(() => {
+      const proceed = confirm(
+        "After joining the Google Group, click OK to open the testing link."
+      );
+      if (proceed) window.open(testLink, "_blank");
+    }, 1200);
+  }
+}
 
 function openAppPage(slug) {
   window.location.href = `/app.html?slug=${encodeURIComponent(slug)}`;
@@ -49,22 +68,28 @@ function showDetails(app) {
     <p><strong>Version:</strong> ${app.version}</p>
 
     <p><strong>Google Group (required):</strong><br>
-      <a href="${app.groupLink}" target="_blank">Join Google Group</a>
+      ${
+        app.groupLink
+          ? `<a href="${app.groupLink}" target="_blank">Join Google Group</a>`
+          : "Not provided"
+      }
     </p>
 
     <p><strong>Testing Link (unlocked after joining):</strong><br>
-      <a href="${app.testLink}" target="_blank">${app.testLink}</a>
+      ${
+        app.testLink
+          ? `<a href="${app.testLink}" target="_blank">${app.testLink}</a>`
+          : "Not provided"
+      }
     </p>
 
-    <button class="btn btn-primary" onclick="joinTest('${app.groupLink}')">
-  Join test (Google Group)
-</button>
-
+    <button class="btn btn-primary" onclick='joinTest(${JSON.stringify(app)})'>
+      Join test (Google Group)
+    </button>
   `;
 
   modal.classList.remove("hidden");
 }
-
 
 function closeModal() {
   document.getElementById("details-modal").classList.add("hidden");
@@ -96,30 +121,30 @@ function renderApps() {
     const card = document.createElement("article");
     card.className = "app-card";
 
-    const title = app.title || "Untitled app";
-    const platform = app.platform || "Unknown platform";
-    const version = app.version || "—";
-    const description = app.description || "";
-    const slug = app.slug || "";
-
     card.innerHTML = `
       <div class="app-header">
         <div>
-          <div class="app-title">${title}</div>
-          <div class="app-meta">${platform} • v${version}</div>
+          <div class="app-title">${app.title || "Untitled app"}</div>
+          <div class="app-meta">${app.platform || "Unknown platform"} • v${app.version || "—"}</div>
           <div class="app-badges">
             <span class="badge badge-status-active">Open for testers</span>
           </div>
         </div>
       </div>
-      <div class="app-description">${description}</div>
+
+      <div class="app-description">${app.description || ""}</div>
+
       <div class="app-footer">
         <div class="app-timing">
           14‑day install requirement • Daily usage recommended
         </div>
+
         <div class="app-actions">
-          <button class="btn btn-ghost" onclick='openAppPage("${slug}")'>Details</button>
-          <button class="btn btn-primary" onclick='joinTest("${app.group || ""}")'>
+          <button class="btn btn-ghost" onclick='showDetails(${JSON.stringify(app)})'>
+            Details
+          </button>
+
+          <button class="btn btn-primary" onclick='joinTest(${JSON.stringify(app)})'>
             Join test
           </button>
         </div>
