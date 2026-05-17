@@ -1,8 +1,10 @@
+import { parseStringPromise } from "xml2js";
+
 export async function updateAllFeeds() {
   console.log("🚀 updateAllFeeds() started");
 
   const feeds = [
-   "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/refs/heads/main/appfeed.xml"
+    "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/refs/heads/main/appfeed.xml"
   ];
 
   console.log("📡 Feeds to fetch:", feeds);
@@ -17,19 +19,32 @@ export async function updateAllFeeds() {
     console.log("🟣 XML length:", xml.length);
     console.log("🟣 First 200 chars of XML:\n", xml.substring(0, 200));
 
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(xml, "application/xml");
-
-    const item = doc.querySelector("item");
-    if (!item) {
-      console.log("❌ No <item> found");
+    // Convert XML → JS object
+    let json;
+    try {
+      json = await parseStringPromise(xml, {
+        explicitArray: false,
+        mergeAttrs: true,
+        tagNameProcessors: [name => name.replace("app:", "").replace("dev:", "").replace("social:", "")]
+      });
+    } catch (err) {
+      console.log("❌ XML parse error:", err);
       continue;
     }
 
-    const title = item.querySelector("title")?.textContent || "";
-    const description = item.querySelector("description")?.textContent || "";
-    const platform = item.querySelector("app\\:platform")?.textContent || "";
-    const version = item.querySelector("app\\:version")?.textContent || "";
+    console.log("🟡 Parsed JSON:", JSON.stringify(json).substring(0, 300));
+
+    // Navigate to rss.channel.item
+    const item = json?.rss?.channel?.item;
+    if (!item) {
+      console.log("❌ No <item> found in feed");
+      continue;
+    }
+
+    const title = item.title || "";
+    const description = item.description || "";
+    const platform = item.platform || "";
+    const version = item.version || "";
 
     console.log("🟢 Extracted:", { title, description, platform, version });
 
@@ -39,7 +54,6 @@ export async function updateAllFeeds() {
   console.log("✅ Final apps:", apps);
   return apps;
 }
-
 
 
 /*export async function updateAllFeeds() {
