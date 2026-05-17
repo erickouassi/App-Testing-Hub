@@ -1,31 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>App Testing Hub</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="/frontend/styles.css" />
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #111; color: #eee; }
+    .app { padding: 12px; margin-bottom: 10px; background: #222; border-radius: 8px; }
+    .title { font-size: 1.1rem; font-weight: bold; }
+    .meta { font-size: 0.85rem; color: #aaa; }
+  </style>
 </head>
 <body>
-  <header class="header">
-    <div class="logo">App Testing Hub</div>
-    <div class="subtitle">Find apps that need testers. No accounts. No tracking.</div>
-  </header>
 
-  <main class="main">
-    <section class="filters" id="filters"></section>
+<h1>App Testing Hub</h1>
+<div id="apps">Loading…</div>
 
-    <section class="apps-container" id="apps-container">
-      <div class="loading" id="loading">Loading apps…</div>
-      <div class="empty hidden" id="empty">No apps found.</div>
-    </section>
-  </main>
+<script>
+async function loadApps() {
+  const API_BASE =
+    location.hostname === "127.0.0.1" || location.hostname === "localhost"
+      ? "https://app-testing-hub.vercel.app"
+      : "";
 
-  <footer class="footer">
-    <span>Local-only: your saves, favorites, and joined status stay on this device.</span>
-  </footer>
+  const res = await fetch(`${API_BASE}/api/apps`);
+  const data = await res.json();
 
-  <script type="module" src="./app.js"></script>
+  const container = document.getElementById("apps");
+  container.innerHTML = "";
+
+  data.apps.forEach(app => {
+    const div = document.createElement("div");
+    div.className = "app";
+    div.innerHTML = `
+      <div class="title">${app.title}</div>
+      <div class="meta">${app.platform} • ${app.version}</div>
+      <div>${app.description}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+loadApps();
+</script>
 
 </body>
 </html>
