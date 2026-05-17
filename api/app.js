@@ -13,3 +13,10 @@ export default async function handler(req, res) {
     return res.status(200).json({ apps: [] });
   }
 }
+
+const API_BASE =
+  location.hostname === "127.0.0.1" || location.hostname === "localhost"
+    ? "https://app-testing-hub.vercel.app"
+    : "";
+
+const res = await fetch(`${API_BASE}/api/apps`);
