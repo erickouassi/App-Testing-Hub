@@ -4,8 +4,12 @@ export default async function handler(req, res) {
   console.log("🔥 /api/build was called");
 
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
 
   try {
     const apps = await updateAllFeeds();
@@ -50,6 +54,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ success: true, commitRes });
   } catch (err) {
+    console.log("❌ /api/build error:", err);
     return res.status(500).json({ error: err.message });
   }
 }

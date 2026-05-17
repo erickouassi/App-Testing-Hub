@@ -1,7 +1,11 @@
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
 
   try {
     const url =
@@ -12,6 +16,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json(json);
   } catch (err) {
-    return res.status(200).json({ apps: [] });
+    console.log("❌ /api/apps error:", err);
+    return res.status(200).json({ generatedAt: null, apps: [] });
   }
 }
