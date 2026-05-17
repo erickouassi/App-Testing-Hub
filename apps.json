@@ -1,11 +1,14 @@
 {
-  "generatedAt": "2026-05-17T03:54:41.873Z",
+  "generatedAt": "2026-05-17T04:39:57.773Z",
   "apps": [
     {
       "title": "Daily Rosary",
       "description": "\r\n        A peaceful Rosary prayer app seeking Android testers for a 14‑day install requirement.\r\n      ",
       "platform": "Android",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "groupLink": "https://groups.google.com/g/daily-rosary-beta-testers",
+      "testLink": "https://play.google.com/apps/testing/com.erickouassi.dailyrosary",
+      "slug": "daily-rosary"
     }
   ]
 }
