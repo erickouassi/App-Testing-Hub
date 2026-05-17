@@ -316,31 +316,33 @@ function renderApps() {
 }
 
 async function loadApps() {
-  setLoading(true);
-  setEmpty(false);
-  appsContainer.innerHTML = "";
+  console.log("🔥 Loading apps");
 
-  const url = `${API_BASE}/api/apps`;
+  // Detect local vs production
+  const API_URL =
+    location.hostname === "127.0.0.1" || location.hostname === "localhost"
+      ? "https://app-testing-hub.vercel.app/api/apps"
+      : "/api/apps";
 
   try {
-    const res = await fetch(url);
+    const res = await fetch(API_URL);
     const data = await res.json();
 
-    allApps = data.apps || [];
+    console.log("DEBUG API response:", data);
 
-    if (data.generatedAt) {
-      const d = new Date(data.generatedAt);
-      lastUpdatedEl.textContent = `Last updated: ${d.toLocaleString()}`;
+    // ✅ FIX: Extract the array correctly
+    const allApps = Array.isArray(data.apps) ? data.apps : [];
+
+    if (!allApps.length) {
+      console.warn("⚠️ No apps found in response.");
     }
 
-    setLoading(false);
-    renderApps();
+    renderApps(allApps);
   } catch (err) {
-    console.log("❌ Error loading apps:", err);
-    setLoading(false);
-    setEmpty(true);
+    console.error("❌ Error loading apps:", err);
   }
 }
+
 
 async function refreshApps() {
   refreshBtn.disabled = true;

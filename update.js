@@ -1,7 +1,7 @@
 import { parseStringPromise } from "xml2js";
 
 // External feed list
-const FEEDS_URL = "https://app-testing-hub.vercel.app/feeds.json";
+const FEEDS_URL = "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/feeds.json";
 
 /* ------------------------------
    Load Approved Feeds
@@ -60,7 +60,7 @@ export async function updateAllFeeds() {
 
     let xml;
     try {
-      xml = await fetch(url).then(r => r.text());
+      xml = await fetch(url + "?t=" + Date.now()).then(r => r.text());
     } catch (err) {
       console.log("❌ Fetch error:", err);
       continue;
