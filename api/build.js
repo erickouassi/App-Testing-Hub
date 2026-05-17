@@ -1,34 +1,27 @@
 // api/build.js
 
-import { updateAllFeeds } from "../backend/aggregator.js";
-import fs from "node:fs";
-import path from "node:path";
+import { updateAllFeeds } from "../update.js";
 
 export default async function handler(req, res) {
-  try {
-    // Load feeds.json
-    const feedsPath = path.join(process.cwd(), "backend", "feeds.json");
-    const feedsData = JSON.parse(fs.readFileSync(feedsPath, "utf8"));
-    const FEEDS = feedsData.feeds;
+  // ✅ Allow cross‑origin requests for local testing
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-    // Process feeds
-    const apps = await updateAllFeeds(FEEDS);
+  try {
+    const apps = await updateAllFeeds();
 
     const output = {
       generatedAt: new Date().toISOString(),
       apps
     };
 
-    // Convert to string
-    const jsonString = JSON.stringify(output, null, 2);
-
-    // Commit to GitHub
+    const token = process.env.GITHUB_TOKEN;
     const repoOwner = "erickouassi";
     const repoName = "App-Testing-Hub";
-    const filePath = "data/apps.json";
-    const token = process.env.GITHUB_TOKEN;
+    const filePath = "apps.json";
 
-    // Get existing file SHA (required for updates)
+    // Get existing file SHA
     const existing = await fetch(
       `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`,
       {
@@ -51,18 +44,14 @@ export default async function handler(req, res) {
           Accept: "application/vnd.github+json"
         },
         body: JSON.stringify({
-          message: "Update apps.json via Vercel cron",
-          content: Buffer.from(jsonString).toString("base64"),
+          message: "Update apps.json",
+          content: Buffer.from(JSON.stringify(output, null, 2)).toString("base64"),
           sha
         })
       }
     ).then(r => r.json());
 
-    return res.status(200).json({
-      success: true,
-      committed: true,
-      githubResponse: commitRes
-    });
+    return res.status(200).json({ success: true, commitRes });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
