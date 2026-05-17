@@ -19,13 +19,18 @@ export async function updateAllFeeds() {
     console.log("🟣 XML length:", xml.length);
     console.log("🟣 First 200 chars of XML:\n", xml.substring(0, 200));
 
-    // Convert XML → JS object
     let json;
     try {
       json = await parseStringPromise(xml, {
         explicitArray: false,
         mergeAttrs: true,
-        tagNameProcessors: [name => name.replace("app:", "").replace("dev:", "").replace("social:", "")]
+        tagNameProcessors: [
+          name =>
+            name
+              .replace("app:", "")
+              .replace("dev:", "")
+              .replace("social:", "")
+        ]
       });
     } catch (err) {
       console.log("❌ XML parse error:", err);
@@ -34,26 +39,51 @@ export async function updateAllFeeds() {
 
     console.log("🟡 Parsed JSON:", JSON.stringify(json).substring(0, 300));
 
-    // Navigate to rss.channel.item
     const item = json?.rss?.channel?.item;
     if (!item) {
       console.log("❌ No <item> found in feed");
       continue;
     }
 
-    const title = item.title || "";
-    const description = item.description || "";
-    const platform = item.platform || "";
-    const version = item.version || "";
+   const title = item.title || "";
+const description = item.description || "";
+const platform = item.platform || "";
+const version = item.version || "";
+const testLink = item.testLink || "";
+const groupLink = item.groupLink || "";
 
-    console.log("🟢 Extracted:", { title, description, platform, version });
+const slug = title
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, "-")
+  .replace(/^-|-$/g, "");
 
-    apps.push({ title, description, platform, version });
+console.log("🟢 Extracted:", {
+  title,
+  description,
+  platform,
+  version,
+  groupLink,
+  testLink,
+  slug
+});
+
+apps.push({
+  title,
+  description,
+  platform,
+  version,
+  groupLink,
+  testLink,
+  slug
+});
+
+
   }
 
   console.log("✅ Final apps:", apps);
   return apps;
 }
+
 
 
 /*export async function updateAllFeeds() {

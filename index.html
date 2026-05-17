@@ -1,47 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>App Testing Hub</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; background: #111; color: #eee; }
-    .app { padding: 12px; margin-bottom: 10px; background: #222; border-radius: 8px; }
-    .title { font-size: 1.1rem; font-weight: bold; }
-    .meta { font-size: 0.85rem; color: #aaa; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <header class="header">
+    <div class="header-top">
+      <div>
+        <div class="logo">App Testing Hub</div>
+        <div class="subtitle">Curated Google Closed Testing campaigns</div>
+      </div>
+      <div class="header-meta">
+        <span id="last-updated">Last updated: —</span>
+        <button id="refresh-btn" class="btn btn-primary">🔄 Refresh apps</button>
+      </div>
+    </div>
+  </header>
 
-<h1>App Testing Hub</h1>
-<div id="apps">Loading…</div>
+  <main class="main">
+    <aside class="filters">
+      <div class="filters-title">
+        Filters <span id="apps-count-label">(0 apps)</span>
+      </div>
 
-<script>
-async function loadApps() {
-  const API_BASE =
-    location.hostname === "127.0.0.1" || location.hostname === "localhost"
-      ? "https://app-testing-hub.vercel.app"
-      : "";
+      <div class="filter-group">
+        <div class="filter-label">Platform</div>
+        <div class="filter-chips" id="platform-filters">
+          <button class="filter-chip active" data-platform="all">All</button>
+          <button class="filter-chip" data-platform="Android">Android</button>
+          <button class="filter-chip" data-platform="iOS">iOS</button>
+          <button class="filter-chip" data-platform="Web">Web</button>
+        </div>
+      </div>
+    </aside>
 
-  const res = await fetch(`${API_BASE}/api/apps`);
-  const data = await res.json();
+    <section>
+      <div id="apps-loading" class="loading">Loading apps…</div>
+      <div id="apps-empty" class="empty hidden">No apps found for this filter.</div>
+      <div id="apps-container" class="apps-container"></div>
+    </section>
+  </main>
 
-  const container = document.getElementById("apps");
-  container.innerHTML = "";
+  <footer class="footer">
+    Built for Google Closed Testing • App Testing Hub
+  </footer>
 
-  data.apps.forEach(app => {
-    const div = document.createElement("div");
-    div.className = "app";
-    div.innerHTML = `
-      <div class="title">${app.title}</div>
-      <div class="meta">${app.platform} • ${app.version}</div>
-      <div>${app.description}</div>
-    `;
-    container.appendChild(div);
-  });
-}
+  <!-- Details modal -->
+  <div id="details-modal" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
 
-loadApps();
-</script>
-
+  <script src="app.js"></script>
 </body>
 </html>
