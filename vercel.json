@@ -1,18 +1,9 @@
 {
   "version": 2,
-  "name": "app-testing-hub",
   "builds": [
-    { "src": "api/*.js", "use": "@vercel/node" },
-    { "src": "frontend/**/*", "use": "@vercel/static" }
+    { "src": "api/*.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1.js" },
-    { "src": "/(.*)", "dest": "/frontend/index.html" }
-  ],
-  "crons": [
-    {
-      "path": "/api/build",
-      "schedule": "0 */6 * * *"
-    }
+    { "src": "/api/(.*)", "dest": "/api/$1.js" }
   ]
 }
