@@ -1,15 +1,15 @@
 // api/apps.js
 
-import path from "node:path";
-import fs from "node:fs";
+export default async function handler(req, res) {
+  try {
+    const url =
+      "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/data/apps.json";
 
-export default function handler(req, res) {
-  const filePath = path.join(process.cwd(), "data", "apps.json");
+    const response = await fetch(url);
+    const json = await response.json();
 
-  if (!fs.existsSync(filePath)) {
+    return res.status(200).json(json);
+  } catch (err) {
     return res.status(200).json({ apps: [] });
   }
-
-  const json = JSON.parse(fs.readFileSync(filePath, "utf8"));
-  return res.status(200).json(json);
 }
