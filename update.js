@@ -7,7 +7,7 @@ async function getApprovedFeeds() {
   try {
     const res = await fetch(FEEDS_URL);
     const data = await res.json();
-    console.log("✅ [update.js] Feeds found:", data.approvedFeeds?.length || 0);
+    console.log("✅ [update.js] Approved feeds:", data.approvedFeeds?.length || 0);
     return data.approvedFeeds || [];
   } catch (err) {
     console.error("❌ [update.js] Error loading feeds.json:", err);
@@ -33,39 +33,42 @@ export async function updateAllFeeds() {
     console.log(`\n🔄 Processing feed: ${url}`);
     try {
       const xml = await fetch(url + "?t=" + Date.now()).then(r => r.text());
-      console.log(`📄 XML fetched (${xml.length} chars)`);
+      console.log(`📄 XML length: ${xml.length} chars`);
 
       const json = await parseStringPromise(xml, {
         explicitArray: false,
         mergeAttrs: true,
         normalizeTags: true,
-        tagNameProcessors: [name => name.replace(/^(app|dev|social):/, "")],
-        attrNameProcessors: [name => name.replace(/^(app|dev|social):/, "")]
+        tagNameProcessors: [(name) => name.replace(/^(app|dev|social):/, "").toLowerCase()],
+        attrNameProcessors: [(name) => name.replace(/^(app|dev|social):/, "")]
       });
 
-      const channel = json?.rss?.channel;
+      const channel = json?.rss?.channel || json?.rss?.rss?.channel;
       if (!channel) {
-        console.warn("⚠️ No <channel> found");
+        console.warn("⚠️ No channel found in XML");
         continue;
       }
 
-      const items = Array.isArray(channel.item) ? channel.item : channel.item ? [channel.item] : [];
-      console.log(`📋 Found ${items.length} <item>s`);
+      let items = channel.item;
+      if (!Array.isArray(items)) items = items ? [items] : [];
+      console.log(`📋 Found ${items.length} items`);
 
       for (const item of items) {
-        // Extract fields with fallback for namespaced versions
-        const title = item.title || "Unknown App";
+        const title = (item.title || "Unknown App").toString().trim();
+
+        // Deep namespace fallback extraction
+        const getField = (key) => {
+          return item[key] || 
+                 item[`app:${key}`] || 
+                 item[key.toLowerCase()] || 
+                 "";
+        };
+
+        const platform = getField("platform").toString().toLowerCase();
+        if (platform && !platform.includes("android")) continue;
+
         const pubDate = item.pubDate || new Date().toISOString();
-
-        // Platform check
-        let platform = (item.platform || "").toString().toLowerCase();
-        if (!platform) platform = (item["app:platform"] || "").toString().toLowerCase();
-        if (platform && platform !== "android") continue;
-
-        const testingDuration = parseInt(
-          item.testingDuration || item["app:testingDuration"] || "14", 10
-        );
-
+        const testingDuration = parseInt(getField("testingDuration") || "14", 10);
         const daysInTesting = countDaysSince(pubDate);
         const daysLeft = Math.max(0, testingDuration - daysInTesting);
 
@@ -77,30 +80,30 @@ export async function updateAllFeeds() {
         const appData = {
           slug,
           title,
-          description: item.description?._ || item.description || "",
+          description: (item.description?._ || item.description || "").toString().trim(),
           platform: "Android",
-          version: item.version || item["app:version"] || "1.0.0",
-          groupLink: item.groupLink || item["app:groupLink"] || "",
-          testLink: item.testLink || item["app:testLink"] || "",
+          version: getField("version") || "1.0.0",
+          groupLink: getField("groupLink") || getField("grouplink"),
+          testLink: getField("testLink") || getField("testlink"),
           pubDate,
           testingDuration,
           daysInTesting,
           daysLeft,
-          status: item.status || item["app:status"] || (daysLeft > 0 ? "open-testing" : "testing-completed"),
+          status: getField("status") || (daysLeft > 0 ? "open-testing" : "testing-completed"),
           languages: extractArray(item.languages || item["app:languages"]),
           countries: extractArray(item.countries || item["app:countries"]),
           requirements: extractArray(item.requirements || item["app:requirements"])
         };
 
-        console.log(`✅ Parsed app: ${appData.title}`);
+        console.log(`✅ Successfully parsed: ${appData.title}`);
         apps.push(appData);
       }
     } catch (err) {
-      console.error(`❌ Failed to process ${url}:`, err.message);
+      console.error(`❌ Failed processing ${url}:`, err.message);
     }
   }
 
-  console.log(`🎉 Total apps successfully parsed: ${apps.length}`);
+  console.log(`🎉 TOTAL APPS PARSED: ${apps.length}`);
   
   return {
     generatedAt: new Date().toISOString(),
@@ -111,11 +114,10 @@ export async function updateAllFeeds() {
 function extractArray(field) {
   if (!field) return [];
   if (Array.isArray(field)) return field;
-  if (typeof field === "string") return [field];
+  if (typeof field === "string") return field.split(",").map(s => s.trim()).filter(Boolean);
 
-  // Handle nested XML arrays like <app:languages><app:language>...
-  const possibleArrays = ['language', 'requirement', 'country'];
-  for (const key of possibleArrays) {
+  // Handle nested <language>, <requirement>, etc.
+  for (const key of ['language', 'requirement', 'country']) {
     if (field[key]) {
       const val = field[key];
       return Array.isArray(val) ? val : [val].filter(Boolean);
