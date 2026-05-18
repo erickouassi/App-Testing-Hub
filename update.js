@@ -1,25 +1,20 @@
 import { parseStringPromise } from "xml2js";
 
-const FEEDS_URL =
-  "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/feeds.json";
+const FEEDS_URL = "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/feeds.json";
 
-/* ---------------------------------------
-   Load Approved Feeds
---------------------------------------- */
 async function getApprovedFeeds() {
+  console.log("🔍 [update.js] Fetching approved feeds...");
   try {
     const res = await fetch(FEEDS_URL);
     const data = await res.json();
+    console.log("✅ [update.js] Feeds found:", data.approvedFeeds?.length || 0);
     return data.approvedFeeds || [];
   } catch (err) {
-    console.error("❌ Error loading feeds.json:", err);
+    console.error("❌ [update.js] Error loading feeds.json:", err);
     return [];
   }
 }
 
-/* ---------------------------------------
-   Helpers
---------------------------------------- */
 function countDaysSince(pubDate) {
   if (!pubDate) return 0;
   const published = new Date(pubDate);
@@ -28,110 +23,103 @@ function countDaysSince(pubDate) {
   return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
 }
 
-/* ---------------------------------------
-   MAIN: updateAllFeeds()
---------------------------------------- */
 export async function updateAllFeeds() {
+  console.log("🚀 [update.js] Starting updateAllFeeds...");
+
   const feeds = await getApprovedFeeds();
   const apps = [];
 
   for (const url of feeds) {
+    console.log(`\n🔄 Processing feed: ${url}`);
     try {
-      const xml = await fetch(url + "?t=" + Date.now()).then((r) => r.text());
+      const xml = await fetch(url + "?t=" + Date.now()).then(r => r.text());
+      console.log(`📄 XML fetched (${xml.length} chars)`);
 
       const json = await parseStringPromise(xml, {
-        explicitArray: true, // force arrays for repeated tags
+        explicitArray: false,
         mergeAttrs: true,
-        tagNameProcessors: [(name) => name.replace(/^(app|dev|social):/, "")]
+        normalizeTags: true,
+        tagNameProcessors: [name => name.replace(/^(app|dev|social):/, "")],
+        attrNameProcessors: [name => name.replace(/^(app|dev|social):/, "")]
       });
 
-      /* ---------------------------------------
-         Extract developer metadata
-      --------------------------------------- */
-      const dev = json?.rss?.channel?.developer?.[0] || {};
-      const developer = {
-        name: dev.name?.[0] || "Unknown Developer",
-        email: dev.email?.[0] || "",
-        website: dev.website?.[0] || "",
-        socials: {
-          reddit: dev.links?.[0]?.reddit?.[0] || "",
-          facebook: dev.links?.[0]?.facebook?.[0] || "",
-          github: dev.links?.[0]?.github?.[0] || "",
-          discord: dev.links?.[0]?.discord?.[0] || "",
-          twitter: dev.links?.[0]?.twitter?.[0] || "",
-          youtube: dev.links?.[0]?.youtube?.[0] || ""
-        }
-      };
+      const channel = json?.rss?.channel;
+      if (!channel) {
+        console.warn("⚠️ No <channel> found");
+        continue;
+      }
 
-      /* ---------------------------------------
-         Extract <item> nodes safely
-      --------------------------------------- */
-      const items = (json?.rss?.channel?.item || []).filter(
-        (i) => i && typeof i === "object" && i.title
-      );
+      const items = Array.isArray(channel.item) ? channel.item : channel.item ? [channel.item] : [];
+      console.log(`📋 Found ${items.length} <item>s`);
 
-      /* ---------------------------------------
-         Process each app item
-      --------------------------------------- */
       for (const item of items) {
-        const platformRaw = String(item.platform?.[0] || "").toLowerCase();
-        if (platformRaw !== "android") continue;
+        // Extract fields with fallback for namespaced versions
+        const title = item.title || "Unknown App";
+        const pubDate = item.pubDate || new Date().toISOString();
 
-        const title = item.title?.[0] || "Unknown App";
-        const pubDate = item.pubDate?.[0] || new Date().toISOString();
-        const testingDuration = parseInt(item.testingDuration?.[0] || "14", 10);
+        // Platform check
+        let platform = (item.platform || "").toString().toLowerCase();
+        if (!platform) platform = (item["app:platform"] || "").toString().toLowerCase();
+        if (platform && platform !== "android") continue;
+
+        const testingDuration = parseInt(
+          item.testingDuration || item["app:testingDuration"] || "14", 10
+        );
+
         const daysInTesting = countDaysSince(pubDate);
         const daysLeft = Math.max(0, testingDuration - daysInTesting);
 
-        /* ---------------------------------------
-           Description (handles CDATA + multiline)
-        --------------------------------------- */
-        const description =
-          typeof item.description?.[0] === "string"
-            ? item.description[0].trim()
-            : item.description?.[0]?._?.trim() || "";
+        const slug = title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, "") || `app-${Date.now()}`;
 
-        /* ---------------------------------------
-           Arrays: requirements, languages, countries
-        --------------------------------------- */
-        const requirements = item.requirements?.[0]?.requirement || [];
-        const languages = item.languages?.[0]?.language || [];
-        const countries = item.countries?.[0]?.country || [];
-
-        /* ---------------------------------------
-           Final App Object
-        --------------------------------------- */
-        apps.push({
+        const appData = {
+          slug,
           title,
-          description,
+          description: item.description?._ || item.description || "",
           platform: "Android",
-          version: item.version?.[0] || "1.0.0",
-          groupLink: item.groupLink?.[0] || "",
-          testLink: item.testLink?.[0] || "",
+          version: item.version || item["app:version"] || "1.0.0",
+          groupLink: item.groupLink || item["app:groupLink"] || "",
+          testLink: item.testLink || item["app:testLink"] || "",
           pubDate,
           testingDuration,
           daysInTesting,
           daysLeft,
-          status:
-            item.status?.[0] ||
-            (daysLeft > 0 ? "open-testing" : "testing-completed"),
-          slug: title
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-|-$/g, ""),
-          requirements,
-          languages,
-          countries,
-          developer
-        });
+          status: item.status || item["app:status"] || (daysLeft > 0 ? "open-testing" : "testing-completed"),
+          languages: extractArray(item.languages || item["app:languages"]),
+          countries: extractArray(item.countries || item["app:countries"]),
+          requirements: extractArray(item.requirements || item["app:requirements"])
+        };
+
+        console.log(`✅ Parsed app: ${appData.title}`);
+        apps.push(appData);
       }
     } catch (err) {
-      console.error(`❌ Skip feed ${url}:`, err);
+      console.error(`❌ Failed to process ${url}:`, err.message);
     }
   }
 
+  console.log(`🎉 Total apps successfully parsed: ${apps.length}`);
+  
   return {
     generatedAt: new Date().toISOString(),
-    apps
+    apps: apps
   };
+}
+
+function extractArray(field) {
+  if (!field) return [];
+  if (Array.isArray(field)) return field;
+  if (typeof field === "string") return [field];
+
+  // Handle nested XML arrays like <app:languages><app:language>...
+  const possibleArrays = ['language', 'requirement', 'country'];
+  for (const key of possibleArrays) {
+    if (field[key]) {
+      const val = field[key];
+      return Array.isArray(val) ? val : [val].filter(Boolean);
+    }
+  }
+  return [];
 }
