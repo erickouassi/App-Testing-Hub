@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-05-18T05:19:34.436Z",
+  "generatedAt": "2026-05-18T05:26:43.122Z",
   "apps": {
-    "generatedAt": "2026-05-18T05:19:34.436Z",
+    "generatedAt": "2026-05-18T05:26:43.122Z",
     "apps": [
       {
         "slug": "daily-rosary",
         "title": "Daily Rosary",
-        "description": "\r\n        A peaceful Rosary prayer app seeking Android testers for a 14‑day install requirement.\r\n      ",
+        "description": "A peaceful Rosary prayer app seeking Android testers for a 14‑day install requirement.",
         "platform": "Android",
         "version": "1.0.0",
-        "groupLink": "",
-        "testLink": "",
-        "pubDate": "2026-05-18T05:19:34.369Z",
-        "testingDuration": 14,
+        "groupLink": "https://groups.google.com/g/daily-rosary-beta-testers",
+        "testLink": "https://play.google.com/apps/testing/com.erickouassi.dailyrosary",
+        "pubDate": "2026-05-18T05:26:43.078Z",
+        "testingDuration": 25,
         "daysInTesting": 0,
-        "daysLeft": 14,
+        "daysLeft": 25,
         "status": "open-testing",
         "languages": [
           "English",
@@ -34,42 +34,15 @@
       {
         "slug": "le-rosaire-du-jour",
         "title": "Le Rosaire du Jour",
-        "description": "\r\n        Version française du Rosaire quotidien, avec audio, mystère du jour automatique et suivi de prière.\r\n      ",
+        "description": "Version française du Rosaire quotidien, avec audio, mystère du jour automatique et suivi de prière.",
         "platform": "Android",
         "version": "1.0.0",
-        "groupLink": "",
-        "testLink": "",
-        "pubDate": "2026-05-18T05:19:34.370Z",
-        "testingDuration": 14,
+        "groupLink": "https://groups.google.com/g/le-rosaire-du-jour-beta-testers",
+        "testLink": "https://play.google.com/apps/testing/com.erickouassi.lerosaire.dailyrosary",
+        "pubDate": "2026-05-18T05:26:43.119Z",
+        "testingDuration": 25,
         "daysInTesting": 0,
-        "daysLeft": 14,
-        "status": "open-testing",
-        "languages": [
-          "French"
-        ],
-        "countries": [
-          "Cote D'Ivoire",
-          "France",
-          "Canada",
-          "United States"
-        ],
-        "requirements": [
-          "Connexion Internet",
-          "Navigateur moderne"
-        ]
-      },
-      {
-        "slug": "le-rosaire-du-jour",
-        "title": "Le Rosaire du Jour",
-        "description": "\r\n        Version française du Rosaire quotidien, avec audio, mystère du jour automatique et suivi de prière.\r\n      ",
-        "platform": "Android",
-        "version": "1.0.0",
-        "groupLink": "",
-        "testLink": "",
-        "pubDate": "2026-05-18T05:19:34.436Z",
-        "testingDuration": 14,
-        "daysInTesting": 0,
-        "daysLeft": 14,
+        "daysLeft": 25,
         "status": "open-testing",
         "languages": [
           "French"
