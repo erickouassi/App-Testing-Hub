@@ -1,36 +1,25 @@
 {
-  "generatedAt": "2026-05-18T02:13:08.860Z",
+  "generatedAt": "2026-05-18T02:26:33.258Z",
   "apps": {
-    "generatedAt": "2026-05-18T02:13:08.860Z",
+    "generatedAt": "2026-05-18T02:26:33.258Z",
     "apps": [
       {
-        "title": "Daily Rosary",
-        "description": "\r\n        A peaceful Rosary prayer app seeking Android testers for a 14‑day install requirement.\r\n      ",
+        "title": "",
+        "description": "",
         "platform": "Android",
-        "version": "1.0.0",
-        "groupLink": "https://groups.google.com/g/daily-rosary-beta-testers",
-        "testLink": "https://play.google.com/apps/testing/com.erickouassi.dailyrosary",
-        "pubDate": "Mon, 04 May 2026 09:00:00 -0500",
-        "testingDuration": 25,
-        "daysInTesting": 13,
-        "daysLeft": 12,
-        "status": "open-testing",
-        "groupMembers": 40,
-        "slug": "daily-rosary",
-        "languages": [
-          "English",
-          "French"
-        ],
-        "countries": [
-          "United States",
-          "Canada",
-          "France"
-        ],
-        "requirements": [
-          "Android phone",
-          "Google account",
-          "Keep installed 14 days +"
-        ]
+        "version": "",
+        "groupLink": "",
+        "testLink": "",
+        "pubDate": "",
+        "testingDuration": 14,
+        "daysInTesting": 0,
+        "daysLeft": 14,
+        "status": "not-started",
+        "groupMembers": 0,
+        "slug": "",
+        "languages": [],
+        "countries": [],
+        "requirements": []
       }
     ]
   }
