@@ -15,7 +15,6 @@ async function getApprovedFeeds() {
   }
 }
 
-// ✅ BEST VERSION - Reliable date calculation
 function countDaysSince(pubDate) {
   if (!pubDate) return 1;
 
@@ -27,15 +26,11 @@ function countDaysSince(pubDate) {
     }
 
     const now = new Date();
-
-    // Calculate days passed (simple and reliable method)
     const diffTime = now.getTime() - published.getTime();
     const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-    // Day 1 on the first day
     const daysInTesting = Math.max(1, daysPassed + 1);
 
-    console.log(`📅 [countDaysSince] ${pubDate} → Day ${daysInTesting} (passed: ${daysPassed})`);
+    console.log(`📅 [countDaysSince] ${pubDate} → Day ${daysInTesting}`);
     return daysInTesting;
   } catch (e) {
     console.error("❌ Date parsing error:", e);
@@ -77,13 +72,23 @@ export async function updateAllFeeds() {
         const title = (item.title || "Unknown App").toString().trim();
 
         const getField = (key) => {
-          return item[key] || item[`app:${key}`] || item[key.toLowerCase()] || "";
+          return item[key] || 
+                 item[`app:${key}`] || 
+                 item[key.toLowerCase()] || 
+                 "";
         };
 
         const platform = getField("platform").toString().toLowerCase();
         if (platform && !platform.includes("android")) continue;
 
-        const pubDate = item.pubDate || new Date().toISOString();
+        // ✅ Improved pubDate extraction
+        let pubDate = item.pubDate || item["pubdate"] || item["dc:date"] || new Date().toISOString();
+        
+        // If it's an object (xml2js sometimes wraps text), extract the text
+        if (typeof pubDate === 'object' && pubDate._) {
+          pubDate = pubDate._;
+        }
+
         const testingDuration = parseInt(getField("testingDuration") || "14", 10);
         const daysInTesting = countDaysSince(pubDate);
         const daysLeft = Math.max(0, testingDuration - daysInTesting);
@@ -111,7 +116,7 @@ export async function updateAllFeeds() {
           requirements: extractArray(item.requirements || item["app:requirements"])
         };
 
-        console.log(`✅ Parsed: ${appData.title} → Day ${daysInTesting} of ${testingDuration}`);
+        console.log(`✅ Parsed: ${appData.title} | pubDate: ${pubDate} → Day ${daysInTesting}`);
         apps.push(appData);
       }
     } catch (err) {
