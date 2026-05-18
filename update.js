@@ -15,14 +15,12 @@ async function getApprovedFeeds() {
   }
 }
 
-// ✅ FIXED: Returns "Day 1 of X" correctly
+// ✅ BEST VERSION - Reliable date calculation
 function countDaysSince(pubDate) {
   if (!pubDate) return 1;
 
   try {
-    // Parse the RSS date format properly
     const published = new Date(pubDate);
-    
     if (isNaN(published.getTime())) {
       console.warn("⚠️ Invalid pubDate:", pubDate);
       return 1;
@@ -30,17 +28,17 @@ function countDaysSince(pubDate) {
 
     const now = new Date();
 
-    // Calculate full days between dates (ignoring time)
+    // Calculate days passed (simple and reliable method)
     const diffTime = now.getTime() - published.getTime();
-    let daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    // Convert to "Day N" (first day = Day 1)
+    // Day 1 on the first day
     const daysInTesting = Math.max(1, daysPassed + 1);
 
-    console.log(`📅 [countDaysSince] ${pubDate} → ${daysInTesting} days in testing (passed: ${daysPassed})`);
+    console.log(`📅 [countDaysSince] ${pubDate} → Day ${daysInTesting} (passed: ${daysPassed})`);
     return daysInTesting;
   } catch (e) {
-    console.error("❌ Date parsing error for", pubDate, e);
+    console.error("❌ Date parsing error:", e);
     return 1;
   }
 }
@@ -79,10 +77,7 @@ export async function updateAllFeeds() {
         const title = (item.title || "Unknown App").toString().trim();
 
         const getField = (key) => {
-          return item[key] || 
-                 item[`app:${key}`] || 
-                 item[key.toLowerCase()] || 
-                 "";
+          return item[key] || item[`app:${key}`] || item[key.toLowerCase()] || "";
         };
 
         const platform = getField("platform").toString().toLowerCase();
@@ -116,7 +111,7 @@ export async function updateAllFeeds() {
           requirements: extractArray(item.requirements || item["app:requirements"])
         };
 
-        console.log(`✅ Successfully parsed: ${appData.title} (Day ${daysInTesting})`);
+        console.log(`✅ Parsed: ${appData.title} → Day ${daysInTesting} of ${testingDuration}`);
         apps.push(appData);
       }
     } catch (err) {
