@@ -17,10 +17,23 @@ async function getApprovedFeeds() {
 
 function countDaysSince(pubDate) {
   if (!pubDate) return 0;
+
+  console.log(`📅 Calculating days since: ${pubDate}`);
+
   const published = new Date(pubDate);
   const now = new Date();
-  const diff = now - published;
-  return Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+
+  // Handle invalid dates
+  if (isNaN(published.getTime())) {
+    console.warn("⚠️ Invalid pubDate:", pubDate);
+    return 0;
+  }
+
+  const diffTime = now - published;
+  const days = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+
+  console.log(`📅 Result: ${days} days in testing`);
+  return days;
 }
 
 export async function updateAllFeeds() {
