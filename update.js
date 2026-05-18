@@ -19,19 +19,36 @@ async function getApprovedFeeds() {
 function countDaysSince(pubDate) {
   if (!pubDate) return 0;
 
-  const published = new Date(pubDate);
-  const now = new Date();
+  try {
+    const published = new Date(pubDate);
+    const now = new Date();
 
-  if (isNaN(published.getTime())) {
-    console.warn("⚠️ Invalid pubDate:", pubDate);
+    if (isNaN(published.getTime())) {
+      console.warn("⚠️ Invalid pubDate:", pubDate);
+      return 0;
+    }
+
+    // Use UTC to avoid timezone edge cases
+    const publishedUTC = Date.UTC(
+      published.getUTCFullYear(),
+      published.getUTCMonth(),
+      published.getUTCDate()
+    );
+    const nowUTC = Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate()
+    );
+
+    const diffTime = nowUTC - publishedUTC;
+    const days = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+
+    console.log(`📅 [countDaysSince] ${pubDate} → ${days} days in testing`);
+    return days;
+  } catch (e) {
+    console.error("❌ Date parsing error:", e);
     return 0;
   }
-
-  const diffTime = now - published;
-  const days = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
-  
-  console.log(`📅 [countDaysSince] ${pubDate} → ${days} days`);
-  return days;
 }
 
 export async function updateAllFeeds() {

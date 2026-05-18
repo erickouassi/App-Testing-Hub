@@ -105,11 +105,43 @@ function joinTest(app) {
 --------------------------------------- */
 function formatDaysLabel(app) {
   const { daysInTesting = 0, daysLeft = 0, testingDuration = 0 } = app;
-  if (testingDuration > 0) {
-    return `Testing: ${daysInTesting} day${daysInTesting === 1 ? "" : "s"} in • ${daysLeft} day${daysLeft === 1 ? "" : "s"} left (${testingDuration} total)`;
+
+  if (daysInTesting === 0) {
+    return `Testing: Just started • ${daysLeft} day${daysLeft === 1 ? '' : 's'} left (${testingDuration} total)`;
   }
-  return `Testing: ${daysInTesting} day${daysInTesting === 1 ? "" : "s"} in`;
+
+  if (testingDuration > 0) {
+    return `Testing: ${daysInTesting} day${daysInTesting === 1 ? '' : 's'} in • ${daysLeft} day${daysLeft === 1 ? '' : 's'} left (${testingDuration} total)`;
+  }
+
+  return `Testing: ${daysInTesting} day${daysInTesting === 1 ? '' : 's'} in`;
 }
+
+//
+
+/*
+function countDaysSince(pubDate) {
+  if (!pubDate) return 0;
+
+  console.log(`📅 Calculating days since: ${pubDate}`);
+
+  const published = new Date(pubDate);
+  const now = new Date();
+
+  // Handle invalid dates
+  if (isNaN(published.getTime())) {
+    console.warn("⚠️ Invalid pubDate:", pubDate);
+    return 0;
+  }
+
+  const diffTime = now - published;
+  const days = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+
+  console.log(`📅 Result: ${days} days in testing`);
+  return days;
+} */
+
+//
 
 function statusBadge(app) {
   const slug = app.slug || "";
@@ -204,62 +236,33 @@ async function loadApps() {
       ? "https://app-testing-hub.vercel.app/api/apps"
       : "/api/apps";
 
-  console.log("🌐 [app.js] Fetching from:", API_URL);
-
   try {
     const res = await fetch(API_URL);
-    console.log("📡 [app.js] Response status:", res.status);
-
     const data = await res.json();
-    console.log("📦 [app.js] Full API response:", JSON.stringify(data, null, 2));
 
-    // === DEEP ROBUST PARSING ===
+    // === CLEAN & ROBUST PARSING ===
     let appsList = [];
 
-    console.log("🔍 [app.js] Starting deep parsing...");
-
-    if (data?.apps?.length) {
-      console.log("✅ Path 1: data.apps is array");
+    if (data?.apps?.apps?.length) {
+      appsList = data.apps.apps;           
+    } else if (data?.apps?.length) {
       appsList = data.apps;
-    } 
-    else if (data?.apps?.apps?.length) {
-      console.log("✅ Path 2: data.apps.apps is array (double nested)");
-      appsList = data.apps.apps;
-    } 
-    else if (data?.apps && typeof data.apps === 'object') {
-      console.log("✅ Path 3: data.apps is object → checking inner apps");
-      if (Array.isArray(data.apps.apps)) {
-        appsList = data.apps.apps;
-        console.log("✅ Path 3a: Found inner apps array");
-      } else if (Array.isArray(data.apps)) {
-        appsList = data.apps;
-      }
-    } 
-    else if (Array.isArray(data)) {
-      console.log("✅ Path 4: Root is array");
+    } else if (Array.isArray(data)) {
       appsList = data;
-    } 
-    else {
-      console.warn("⚠️ [app.js] Still unknown structure");
-      console.log("Available keys at root:", Object.keys(data || {}));
-      if (data?.apps) console.log("Keys inside data.apps:", Object.keys(data.apps || {}));
+    } else {
       appsList = [];
     }
 
     allApps = appsList;
-    console.log(`✅ [app.js] Successfully loaded ${allApps.length} apps`);
-
-    if (allApps.length === 0) {
-      console.warn("⚠️ No apps loaded — check update.js on the server");
-    }
+    console.log(`✅ Successfully loaded ${allApps.length} apps`);
 
     renderApps();
   } catch (err) {
-    console.error("❌ [app.js] Error loading apps:", err);
+    console.error("❌ Error loading apps:", err);
     setEmpty(true);
   } finally {
     setLoading(false);
-    console.log("🏁 [app.js] loadApps() completed");
+    console.log("🏁 loadApps() completed");
   }
 }
 /* ---------------------------------------
