@@ -20,32 +20,27 @@ function countDaysSince(pubDate) {
   if (!pubDate) return 1;
 
   try {
+    // Parse the RSS date format properly
     const published = new Date(pubDate);
-    const now = new Date();
-
+    
     if (isNaN(published.getTime())) {
       console.warn("⚠️ Invalid pubDate:", pubDate);
       return 1;
     }
 
-    const publishedUTC = Date.UTC(
-      published.getUTCFullYear(),
-      published.getUTCMonth(),
-      published.getUTCDate()
-    );
-    const nowUTC = Date.UTC(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate()
-    );
+    const now = new Date();
 
-    const daysPassed = Math.floor((nowUTC - publishedUTC) / (1000 * 60 * 60 * 24));
-    const daysInTesting = Math.max(1, daysPassed + 1);   // Day 1 on first day
+    // Calculate full days between dates (ignoring time)
+    const diffTime = now.getTime() - published.getTime();
+    let daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    console.log(`📅 [countDaysSince] ${pubDate} → Day ${daysInTesting}`);
+    // Convert to "Day N" (first day = Day 1)
+    const daysInTesting = Math.max(1, daysPassed + 1);
+
+    console.log(`📅 [countDaysSince] ${pubDate} → ${daysInTesting} days in testing (passed: ${daysPassed})`);
     return daysInTesting;
   } catch (e) {
-    console.error("❌ Date parsing error:", e);
+    console.error("❌ Date parsing error for", pubDate, e);
     return 1;
   }
 }
