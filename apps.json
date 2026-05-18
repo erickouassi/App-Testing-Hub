@@ -1,7 +1,90 @@
 {
-  "generatedAt": "2026-05-18T03:39:12.314Z",
+  "generatedAt": "2026-05-18T05:19:34.436Z",
   "apps": {
-    "generatedAt": "2026-05-18T03:39:12.314Z",
-    "apps": []
+    "generatedAt": "2026-05-18T05:19:34.436Z",
+    "apps": [
+      {
+        "slug": "daily-rosary",
+        "title": "Daily Rosary",
+        "description": "\r\n        A peaceful Rosary prayer app seeking Android testers for a 14‑day install requirement.\r\n      ",
+        "platform": "Android",
+        "version": "1.0.0",
+        "groupLink": "",
+        "testLink": "",
+        "pubDate": "2026-05-18T05:19:34.369Z",
+        "testingDuration": 14,
+        "daysInTesting": 0,
+        "daysLeft": 14,
+        "status": "open-testing",
+        "languages": [
+          "English",
+          "French"
+        ],
+        "countries": [
+          "United States",
+          "Canada",
+          "France"
+        ],
+        "requirements": [
+          "Android phone",
+          "Google account",
+          "Keep installed 14 days +"
+        ]
+      },
+      {
+        "slug": "le-rosaire-du-jour",
+        "title": "Le Rosaire du Jour",
+        "description": "\r\n        Version française du Rosaire quotidien, avec audio, mystère du jour automatique et suivi de prière.\r\n      ",
+        "platform": "Android",
+        "version": "1.0.0",
+        "groupLink": "",
+        "testLink": "",
+        "pubDate": "2026-05-18T05:19:34.370Z",
+        "testingDuration": 14,
+        "daysInTesting": 0,
+        "daysLeft": 14,
+        "status": "open-testing",
+        "languages": [
+          "French"
+        ],
+        "countries": [
+          "Cote D'Ivoire",
+          "France",
+          "Canada",
+          "United States"
+        ],
+        "requirements": [
+          "Connexion Internet",
+          "Navigateur moderne"
+        ]
+      },
+      {
+        "slug": "le-rosaire-du-jour",
+        "title": "Le Rosaire du Jour",
+        "description": "\r\n        Version française du Rosaire quotidien, avec audio, mystère du jour automatique et suivi de prière.\r\n      ",
+        "platform": "Android",
+        "version": "1.0.0",
+        "groupLink": "",
+        "testLink": "",
+        "pubDate": "2026-05-18T05:19:34.436Z",
+        "testingDuration": 14,
+        "daysInTesting": 0,
+        "daysLeft": 14,
+        "status": "open-testing",
+        "languages": [
+          "French"
+        ],
+        "countries": [
+          "Cote D'Ivoire",
+          "France",
+          "Canada",
+          "United States"
+        ],
+        "requirements": [
+          "Connexion Internet",
+          "Navigateur moderne"
+        ]
+      }
+    ]
   }
 }
