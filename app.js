@@ -1,7 +1,7 @@
 console.log("🔥 app.js loaded");
 
 /* ---------------------------------------
-   API BASE (local vs production)
+   API BASE
 --------------------------------------- */
 const API_BASE =
   location.hostname === "127.0.0.1" || location.hostname === "localhost"
@@ -26,9 +26,7 @@ const STORAGE_KEY = "testingHubState";
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw
-      ? JSON.parse(raw)
-      : { favorites: {}, likes: {}, joined: {}, completed: {}, saved: {} };
+    return raw ? JSON.parse(raw) : { favorites: {}, likes: {}, joined: {}, completed: {}, saved: {} };
   } catch {
     return { favorites: {}, likes: {}, joined: {}, completed: {}, saved: {} };
   }
@@ -41,7 +39,7 @@ function saveState(state) {
 let userState = loadState();
 
 /* ---------------------------------------
-   GLOBAL APP STATE
+   GLOBAL STATE
 --------------------------------------- */
 let allApps = [];
 let currentActivityFilter = "all";
@@ -86,9 +84,7 @@ function joinTest(app) {
 
   if (testLink) {
     setTimeout(() => {
-      const proceed = confirm(
-        "After joining the Google Group, click OK to open the testing link."
-      );
+      const proceed = confirm("After joining the Google Group, click OK to open the testing link.");
       if (proceed) window.open(testLink, "_blank");
     }, 1200);
   }
@@ -104,44 +100,13 @@ function joinTest(app) {
    LABEL HELPERS
 --------------------------------------- */
 function formatDaysLabel(app) {
-  const { daysInTesting = 0, daysLeft = 0, testingDuration = 0 } = app;
-
-  if (daysInTesting === 0) {
-    return `Testing: Just started • ${daysLeft} day${daysLeft === 1 ? '' : 's'} left (${testingDuration} total)`;
-  }
+  const { daysInTesting = 1, daysLeft = 0, testingDuration = 0 } = app;
 
   if (testingDuration > 0) {
-    return `Testing: ${daysInTesting} day${daysInTesting === 1 ? '' : 's'} in • ${daysLeft} day${daysLeft === 1 ? '' : 's'} left (${testingDuration} total)`;
+    return `Day ${daysInTesting} of ${testingDuration}`;
   }
-
-  return `Testing: ${daysInTesting} day${daysInTesting === 1 ? '' : 's'} in`;
+  return `Day ${daysInTesting} in testing`;
 }
-
-//
-
-/*
-function countDaysSince(pubDate) {
-  if (!pubDate) return 0;
-
-  console.log(`📅 Calculating days since: ${pubDate}`);
-
-  const published = new Date(pubDate);
-  const now = new Date();
-
-  // Handle invalid dates
-  if (isNaN(published.getTime())) {
-    console.warn("⚠️ Invalid pubDate:", pubDate);
-    return 0;
-  }
-
-  const diffTime = now - published;
-  const days = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
-
-  console.log(`📅 Result: ${days} days in testing`);
-  return days;
-} */
-
-//
 
 function statusBadge(app) {
   const slug = app.slug || "";
@@ -175,9 +140,7 @@ function renderApps() {
   });
 
   if (appsCountLabel)
-    appsCountLabel.textContent = `(${filtered.length} app${
-      filtered.length === 1 ? "" : "s"
-    })`;
+    appsCountLabel.textContent = `(${filtered.length} app${filtered.length === 1 ? "" : "s"})`;
 
   if (filtered.length === 0) {
     setEmpty(true);
@@ -198,11 +161,7 @@ function renderApps() {
           <div class="app-meta">Android • v${app.version}</div>
           <div class="app-badges">
             ${statusBadge(app)}
-            ${
-              isFlagged("favorites", slug)
-                ? '<span class="badge">★ Favorite</span>'
-                : ""
-            }
+            ${isFlagged("favorites", slug) ? '<span class="badge">★ Favorite</span>' : ""}
           </div>
         </div>
       </div>
@@ -213,9 +172,7 @@ function renderApps() {
         <div class="app-timing">${formatDaysLabel(app)}</div>
         <div class="app-actions">
           <a href="app.html?slug=${slug}" class="btn btn-ghost">Details</a>
-          <button class="btn btn-primary" onclick='joinTest(${JSON.stringify(
-            app
-          )})'>Join test</button>
+          <button class="btn btn-primary" onclick='joinTest(${JSON.stringify(app)})'>Join test</button>
         </div>
       </div>
     `;
@@ -225,7 +182,7 @@ function renderApps() {
 }
 
 /* ---------------------------------------
-   LOAD APPS FROM API
+   LOAD APPS
 --------------------------------------- */
 async function loadApps() {
   console.log("🚀 [app.js] loadApps() started");
@@ -240,11 +197,10 @@ async function loadApps() {
     const res = await fetch(API_URL);
     const data = await res.json();
 
-    // === CLEAN & ROBUST PARSING ===
     let appsList = [];
 
     if (data?.apps?.apps?.length) {
-      appsList = data.apps.apps;           
+      appsList = data.apps.apps;
     } else if (data?.apps?.length) {
       appsList = data.apps;
     } else if (Array.isArray(data)) {
@@ -265,8 +221,9 @@ async function loadApps() {
     console.log("🏁 loadApps() completed");
   }
 }
+
 /* ---------------------------------------
-   FILTERS
+   FILTERS & REFRESH
 --------------------------------------- */
 activityFilters?.addEventListener("click", (e) => {
   const btn = e.target.closest(".filter-chip");
@@ -281,9 +238,6 @@ activityFilters?.addEventListener("click", (e) => {
   renderApps();
 });
 
-/* ---------------------------------------
-   REFRESH BUTTON
---------------------------------------- */
 refreshBtn?.addEventListener("click", loadApps);
 
 /* ---------------------------------------

@@ -15,9 +15,9 @@ async function getApprovedFeeds() {
   }
 }
 
-// ✅ FIXED: Proper date calculation
+// ✅ FIXED: Returns "Day 1 of X" correctly
 function countDaysSince(pubDate) {
-  if (!pubDate) return 0;
+  if (!pubDate) return 1;
 
   try {
     const published = new Date(pubDate);
@@ -25,10 +25,9 @@ function countDaysSince(pubDate) {
 
     if (isNaN(published.getTime())) {
       console.warn("⚠️ Invalid pubDate:", pubDate);
-      return 0;
+      return 1;
     }
 
-    // Use UTC to avoid timezone edge cases
     const publishedUTC = Date.UTC(
       published.getUTCFullYear(),
       published.getUTCMonth(),
@@ -40,14 +39,14 @@ function countDaysSince(pubDate) {
       now.getUTCDate()
     );
 
-    const diffTime = nowUTC - publishedUTC;
-    const days = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
+    const daysPassed = Math.floor((nowUTC - publishedUTC) / (1000 * 60 * 60 * 24));
+    const daysInTesting = Math.max(1, daysPassed + 1);   // Day 1 on first day
 
-    console.log(`📅 [countDaysSince] ${pubDate} → ${days} days in testing`);
-    return days;
+    console.log(`📅 [countDaysSince] ${pubDate} → Day ${daysInTesting}`);
+    return daysInTesting;
   } catch (e) {
     console.error("❌ Date parsing error:", e);
-    return 0;
+    return 1;
   }
 }
 
@@ -122,7 +121,7 @@ export async function updateAllFeeds() {
           requirements: extractArray(item.requirements || item["app:requirements"])
         };
 
-        console.log(`✅ Successfully parsed: ${appData.title} (${daysInTesting} days in)`);
+        console.log(`✅ Successfully parsed: ${appData.title} (Day ${daysInTesting})`);
         apps.push(appData);
       }
     } catch (err) {
