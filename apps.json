@@ -1,26 +1,7 @@
 {
-  "generatedAt": "2026-05-18T02:48:40.928Z",
+  "generatedAt": "2026-05-18T03:02:44.420Z",
   "apps": {
-    "generatedAt": "2026-05-18T02:48:40.928Z",
-    "apps": [
-      {
-        "title": "",
-        "description": "",
-        "platform": "Android",
-        "version": "",
-        "groupLink": "",
-        "testLink": "",
-        "pubDate": "",
-        "testingDuration": 14,
-        "daysInTesting": 0,
-        "daysLeft": 14,
-        "status": "not-started",
-        "groupMembers": 0,
-        "slug": "",
-        "languages": [],
-        "countries": [],
-        "requirements": []
-      }
-    ]
+    "generatedAt": "2026-05-18T03:02:44.420Z",
+    "apps": []
   }
 }
