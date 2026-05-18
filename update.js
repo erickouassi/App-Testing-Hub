@@ -15,15 +15,13 @@ async function getApprovedFeeds() {
   }
 }
 
+// ✅ FIXED: Proper date calculation
 function countDaysSince(pubDate) {
   if (!pubDate) return 0;
-
-  console.log(`📅 Calculating days since: ${pubDate}`);
 
   const published = new Date(pubDate);
   const now = new Date();
 
-  // Handle invalid dates
   if (isNaN(published.getTime())) {
     console.warn("⚠️ Invalid pubDate:", pubDate);
     return 0;
@@ -31,8 +29,8 @@ function countDaysSince(pubDate) {
 
   const diffTime = now - published;
   const days = Math.max(0, Math.floor(diffTime / (1000 * 60 * 60 * 24)));
-
-  console.log(`📅 Result: ${days} days in testing`);
+  
+  console.log(`📅 [countDaysSince] ${pubDate} → ${days} days`);
   return days;
 }
 
@@ -69,7 +67,6 @@ export async function updateAllFeeds() {
       for (const item of items) {
         const title = (item.title || "Unknown App").toString().trim();
 
-        // Deep namespace fallback extraction
         const getField = (key) => {
           return item[key] || 
                  item[`app:${key}`] || 
@@ -108,7 +105,7 @@ export async function updateAllFeeds() {
           requirements: extractArray(item.requirements || item["app:requirements"])
         };
 
-        console.log(`✅ Successfully parsed: ${appData.title}`);
+        console.log(`✅ Successfully parsed: ${appData.title} (${daysInTesting} days in)`);
         apps.push(appData);
       }
     } catch (err) {
@@ -129,7 +126,6 @@ function extractArray(field) {
   if (Array.isArray(field)) return field;
   if (typeof field === "string") return field.split(",").map(s => s.trim()).filter(Boolean);
 
-  // Handle nested <language>, <requirement>, etc.
   for (const key of ['language', 'requirement', 'country']) {
     if (field[key]) {
       const val = field[key];
