@@ -1,12 +1,9 @@
 console.log("🔥 app.js loaded");
 
 /* ---------------------------------------
-   API BASE (Smart Environment Detection)
+   API BASE (Relative Routing for pure Vercel setups)
 --------------------------------------- */
-const API_BASE = 
-  location.hostname.includes("vercel.app")
-    ? "" 
-    : "https://app-testing-hub.vercel.app";
+const API_BASE = "";
 
 /* ---------------------------------------
    DOM ELEMENTS
