@@ -1,12 +1,9 @@
 console.log("🔥 app-page.js loaded");
 
 /* ---------------------------------------
-   API BASE (local vs production)
+   API BASE (local vs production - FIXED Option 1)
 --------------------------------------- */
-const API_BASE_PAGE =
-  location.hostname === "127.0.0.1" || location.hostname === "localhost"
-    ? "https://app-testing-hub.adminhq.cf"
-    : "";
+const API_BASE_PAGE = "";
 
 /* ---------------------------------------
    DOM + Local Storage
@@ -75,7 +72,7 @@ function joinTestFlow(app) {
 }
 
 /* ---------------------------------------
-   Load App Details Page (Real-time Live Calculations)
+   Load App Details Page
 --------------------------------------- */
 async function loadAppPage() {
   console.log("🚀 [app-page.js] loadAppPage() START");
@@ -92,12 +89,9 @@ async function loadAppPage() {
   container.innerHTML = "<div class='loading'>Loading app details...</div>";
 
   try {
-    const API_URL = 
-      location.hostname === "127.0.0.1" || location.hostname === "localhost"
-        ? `https://app-testing-hub.adminhq.cf/api/apps?t=${Date.now()}`
-        : `/api/apps?t=${Date.now()}`;
-
+    const API_URL = `${API_BASE_PAGE}/api/apps?t=${Date.now()}`;
     const res = await fetch(API_URL);
+
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
     const data = await res.json();
@@ -125,7 +119,7 @@ async function loadAppPage() {
       return;
     }
 
-    // Live Day Calculations evaluated inside client viewport
+    // Dynamic Live Day calculations computed instantly on page parse
     const testingDuration = app.testingDuration ?? 25;
     let liveDaysInTesting = 1;
     let liveDaysLeft = testingDuration;
@@ -136,6 +130,7 @@ async function loadAppPage() {
         const now = new Date();
         now.setHours(0,0,0,0);
         published.setHours(0,0,0,0);
+        
         const diffTime = now.getTime() - published.getTime();
         const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
         liveDaysInTesting = Math.max(1, daysPassed + 1);

@@ -1,12 +1,9 @@
 console.log("🔥 app.js loaded");
 
 /* ---------------------------------------
-   API BASE
+   API BASE (FIXED: Option 1 - Completely Dynamic Relative Routing)
 --------------------------------------- */
-const API_BASE =
-  location.hostname === "127.0.0.1" || location.hostname === "localhost"
-    ? "https://app-testing-hub.adminhq.cf"
-    : "";
+const API_BASE = "";
 
 /* ---------------------------------------
    DOM ELEMENTS
@@ -97,7 +94,7 @@ function joinTest(app) {
 }
 
 /* ---------------------------------------
-   LABEL HELPERS (Dynamic client-side calculation)
+   LABEL HELPERS (FIXED: Dynamic client-side calculation)
 --------------------------------------- */
 function formatDaysLabel(app) {
   const testingDuration = app.testingDuration ?? 25;
@@ -115,14 +112,12 @@ function formatDaysLabel(app) {
 
     const now = new Date();
     
-    // Clear hours to guarantee accurate absolute day spans
+    // Normalize hour bounds to calculate pure relative day splits
     now.setHours(0, 0, 0, 0);
     published.setHours(0, 0, 0, 0);
 
     const diffTime = now.getTime() - published.getTime();
     const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
-    // Testing timeline counts day of publication as Day 1
     const daysInTesting = Math.max(1, daysPassed + 1);
 
     console.log(`🔍 [formatDaysLabel] ${app.title} → Day ${daysInTesting} of ${testingDuration} (Calculated from ${app.pubDate})`);
@@ -145,6 +140,22 @@ function statusBadge(app) {
     case "expired":
       return `<span class="badge badge-status-expired">Expired</span>`;
     default:
+      // Live frontend fallback validation block
+      if (app.pubDate) {
+        const published = new Date(app.pubDate);
+        if (!isNaN(published.getTime())) {
+          const now = new Date();
+          now.setHours(0,0,0,0);
+          published.setHours(0,0,0,0);
+          const diffTime = now.getTime() - published.getTime();
+          const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+          const liveDaysInTesting = Math.max(1, daysPassed + 1);
+          const testingDuration = app.testingDuration ?? 25;
+          if (testingDuration - liveDaysInTesting <= 0) {
+            return `<span class="badge badge-status-completed">Testing completed</span>`;
+          }
+        }
+      }
       return `<span class="badge badge-status-active">Open for testers</span>`;
   }
 }
@@ -206,16 +217,14 @@ function renderApps() {
 }
 
 /* ---------------------------------------
-   LOAD APPS (Dynamic Cross-Origin Cache Busting Routes)
+   LOAD APPS (FIXED: Dynamic Routing Route Payload)
 --------------------------------------- */
 async function loadApps() {
   console.log("🚀 [app.js] loadApps() started");
   setLoading(true);
 
-  const API_URL =
-    location.hostname === "127.0.0.1" || location.hostname === "localhost"
-      ? `https://app-testing-hub.adminhq.cf/api/apps?t=${Date.now()}`
-      : `/api/apps?t=${Date.now()}`;
+  // Option 1 dynamically appends context routes to whatever domain runs the frontend view
+  const API_URL = `${API_BASE}/api/apps?t=${Date.now()}`;
 
   try {
     const res = await fetch(API_URL);

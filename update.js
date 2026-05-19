@@ -7,6 +7,7 @@ async function getApprovedFeeds() {
   try {
     const res = await fetch(FEEDS_URL);
     const data = await res.json();
+    console.log("✅ [update.js] Approved feeds:", data.approvedFeeds?.length || 0);
     return data.approvedFeeds || [];
   } catch (err) {
     console.error("❌ [update.js] Error loading feeds.json:", err);
@@ -30,7 +31,10 @@ function countDaysSince(pubDate) {
 
     const diffTime = now.getTime() - published.getTime();
     const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    return Math.max(1, daysPassed + 1);
+    const daysInTesting = Math.max(1, daysPassed + 1);
+
+    console.log(`📅 [countDaysSince] ${pubDate} → Day ${daysInTesting}`);
+    return daysInTesting;
   } catch (e) {
     return 1;
   }
@@ -74,7 +78,7 @@ export async function updateAllFeeds() {
         const platform = getField("platform").toString().toLowerCase();
         if (platform && !platform.includes("android")) continue;
 
-        // Lookup variations because tag-name processors force lowercase
+        // FIXED: Lowercase XML Tag processor lookup wrapper bypass tracking
         let rawPubDate = item.pubdate || item["dc:date"] || item.pubDate;
         
         if (rawPubDate && typeof rawPubDate === 'object') {
@@ -100,7 +104,7 @@ export async function updateAllFeeds() {
           version: getField("version") || "1.0.0",
           groupLink: getField("groupLink") || getField("grouplink"),
           testLink: getField("testLink") || getField("testlink"),
-          pubDate, 
+          pubDate,
           testingDuration,
           daysInTesting,
           daysLeft,
