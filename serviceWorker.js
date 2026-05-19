@@ -7,11 +7,11 @@ const ASSETS = [
   "/app.js",
   "/app-page.js",
   "/manifest.json",
-  "/img/android-chrome-192x192.png",
-  "/img/android-chrome-192x192-maskable.png",
-  "/img/android-chrome-256x256.png",
-  "/img/android-chrome-512x512.png",
-  "/img/android-chrome-512x512-maskable.png"
+  "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-192x192.png",
+  "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-192x192-maskable.png",
+  "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-256x256.png",
+  "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-512x512.png",
+  "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-512x512-maskable.png"
 ];
 
 // 🧩 INSTALL — Cache platform assets & activate immediately

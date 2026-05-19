@@ -17,31 +17,31 @@
   "background_color": "#F44336",
   "icons": [
     {
-      "src": "/img/android-chrome-192x192.png",
+      "src": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/img/android-chrome-192x192-maskable.png",
+      "src": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-192x192-maskable.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/img/android-chrome-256x256.png",
+      "src": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-256x256.png",
       "sizes": "256x256",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/img/android-chrome-512x512.png",
+      "src": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/img/android-chrome-512x512-maskable.png",
+      "src": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-512x512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -49,14 +49,14 @@
   ],
   "screenshots": [
     {
-      "src": "/img/android-chrome-256x256.png",
+      "src": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-256x256.png",
       "sizes": "256x256",
       "type": "image/png",
       "form_factor": "narrow",
       "label": "App Testing Hub Mobile Dashboard"
     },
     {
-      "src": "/img/android-chrome-512x512.png",
+      "src": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "wide",
@@ -77,7 +77,7 @@
       "url": "/?shortcut=joined",
       "icons": [
         {
-          "src": "/img/android-chrome-192x192.png",
+          "src": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-192x192.png",
           "sizes": "192x192",
           "type": "image/png"
         }
