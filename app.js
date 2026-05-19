@@ -1,10 +1,10 @@
 console.log("🔥 app.js loaded");
 
 /* ---------------------------------------
-   API BASE (Smart Environment Check)
+   API BASE (Smart Environment Detection)
 --------------------------------------- */
-const API_BASE =
-  location.hostname.includes("vercel.app") || (location.hostname === "" || location.hostname === "localhost" && false) 
+const API_BASE = 
+  location.hostname.includes("vercel.app")
     ? "" 
     : "https://app-testing-hub.vercel.app";
 
@@ -100,30 +100,11 @@ function joinTest(app) {
    LABEL HELPERS
 --------------------------------------- */
 function formatDaysLabel(app) {
-  const testingDuration = app.testingDuration ?? 25;
-
-  if (!app.pubDate) {
-    return `Day 1 of ${testingDuration}`;
-  }
-
-  try {
-    const published = new Date(app.pubDate);
-    if (isNaN(published.getTime())) {
-      return `Day 1 of ${testingDuration}`;
-    }
-
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    published.setHours(0, 0, 0, 0);
-
-    const diffTime = now.getTime() - published.getTime();
-    const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    const daysInTesting = Math.max(1, daysPassed + 1);
-
+  const { daysInTesting = 1, testingDuration = 0 } = app;
+  if (testingDuration > 0) {
     return `Day ${daysInTesting} of ${testingDuration}`;
-  } catch (e) {
-    return `Day 1 of ${testingDuration}`;
   }
+  return `Day ${daysInTesting} in testing`;
 }
 
 function statusBadge(app) {
@@ -139,21 +120,6 @@ function statusBadge(app) {
     case "expired":
       return `<span class="badge badge-status-expired">Expired</span>`;
     default:
-      if (app.pubDate) {
-        const published = new Date(app.pubDate);
-        if (!isNaN(published.getTime())) {
-          const now = new Date();
-          now.setHours(0,0,0,0);
-          published.setHours(0,0,0,0);
-          const diffTime = now.getTime() - published.getTime();
-          const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-          const liveDaysInTesting = Math.max(1, daysPassed + 1);
-          const testingDuration = app.testingDuration ?? 25;
-          if (testingDuration - liveDaysInTesting <= 0) {
-            return `<span class="badge badge-status-completed">Testing completed</span>`;
-          }
-        }
-      }
       return `<span class="badge badge-status-active">Open for testers</span>`;
   }
 }
@@ -226,9 +192,10 @@ async function loadApps() {
   try {
     const res = await fetch(API_URL);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    
     const data = await res.json();
-
     let appsList = [];
+
     if (data?.apps?.apps?.length) {
       appsList = data.apps.apps;
     } else if (data?.apps?.length) {
@@ -238,12 +205,14 @@ async function loadApps() {
     }
 
     allApps = appsList;
+    console.log(`✅ Successfully loaded ${allApps.length} apps`);
     renderApps();
   } catch (err) {
     console.error("❌ Error loading apps:", err);
     setEmpty(true);
   } finally {
     setLoading(false);
+    console.log("🏁 loadApps() completed");
   }
 }
 
@@ -258,6 +227,7 @@ activityFilters?.addEventListener("click", (e) => {
   [...activityFilters.querySelectorAll(".filter-chip")].forEach((chip) =>
     chip.classList.toggle("active", chip === btn)
   );
+
   renderApps();
 });
 

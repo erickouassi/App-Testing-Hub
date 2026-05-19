@@ -1,9 +1,9 @@
 console.log("🔥 app-page.js loaded");
 
 /* ---------------------------------------
-   API BASE (Smart Environment Check)
+   API BASE (Smart Environment Detection)
 --------------------------------------- */
-const API_BASE_PAGE =
+const API_BASE_PAGE = 
   location.hostname.includes("vercel.app")
     ? "" 
     : "https://app-testing-hub.vercel.app";
@@ -107,24 +107,6 @@ async function loadAppPage() {
       return;
     }
 
-    const testingDuration = app.testingDuration ?? 25;
-    let liveDaysInTesting = 1;
-    let liveDaysLeft = testingDuration;
-
-    if (app.pubDate) {
-      const published = new Date(app.pubDate);
-      if (!isNaN(published.getTime())) {
-        const now = new Date();
-        now.setHours(0,0,0,0);
-        published.setHours(0,0,0,0);
-        
-        const diffTime = now.getTime() - published.getTime();
-        const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        liveDaysInTesting = Math.max(1, daysPassed + 1);
-        liveDaysLeft = Math.max(0, testingDuration - liveDaysInTesting);
-      }
-    }
-
     container.innerHTML = `
       <article class="app-card">
         <div class="app-header">
@@ -132,15 +114,15 @@ async function loadAppPage() {
           <div class="app-meta">Android • v${app.version || '1.0.0'}</div>
         </div>
 
-        <div class="app-description" style="max-height:none; white-wrap:pre-wrap;">
+        <div class="app-description" style="max-height:none; white-space:pre-wrap;">
           ${app.description || 'No description available.'}
         </div>
 
         <div class="app-info" style="margin: 15px 0;">
-          <p><strong>Status:</strong> ${liveDaysLeft > 0 ? (app.status || 'Open for testers') : 'Testing completed'}</p>
-          <p><strong>Days in testing:</strong> ${liveDaysInTesting}</p>
-          <p><strong>Days left:</strong> ${liveDaysLeft}</p>
-          <p><strong>Total testing duration:</strong> ${testingDuration} days</p>
+          <p><strong>Status:</strong> ${app.status || 'Open for testers'}</p>
+          <p><strong>Days in testing:</strong> ${app.daysInTesting || 0}</p>
+          <p><strong>Days left:</strong> ${app.daysLeft || 0}</p>
+          <p><strong>Total testing duration:</strong> ${app.testingDuration || 0} days</p>
 
           ${app.languages?.length ? `<p><strong>Languages:</strong> ${app.languages.join(", ")}</p>` : ""}
           ${app.countries?.length ? `<p><strong>Countries:</strong> ${app.countries.join(", ")}</p>` : ""}
