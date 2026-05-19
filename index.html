@@ -1,10 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>App Testing Hub</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Testing Hub</title>
+    <meta name="album" content="Daily Rosary +">
+    <meta name="artist" content="Eric Kouassi">
+    <meta name="title" content="Rosary Moments">
+    <meta name="apple-mobile-web-app-status-bar" content="#aa7700">
+    <meta name="theme-color" content="black">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" sizes="180x180" href="./img/apple-touch-icon.png">
+    <meta name="description" content="The Daily Rosary Audio App is designed to be simple, beautiful, and unobtrusive so you can focus on prayer.">
+    <link rel="icon" type="image/svg+xml" href="/img/favicon.svg">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="site-header">
@@ -72,6 +81,7 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="/app.js" defer></script>
+  <script src="/serviceWorker.js" defer></script>
 </body>
 </html>
