@@ -1,9 +1,12 @@
 console.log("🔥 app.js loaded");
 
 /* ---------------------------------------
-   API BASE (FIXED: Option 1 - Completely Dynamic Relative Routing)
+   API BASE (Smart Environment Check)
 --------------------------------------- */
-const API_BASE = "";
+const API_BASE =
+  location.hostname.includes("vercel.app") || (location.hostname === "" || location.hostname === "localhost" && false) 
+    ? "" 
+    : "https://app-testing-hub.vercel.app";
 
 /* ---------------------------------------
    DOM ELEMENTS
@@ -94,7 +97,7 @@ function joinTest(app) {
 }
 
 /* ---------------------------------------
-   LABEL HELPERS (FIXED: Dynamic client-side calculation)
+   LABEL HELPERS
 --------------------------------------- */
 function formatDaysLabel(app) {
   const testingDuration = app.testingDuration ?? 25;
@@ -106,13 +109,10 @@ function formatDaysLabel(app) {
   try {
     const published = new Date(app.pubDate);
     if (isNaN(published.getTime())) {
-      console.warn(`⚠️ Invalid pubDate for ${app.title}:`, app.pubDate);
       return `Day 1 of ${testingDuration}`;
     }
 
     const now = new Date();
-    
-    // Normalize hour bounds to calculate pure relative day splits
     now.setHours(0, 0, 0, 0);
     published.setHours(0, 0, 0, 0);
 
@@ -120,7 +120,6 @@ function formatDaysLabel(app) {
     const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     const daysInTesting = Math.max(1, daysPassed + 1);
 
-    console.log(`🔍 [formatDaysLabel] ${app.title} → Day ${daysInTesting} of ${testingDuration} (Calculated from ${app.pubDate})`);
     return `Day ${daysInTesting} of ${testingDuration}`;
   } catch (e) {
     return `Day 1 of ${testingDuration}`;
@@ -140,7 +139,6 @@ function statusBadge(app) {
     case "expired":
       return `<span class="badge badge-status-expired">Expired</span>`;
     default:
-      // Live frontend fallback validation block
       if (app.pubDate) {
         const published = new Date(app.pubDate);
         if (!isNaN(published.getTime())) {
@@ -217,41 +215,35 @@ function renderApps() {
 }
 
 /* ---------------------------------------
-   LOAD APPS (FIXED: Dynamic Routing Route Payload)
+   LOAD APPS
 --------------------------------------- */
 async function loadApps() {
   console.log("🚀 [app.js] loadApps() started");
   setLoading(true);
 
-  // Option 1 dynamically appends context routes to whatever domain runs the frontend view
   const API_URL = `${API_BASE}/api/apps?t=${Date.now()}`;
 
   try {
     const res = await fetch(API_URL);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     const data = await res.json();
 
     let appsList = [];
-
     if (data?.apps?.apps?.length) {
       appsList = data.apps.apps;
     } else if (data?.apps?.length) {
       appsList = data.apps;
     } else if (Array.isArray(data)) {
       appsList = data;
-    } else {
-      appsList = [];
     }
 
     allApps = appsList;
-    console.log(`✅ Successfully loaded ${allApps.length} apps`);
-
     renderApps();
   } catch (err) {
     console.error("❌ Error loading apps:", err);
     setEmpty(true);
   } finally {
     setLoading(false);
-    console.log("🏁 loadApps() completed");
   }
 }
 
@@ -263,17 +255,11 @@ activityFilters?.addEventListener("click", (e) => {
   if (!btn) return;
 
   currentActivityFilter = btn.getAttribute("data-filter");
-
   [...activityFilters.querySelectorAll(".filter-chip")].forEach((chip) =>
     chip.classList.toggle("active", chip === btn)
   );
-
   renderApps();
 });
 
 refreshBtn?.addEventListener("click", loadApps);
-
-/* ---------------------------------------
-   INITIAL LOAD
---------------------------------------- */
 loadApps();

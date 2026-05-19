@@ -1,9 +1,12 @@
 console.log("🔥 app-page.js loaded");
 
 /* ---------------------------------------
-   API BASE (local vs production - FIXED Option 1)
+   API BASE (Smart Environment Check)
 --------------------------------------- */
-const API_BASE_PAGE = "";
+const API_BASE_PAGE =
+  location.hostname.includes("vercel.app")
+    ? "" 
+    : "https://app-testing-hub.vercel.app";
 
 /* ---------------------------------------
    DOM + Local Storage
@@ -14,9 +17,7 @@ const STORAGE_KEY = "testingHubState";
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw
-      ? JSON.parse(raw)
-      : { favorites: {}, likes: {}, joined: {}, completed: {}, saved: {} };
+    return raw ? JSON.parse(raw) : { favorites: {}, likes: {}, joined: {}, completed: {}, saved: {} };
   } catch {
     return { favorites: {}, likes: {}, joined: {}, completed: {}, saved: {} };
   }
@@ -28,9 +29,6 @@ function saveState(state) {
 
 let userState = loadState();
 
-/* ---------------------------------------
-   Global toggle for Save / Joined / Completed
---------------------------------------- */
 window.toggleFlag = function (collection, slug) {
   userState[collection][slug] = !userState[collection][slug];
   saveState(userState);
@@ -41,9 +39,6 @@ function isFlagged(collection, slug) {
   return !!userState[collection][slug];
 }
 
-/* ---------------------------------------
-   Join Test (Google Group → Testing Link)
---------------------------------------- */
 function joinTestFlow(app) {
   const groupLink = app.groupLink?.trim();
   const testLink = app.testLink?.trim();
@@ -57,9 +52,7 @@ function joinTestFlow(app) {
 
   if (testLink) {
     setTimeout(() => {
-      const proceed = confirm(
-        "After joining the Google Group, click OK to open the testing link."
-      );
+      const proceed = confirm("After joining the Google Group, click OK to open the testing link.");
       if (proceed) window.open(testLink, "_blank");
     }, 1200);
   }
@@ -71,12 +64,7 @@ function joinTestFlow(app) {
   }
 }
 
-/* ---------------------------------------
-   Load App Details Page
---------------------------------------- */
 async function loadAppPage() {
-  console.log("🚀 [app-page.js] loadAppPage() START");
-
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("slug");
 
@@ -119,7 +107,6 @@ async function loadAppPage() {
       return;
     }
 
-    // Dynamic Live Day calculations computed instantly on page parse
     const testingDuration = app.testingDuration ?? 25;
     let liveDaysInTesting = 1;
     let liveDaysLeft = testingDuration;
@@ -145,7 +132,7 @@ async function loadAppPage() {
           <div class="app-meta">Android • v${app.version || '1.0.0'}</div>
         </div>
 
-        <div class="app-description" style="max-height:none; white-space:pre-wrap;">
+        <div class="app-description" style="max-height:none; white-wrap:pre-wrap;">
           ${app.description || 'No description available.'}
         </div>
 
@@ -164,22 +151,18 @@ async function loadAppPage() {
           <button class="btn btn-ghost" onclick='toggleFlag("saved", "${slug}")'>
             ${isFlagged("saved", slug) ? "★ Unsave" : "☆ Save"}
           </button>
-
           <button class="btn btn-ghost" onclick='toggleFlag("joined", "${slug}")'>
             ${isFlagged("joined", slug) ? "Unmark joined" : "Mark joined"}
           </button>
-
           <button class="btn btn-ghost" onclick='toggleFlag("completed", "${slug}")'>
             ${isFlagged("completed", slug) ? "Undo completed" : "Mark completed"}
           </button>
-
           <button class="btn btn-primary" onclick='joinTestFlow(${JSON.stringify(app).replace(/'/g, "&apos;")})'>
             Join Test
           </button>
         </div>
       </article>
     `;
-
   } catch (err) {
     console.error("❌ Critical error loading app page:", err);
     container.innerHTML = `
