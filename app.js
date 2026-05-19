@@ -1,9 +1,12 @@
 console.log("🔥 app.js loaded");
 
 /* ---------------------------------------
-   API BASE (Relative Routing for pure Vercel setups)
+   API BASE (Smart Detection for Local Testing vs Production)
 --------------------------------------- */
-const API_BASE = "";
+const API_BASE =
+  location.hostname === "127.0.0.1" || location.hostname === "localhost"
+    ? "https://app-testing-hub.vercel.app"
+    : "";
 
 /* ---------------------------------------
    DOM ELEMENTS
@@ -184,6 +187,7 @@ async function loadApps() {
   console.log("🚀 [app.js] loadApps() started");
   setLoading(true);
 
+  // Uses the clean top-level base configuration safely
   const API_URL = `${API_BASE}/api/apps?t=${Date.now()}`;
 
   try {

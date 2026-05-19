@@ -1,9 +1,12 @@
 console.log("🔥 app-page.js loaded");
 
 /* ---------------------------------------
-   API BASE (Relative Routing for pure Vercel setups)
+   API BASE (Smart Detection for Local Testing vs Production)
 --------------------------------------- */
-const API_BASE_PAGE = "";
+const API_BASE_PAGE =
+  location.hostname === "127.0.0.1" || location.hostname === "localhost"
+    ? "https://app-testing-hub.vercel.app"
+    : "";
 
 /* ---------------------------------------
    DOM + Local Storage
