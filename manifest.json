@@ -1,0 +1,103 @@
+{
+  "name": "App Testing Hub",
+  "short_name": "TestingHub",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "window-controls-overlay"
+  ],
+  "orientation": "portrait",
+  "description": "Discover early access Android apps and join closed testing tracks to help indie developers meet Google Play Store requirements.",
+  "lang": "en",
+  "dir": "ltr",
+  "theme_color": "#000000",
+  "background_color": "#F44336",
+  "icons": [
+    {
+      "src": "/img/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/android-chrome-192x192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/img/android-chrome-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/img/android-chrome-512x512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/img/android-chrome-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "App Testing Hub Mobile Dashboard"
+    },
+    {
+      "src": "/img/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "App Testing Hub Desktop Dashboard"
+    }
+  ],
+  "categories": [
+    "developer",
+    "utilities",
+    "productivity",
+    "tools"
+  ],
+  "shortcuts": [
+    {
+      "name": "My Joined Tracks",
+      "short_name": "Joined Apps",
+      "description": "Quickly check your ongoing 14-day testing streaks",
+      "url": "/?shortcut=joined",
+      "icons": [
+        {
+          "src": "/img/android-chrome-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Explore New Apps",
+      "short_name": "Discover",
+      "description": "Find freshly added apps needing closed testers",
+      "url": "/?shortcut=discover"
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+testinghub",
+      "url": "/app.html?slug=%s"
+    }
+  ],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 480
+  }
+}

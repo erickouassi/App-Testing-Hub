@@ -498,3 +498,11 @@ body {
 .site-footer a:hover {
   text-decoration: underline;
 }
+/* Add to your styles.css file */
+#apps-container {
+  min-height: 60vh; /* Allocates vertical structural baseline space ahead of feed data */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  content-visibility: auto; /* Optimizes off-screen element rendering layout costs */
+}
