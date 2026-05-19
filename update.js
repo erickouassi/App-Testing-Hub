@@ -7,7 +7,6 @@ async function getApprovedFeeds() {
   try {
     const res = await fetch(FEEDS_URL);
     const data = await res.json();
-    console.log("✅ [update.js] Approved feeds:", data.approvedFeeds?.length || 0);
     return data.approvedFeeds || [];
   } catch (err) {
     console.error("❌ [update.js] Error loading feeds.json:", err);
@@ -26,14 +25,13 @@ function countDaysSince(pubDate) {
     }
 
     const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    published.setHours(0, 0, 0, 0);
+
     const diffTime = now.getTime() - published.getTime();
     const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    const daysInTesting = Math.max(1, daysPassed + 1);
-
-    console.log(`📅 [countDaysSince] ${pubDate} → Day ${daysInTesting}`);
-    return daysInTesting;
+    return Math.max(1, daysPassed + 1);
   } catch (e) {
-    console.error("❌ Date parsing error:", e);
     return 1;
   }
 }
@@ -48,7 +46,6 @@ export async function updateAllFeeds() {
     console.log(`\n🔄 Processing feed: ${url}`);
     try {
       const xml = await fetch(url + "?t=" + Date.now()).then(r => r.text());
-      console.log(`📄 XML length: ${xml.length} chars`);
 
       const json = await parseStringPromise(xml, {
         explicitArray: false,
@@ -59,14 +56,10 @@ export async function updateAllFeeds() {
       });
 
       const channel = json?.rss?.channel || json?.rss?.rss?.channel;
-      if (!channel) {
-        console.warn("⚠️ No channel found in XML");
-        continue;
-      }
+      if (!channel) continue;
 
       let items = channel.item;
       if (!Array.isArray(items)) items = items ? [items] : [];
-      console.log(`📋 Found ${items.length} items`);
 
       for (const item of items) {
         const title = (item.title || "Unknown App").toString().trim();
@@ -81,13 +74,14 @@ export async function updateAllFeeds() {
         const platform = getField("platform").toString().toLowerCase();
         if (platform && !platform.includes("android")) continue;
 
-        // ✅ Improved pubDate extraction
-        let pubDate = item.pubDate || item["pubdate"] || item["dc:date"] || new Date().toISOString();
+        // Lookup variations because tag-name processors force lowercase
+        let rawPubDate = item.pubdate || item["dc:date"] || item.pubDate;
         
-        // If it's an object (xml2js sometimes wraps text), extract the text
-        if (typeof pubDate === 'object' && pubDate._) {
-          pubDate = pubDate._;
+        if (rawPubDate && typeof rawPubDate === 'object') {
+          rawPubDate = rawPubDate._ || rawPubDate.text || Object.values(rawPubDate)[0];
         }
+
+        const pubDate = rawPubDate ? rawPubDate.toString().trim() : new Date().toISOString();
 
         const testingDuration = parseInt(getField("testingDuration") || "14", 10);
         const daysInTesting = countDaysSince(pubDate);
@@ -106,7 +100,7 @@ export async function updateAllFeeds() {
           version: getField("version") || "1.0.0",
           groupLink: getField("groupLink") || getField("grouplink"),
           testLink: getField("testLink") || getField("testlink"),
-          pubDate,
+          pubDate, 
           testingDuration,
           daysInTesting,
           daysLeft,
@@ -116,7 +110,6 @@ export async function updateAllFeeds() {
           requirements: extractArray(item.requirements || item["app:requirements"])
         };
 
-        console.log(`✅ Parsed: ${appData.title} | pubDate: ${pubDate} → Day ${daysInTesting}`);
         apps.push(appData);
       }
     } catch (err) {
@@ -124,8 +117,6 @@ export async function updateAllFeeds() {
     }
   }
 
-  console.log(`🎉 TOTAL APPS PARSED: ${apps.length}`);
-  
   return {
     generatedAt: new Date().toISOString(),
     apps: apps

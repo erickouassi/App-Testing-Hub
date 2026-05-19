@@ -5,7 +5,7 @@ console.log("🔥 app.js loaded");
 --------------------------------------- */
 const API_BASE =
   location.hostname === "127.0.0.1" || location.hostname === "localhost"
-    ? "https://app-testing-hub.vercel.app"
+    ? "https://app-testing-hub.adminhq.cf"
     : "";
 
 /* ---------------------------------------
@@ -97,15 +97,39 @@ function joinTest(app) {
 }
 
 /* ---------------------------------------
-   LABEL HELPERS
+   LABEL HELPERS (Dynamic client-side calculation)
 --------------------------------------- */
 function formatDaysLabel(app) {
-  const { daysInTesting = 1, daysLeft = 0, testingDuration = 0 } = app;
+  const testingDuration = app.testingDuration ?? 25;
 
-  if (testingDuration > 0) {
-    return `Day ${daysInTesting} of ${testingDuration}`;
+  if (!app.pubDate) {
+    return `Day 1 of ${testingDuration}`;
   }
-  return `Day ${daysInTesting} in testing`;
+
+  try {
+    const published = new Date(app.pubDate);
+    if (isNaN(published.getTime())) {
+      console.warn(`⚠️ Invalid pubDate for ${app.title}:`, app.pubDate);
+      return `Day 1 of ${testingDuration}`;
+    }
+
+    const now = new Date();
+    
+    // Clear hours to guarantee accurate absolute day spans
+    now.setHours(0, 0, 0, 0);
+    published.setHours(0, 0, 0, 0);
+
+    const diffTime = now.getTime() - published.getTime();
+    const daysPassed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    // Testing timeline counts day of publication as Day 1
+    const daysInTesting = Math.max(1, daysPassed + 1);
+
+    console.log(`🔍 [formatDaysLabel] ${app.title} → Day ${daysInTesting} of ${testingDuration} (Calculated from ${app.pubDate})`);
+    return `Day ${daysInTesting} of ${testingDuration}`;
+  } catch (e) {
+    return `Day 1 of ${testingDuration}`;
+  }
 }
 
 function statusBadge(app) {
@@ -172,7 +196,7 @@ function renderApps() {
         <div class="app-timing">${formatDaysLabel(app)}</div>
         <div class="app-actions">
           <a href="app.html?slug=${slug}" class="btn btn-ghost">Details</a>
-          <button class="btn btn-primary" onclick='joinTest(${JSON.stringify(app)})'>Join test</button>
+          <button class="btn btn-primary" onclick='joinTest(${JSON.stringify(app).replace(/'/g, "&apos;")})'>Join test</button>
         </div>
       </div>
     `;
@@ -182,7 +206,7 @@ function renderApps() {
 }
 
 /* ---------------------------------------
-   LOAD APPS
+   LOAD APPS (Dynamic Cross-Origin Cache Busting Routes)
 --------------------------------------- */
 async function loadApps() {
   console.log("🚀 [app.js] loadApps() started");
@@ -190,8 +214,8 @@ async function loadApps() {
 
   const API_URL =
     location.hostname === "127.0.0.1" || location.hostname === "localhost"
-      ? "https://app-testing-hub.vercel.app/api/apps"
-      : "/api/apps";
+      ? `https://app-testing-hub.adminhq.cf/api/apps?t=${Date.now()}`
+      : `/api/apps?t=${Date.now()}`;
 
   try {
     const res = await fetch(API_URL);
