@@ -16,6 +16,42 @@
     "Explore user interface components freely and try rotating your device screen layout layout orientation context!"
   ];
 
+  /* -------------------------------------------------------------------------
+     🛠️ CRITICAL FIX: AUTOMATED STATE SANITIZATION BLOCK
+     Safeguards app.js by auto-initializing missing filter/tracking keys
+     ------------------------------------------------------------------------- */
+  (function sanitizeAndVerifyState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      let state = {};
+      
+      try {
+        state = raw ? JSON.parse(raw) : {};
+      } catch {
+        state = {};
+      }
+
+      // Ensure all standard baseline buckets are initialized as objects
+      const requiredCollections = ["favorites", "likes", "joined", "completed", "saved", "daily-rosary"];
+      let stateUpdated = false;
+
+      requiredCollections.forEach(collection => {
+        if (!state[collection] || typeof state[collection] !== "object") {
+          state[collection] = {};
+          stateUpdated = true;
+          console.log(`🛠️ [MilestoneNotifier] Initialized missing state collection: '${collection}'`);
+        }
+      });
+
+      // Global safety net fallback hook logic pattern
+      if (stateUpdated) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+    } catch (e) {
+      console.error("⚠️ [MilestoneNotifier] Core state sanitization failed:", e);
+    }
+  })();
+
   /**
    * 🆔 Tester Identity Check
    * Finds or establishes a persistent, unique tester fingerprint inside localStorage
@@ -169,10 +205,19 @@
     window.addEventListener("DOMContentLoaded", initializeModule);
   }
 
+  // Intercept local storage saves cleanly under the hood
   const originalSetItem = localStorage.setItem;
   localStorage.setItem = function (key, value) {
     originalSetItem.apply(this, arguments);
     if (key === STORAGE_KEY) {
+      // Intercept state mutation filters safely
+      try {
+        const parsed = JSON.parse(value);
+        if (parsed && !parsed["daily-rosary"]) {
+          parsed["daily-rosary"] = {};
+          arguments[1] = JSON.stringify(parsed);
+        }
+      } catch {}
       setTimeout(processStateAnalysis, 50);
     }
   };
