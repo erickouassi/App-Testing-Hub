@@ -1,0 +1,15 @@
+# Global rules for all search engine crawlers
+User-agent: *
+Allow: /                  # Allow crawling of the main landing pages and public apps
+Allow: /index.html        # Explicitly allow the primary application shell
+Allow: /img/              # Allow indexing of public image assets and favicons
+
+# Disallow indexing of system logic, local scripts, or mock data files
+Disallow: /api/           # Block search crawlers from reading backend API payloads directly
+Disallow: /js/            # Prevent direct indexing of your independent script engines
+Disallow: /css/           # Protect core asset styles files from separate crawler indexing
+Disallow: /*.json$        # Prevent indexing of metadata config or local pro-tip files
+Disallow: /app.html?slug= # Prevent search bots from bloating crawl budgets with dynamic query strings
+
+# Point search engines to your absolute sitemap XML file
+Sitemap: https://app-testing-hub.vercel.app/sitemap.xml
