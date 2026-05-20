@@ -1,8 +1,0 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "cf.adminhq.app_testing_hub.twa",
-        "sha256_cert_fingerprints": ["B3:4E:10:A6:EE:75:F0:DC:C4:60:73:EF:2F:43:39:2C:C7:32:1E:A7:F5:B9:4A:C6:EB:44:1A:7C:18:65:F0:A8"]
-      }
-    }]
