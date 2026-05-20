@@ -5,16 +5,17 @@
     { "src": "*.html", "use": "@vercel/static" },
     { "src": "*.css", "use": "@vercel/static" },
     { "src": "*.js", "use": "@vercel/static" },
-    { "src": "*.json", "use": "@vercel/static" }
+    { "src": "*.json", "use": "@vercel/static" },
+    { "src": "*.xml", "use": "@vercel/static" },
+    { "src": "*.txt", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1.js" },
     { "src": "/app", "dest": "/app.html" },
-    { "src": "/(.*\\.(html|css|js|json|png|jpg|jpeg|gif|svg))", "dest": "/$1" },
+    { "src": "/(.*\\.(html|css|js|json|xml|txt|png|jpg|jpeg|gif|svg))", "dest": "/$1" },
     { "src": "/(.*)", "dest": "/index.html" }
   ],
   "crons": [
     { "path": "/api/build", "schedule": "0 3 * * *" }
   ]
 }
-
