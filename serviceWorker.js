@@ -83,3 +83,68 @@ self.addEventListener("message", event => {
     self.skipWaiting();
   }
 });
+
+
+/**
+ * 🛰️ Service Worker Push Messaging Extension
+ * Handles background server push events and user click interactions.
+ */
+
+// 1. Listen for background push events from your server
+self.addEventListener('push', (event) => {
+  console.log('📡 [Service Worker] Push message received.');
+
+  let title = 'Testing Hub Update';
+  let options = {
+    body: 'A fellow developer needs testers! Check the active tracks.',
+    icon: 'https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/favicon.svg', // Match your project asset structure
+    badge: 'https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/favicon.svg',
+    tag: 'hub-push-alert', // Overwrites previous notifications to prevent spamming
+    data: { url: '/' }    // Context payload pass-through
+  };
+
+  // If your server sends a dynamic JSON string payload, parse it safely
+  if (event.data) {
+    try {
+      const payload = event.data.json();
+      title = payload.title || title;
+      options.body = payload.body || options.body;
+      if (payload.icon) options.icon = payload.icon;
+      if (payload.url) options.data.url = payload.url;
+    } catch (e) {
+      // Fallback to raw text if it's not JSON
+      options.body = event.data.text();
+    }
+  }
+
+  // Keep the service worker alive until the notification is displayed
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+// 2. Action handler: Direct the tester to your app when they tap the notification
+self.addEventListener('notificationclick', (event) => {
+  console.log('👆 [Service Worker] Notification clicked.');
+  event.notification.close(); // Dimiss the banner instantly
+
+  // Grab the destination URL passed from the push payload
+  const targetUrl = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      // If a tab is already open, focus it and navigate to the target route
+      for (let client of windowClients) {
+        if (client.url.includes(location.host) && 'focus' in client) {
+          return client.focus().then(() => {
+            if (client.navigate) return client.navigate(targetUrl);
+          });
+        }
+      }
+      // Otherwise, open a brand new browser tab
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
+  );
+});
