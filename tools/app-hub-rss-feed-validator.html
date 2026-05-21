@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App Hub RSS Multi-Validator</title>
+  <style>
+    :root {
+      --bg-color: #f5f5f7;
+      --card-bg: #ffffff;
+      --text-color: #1d1d1f;
+      --border-color: #d2d2d7;
+      --primary-blue: #0066cc;
+      --secondary-gray: #edf2f7;
+      --secondary-text: #4a5568;
+      --success-green: #34c759;
+      --error-red: #ff3b30;
+      --warning-orange: #ff9500;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    p.subtitle {
+      color: #6e6e73;
+      margin-bottom: 24px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    @media (min-width: 850px) {
+      .layout {
+        grid-template-columns: 1.1fr 1fr;
+      }
+    }
+
+    /* Tab Layout Settings */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--secondary-text);
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .tab-btn.active {
+      background-color: var(--secondary-gray);
+      color: var(--primary-blue);
+    }
+
+    .input-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .input-group {
+      display: none;
+    }
+
+    .input-group.active {
+      display: block;
+    }
+
+    textarea {
+      width: 100%;
+      height: 480px;
+      font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      padding: 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      resize: vertical;
+      box-sizing: border-box;
+      outline: none;
+    }
+
+    .url-input-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: 480px;
+      justify-content: center;
+    }
+
+    .url-field-wrapper {
+      display: flex;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .url-prefix {
+      background: #f5f5f7;
+      padding: 14px;
+      font-size: 14px;
+      color: #6e6e73;
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      border: none;
+      padding: 14px;
+      font-size: 14px;
+      font-family: monospace;
+      outline: none;
+    }
+
+    textarea:focus, input[type="text"]:focus {
+      border-color: var(--primary-blue);
+    }
+
+    .action-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    button.main-action {
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .btn-validate {
+      background-color: var(--primary-blue);
+      color: white;
+      flex-grow: 2;
+    }
+
+    .btn-validate:hover { background-color: #0055b3; }
+    .btn-validate:disabled { background-color: #a2c4e8; cursor: not-allowed; }
+
+    .btn-clear {
+      background-color: var(--secondary-gray);
+      color: var(--secondary-text);
+      flex-grow: 1;
+    }
+
+    .btn-clear:hover { background-color: #e2e8f0; }
+
+    .results-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      box-sizing: border-box;
+      max-height: 620px;
+      overflow-y: auto;
+    }
+
+    .status-banner {
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .status-banner.pass { background: #e3f9e5; color: #14532d; border: 1px solid #bbf7d0; }
+    .status-banner.fail { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .status-banner.idle { background: #f5f5f7; color: #6e6e73; border: 1px solid #e8e8ed; }
+
+    .validation-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .validation-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid #f5f5f7;
+      font-size: 14px;
+    }
+
+    .validation-item:last-child { border-bottom: none; }
+
+    .section-divider {
+      background: #f5f5f7;
+      padding: 6px 10px;
+      font-weight: bold;
+      font-size: 12px;
+      color: #6e6e73;
+      text-transform: uppercase;
+      margin-top: 15px;
+      border-radius: 4px;
+      letter-spacing: 0.03em;
+    }
+
+    .icon {
+      margin-right: 10px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .icon.valid { color: var(--success-green); }
+    .icon.invalid { color: var(--error-red); }
+    .icon.optional { color: var(--warning-orange); }
+
+    .item-text { flex-grow: 1; }
+    .item-details {
+      font-size: 12px;
+      color: #6e6e73;
+      margin-top: 2px;
+      font-family: monospace;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>App Hub RSS Multi-Validator</h1>
+    <p class="subtitle">Validate your live feed definitions strictly by typing an external XML web URL or pasting explicit markup blocks directly.</p>
+
+    <div class="layout">
+      <div class="input-panel">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab('url-tab')">Validate via Live URL</button>
+          <button class="tab-btn" onclick="switchTab('paste-tab')">Paste Raw XML Markup</button>
+        </div>
+
+        <div id="url-tab" class="input-group active">
+          <div class="url-input-container">
+            <label style="font-size: 14px; font-weight: 600; color: var(--secondary-text);">Target Remote XML URL Destination:</label>
+            <div class="url-field-wrapper">
+              <span class="url-prefix">URL</span>
+              <input type="text" id="feed-url" placeholder="raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/refs/heads/main/appfeed.xml" value="raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/refs/heads/main/appfeed.xml">
+            </div>
+            <p style="font-size: 12px; color: #6e6e73; margin: 0; line-height: 1.4;">
+              * Note: Secure protocols (https://) are attached automatically. If your hosting environment restricts browser connections, our proxy helper layer will negotiate access context automatically.
+            </p>
+          </div>
+        </div>
+
+        <div id="paste-tab" class="input-group">
+          <textarea id="xml-input" placeholder="Paste your multi-item XML feed block here..."></textarea>
+        </div>
+
+        <div class="action-row">
+          <button id="submit-btn" class="main-action btn-validate" onclick="handleValidationExecution()">Run Validation Suite</button>
+          <button class="main-action btn-clear" onclick="clearFeed()">Clear Input</button>
+        </div>
+      </div>
+
+      <div class="results-panel">
+        <div id="status-banner" class="status-banner idle">Awaiting Input</div>
+        <ul class="validation-list" id="checklist">
+          <li class="validation-item"><span class="item-text">Provide a path target or raw xml profile text code to compute metrics.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ALLOWED_STATUSES = [
+      'open-testing', 'closed-testing', 'testing-completed', 
+      'expired', 'not-started', 'internal', 
+      'invite-only', 'marketplace', 'pre-registration'
+    ];
+
+    let activeTabId = 'url-tab';
+
+    function switchTab(tabId) {
+      activeTabId = tabId;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.input-group').forEach(group => group.classList.remove('active'));
+      
+      if(tabId === 'url-tab') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('url-tab').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('paste-tab').classList.add('active');
+      }
+    }
+
+    function clearFeed() {
+      document.getElementById('xml-input').value = '';
+      document.getElementById('feed-url').value = '';
+      const banner = document.getElementById('status-banner');
+      banner.className = "status-banner idle";
+      banner.textContent = "Awaiting Input";
+      document.getElementById('checklist').innerHTML = `
+        <li class="validation-item"><span class="item-text">Provide a path target or raw xml profile text code to compute metrics.</span></li>
+      `;
+    }
+
+    function addDivider(container, text) {
+      const div = document.createElement('div');
+      div.className = 'section-divider';
+      div.innerText = text;
+      container.appendChild(div);
+    }
+
+    async function handleValidationExecution() {
+      const banner = document.getElementById('status-banner');
+      const checklistContainer = document.getElementById('checklist');
+      const submitBtn = document.getElementById('submit-btn');
+
+      if (activeTabId === 'paste-tab') {
+        const rawXml = document.getElementById('xml-input').value;
+        runValidationCore(rawXml);
+        return;
+      }
+
+      // URL Execution block execution handling
+      let urlInput = document.getElementById('feed-url').value.trim();
+      if(!urlInput) {
+        banner.className = "status-banner idle";
+        banner.textContent = "Empty URL Reference Address";
+        checklistContainer.innerHTML = `<li class="validation-item"><span class="item-text">Please input a real valid web directory tracking url pointer link first.</span></li>`;
+        return;
+      }
+
+      // Sanitize standard endpoint prefix protocols automatically
+      if (!/^https?:\/\//i.test(urlInput)) {
+        urlInput = "https://" + urlInput;
+      }
+
+      banner.className = "status-banner idle";
+      banner.textContent = "Fetching Remote Assets...";
+      submitBtn.disabled = true;
+
+      try {
+        let response = await fetch(urlInput);
+        
+        // Dynamic Fallback proxy route injection if CORS limits intercept browser threads natively
+        if (!response.ok) {
+          throw new Error("Direct asset mapping error profile detected.");
+        }
+        
+        let xmlText = await response.text();
+        runValidationCore(xmlText);
+
+      } catch (err) {
+        // Fallback using public runtime resource pipelines if local origins bounce
+        try {
+          const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urlInput)}`;
+          let proxyResponse = await fetch(proxyUrl);
+          if(!proxyResponse.ok) throw new Error();
+          let proxyData = await proxyResponse.json();
+          
+          if(proxyData.contents) {
+            runValidationCore(proxyData.contents);
+          } else {
+            throw new Error();
+          }
+        } catch(proxyErr) {
+          banner.className = "status-banner fail";
+          banner.textContent = "Network Connection Error";
+          checklistContainer.innerHTML = `
+            <li class="validation-item">
+              <span class="icon invalid">✕</span>
+              <div class="item-text">
+                <strong>Unable to capture feed from destination URL</strong>
+                <div class="item-details">Verify spelling paths, check network rules or manually paste data inside the standard text editor canvas tab instead. <br><br>Target evaluated: ${urlInput}</div>
+              </div>
+            </li>`;
+        }
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+
+    function runValidationCore(xmlString) {
+      const checklistContainer = document.getElementById('checklist');
+      const banner = document.getElementById('status-banner');
+      
+      checklistContainer.innerHTML = ''; 
+      
+      if(!xmlString || !xmlString.trim()) {
+        banner.className = "status-banner fail";
+        banner.textContent = "Empty Target Document Payload";
+        return;
+      }
+
+      let overallPassed = true;
+      let uniqueTracking = { guid: new Set(), title: new Set(), description: new Set(), testLink: new Set() };
+
+      function appendResult(label, success, type = 'required', info = '') {
+        if (!success && type === 'required') overallPassed = false;
+        
+        const li = document.createElement('li');
+        li.className = 'validation-item';
+        let iconHtml = success ? '<span class="icon valid">✓</span>' : (type === 'required' ? '<span class="icon invalid">✕</span>' : '<span class="icon optional">⚠</span>');
+        let detailsHtml = info ? `<div class="item-details">${info}</div>` : '';
+        li.innerHTML = `${iconHtml}<div class="item-text"><strong>${label}</strong>${detailsHtml}</div>`;
+        checklistContainer.appendChild(li);
+      }
+
+      function verifyTagValue(parent, tagName, displayLabel, isRequired = true) {
+        const node = parent.getElementsByTagName(tagName)[0];
+        const val = node ? node.textContent.trim() : '';
+        if (isRequired) {
+          if (!node || val === '') {
+            appendResult(`${displayLabel} (&lt;${tagName}&gt;)`, false, 'required', 'Value missing or blank!');
+            return null;
+          }
+          appendResult(`${displayLabel} verified`, true, 'required', `Found: "${val}"`);
+          return val;
+        } else {
+          appendResult(`${displayLabel} (Optional)`, true, 'optional', val ? `Found: "${val}"` : "Not provided");
+          return val;
+        }
+      }
+
+      function verifyUniqueness(tagKey, val, displayLabel) {
+        if (!val) return;
+        if (uniqueTracking[tagKey].has(val)) {
+          appendResult(`Uniqueness Violation: Duplicated ${displayLabel}`, false, 'required', `CRITICAL REJECTION: Multiple items share identical data values: "${val}"`);
+        } else {
+          uniqueTracking[tagKey].add(val);
+          appendResult(`Uniqueness check: ${displayLabel}`, true, 'required', 'Value is distinct and unique.');
+        }
+      }
+
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+      const parseError = xmlDoc.getElementsByTagName("parsererror")[0];
+
+      if (parseError) {
+        banner.className = "status-banner fail";
+        banner.textContent = "XML Syntax Error";
+        appendResult("Malformed XML Structure Structure", false, 'required', parseError.textContent);
+        return;
+      }
+
+      addDivider(checklistContainer, "Feed Environment Headers");
+      appendResult("Valid XML syntax rules", true, 'required');
+
+      const rssNode = xmlDoc.getElementsByTagName("rss")[0];
+      appendResult("Root &lt;rss version=\"2.0\"&gt; present", (rssNode && rssNode.getAttribute("version") === "2.0"));
+
+      const channel = xmlDoc.getElementsByTagName("channel")[0];
+      if (!channel) {
+        appendResult("Parent &lt;channel&gt; element present", false, 'required');
+        banner.className = "status-banner fail";
+        return;
+      }
+      appendResult("Parent &lt;channel&gt; element present", true, 'required');
+
+      verifyTagValue(channel, "title", "Channel Title");
+      verifyTagValue(channel, "link", "Channel Link");
+      verifyTagValue(channel, "description", "Channel Description");
+      verifyTagValue(channel, "language", "Channel Language");
+      verifyTagValue(channel, "lastBuildDate", "Channel Last Build Date");
+
+      const devNode = channel.getElementsByTagName("dev:developer")[0];
+      if (!devNode) {
+        appendResult("Metadata Block &lt;dev:developer&gt;", false, 'required', "Missing whole element block");
+      } else {
+        verifyTagValue(devNode, "dev:name", "Developer Name");
+        verifyTagValue(devNode, "dev:email", "Developer Email");
+        verifyTagValue(devNode, "dev:website", "Developer Website", false);
+      }
+
+      const items = channel.getElementsByTagName("item");
+      appendResult("Contains testing items", items.length > 0, 'required', `Total count found: ${items.length}`);
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const itemTitleNode = item.getElementsByTagName("title")[0];
+        const itemIdentifier = (itemTitleNode && itemTitleNode.textContent.trim()) ? itemTitleNode.textContent.trim() : `Index #${i}`;
+        
+        addDivider(checklistContainer, `Item Block Content Loop: ${itemIdentifier}`);
+
+        const currentTitle = verifyTagValue(item, "title", "Item Title");
+        verifyUniqueness('title', currentTitle, 'App Title');
+
+        const currentGuid = verifyTagValue(item, "guid", "Item GUID");
+        verifyUniqueness('guid', currentGuid, 'App GUID Key');
+
+        const currentDesc = verifyTagValue(item, "description", "Item Description");
+        verifyUniqueness('description', currentDesc, 'App Description');
+
+        verifyTagValue(item, "pubDate", "Item pubDate");
+        verifyTagValue(item, "app:platform", "App Platform");
+        verifyTagValue(item, "app:version", "App Version");
+        verifyTagValue(item, "app:testingDuration", "Testing Duration");
+
+        const statusVal = verifyTagValue(item, "app:status", "App Status Keyword");
+        if (statusVal) {
+          const isValid = ALLOWED_STATUSES.includes(statusVal);
+          appendResult("Valid status keyword matching array rule", isValid, 'required', isValid ? `Passed: "${statusVal}"` : `Failed: "${statusVal}" is unauthorized.`);
+        }
+
+        const testLinkVal = verifyTagValue(item, "app:testLink", "Google Play Testing Link");
+        if (testLinkVal) {
+          const isGooglePlay = /^https:\/\/play\.google\.com\//i.test(testLinkVal);
+          appendResult("Play Store strict domain protocol matching", isGooglePlay, 'required', isGooglePlay ? `Valid: ${testLinkVal}` : "Rejected: URL must begin with https://play.google.com/");
+          verifyUniqueness('testLink', testLinkVal, 'Google Play track link URL');
+        }
+
+        const groupLinkVal = verifyTagValue(item, "app:groupLink", "Google Group Link");
+        if (groupLinkVal) {
+          const isGoogleGroups = /^https:\/\/groups\.google\.com\//i.test(groupLinkVal);
+          appendResult("Google Groups strict domain protocol matching", isGoogleGroups, 'required', isGoogleGroups ? `Valid: ${groupLinkVal}` : "Rejected: URL must begin with https://groups.google.com/");
+        }
+
+        const reqs = item.getElementsByTagName("app:requirement");
+        if (reqs.length === 0 || reqs[0].textContent.trim() === "") {
+          appendResult("Requirements Node List", false, 'required', "Each active application item needs at least one text requirement tag.");
+        } else {
+          appendResult("Requirements Node List", true, 'required', `Passed: ${reqs.length} entries registered.`);
+        }
+      }
+
+      if (overallPassed) {
+        banner.className = "status-banner pass";
+        banner.textContent = "Feed Schema Validated Successfully";
+      } else {
+        banner.className = "status-banner fail";
+        banner.textContent = "Validation Checklist Failed";
+      }
+    }
+  </script>
+</body>
+</html>
