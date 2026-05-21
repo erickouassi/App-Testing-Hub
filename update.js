@@ -7,10 +7,10 @@ async function getApprovedFeeds() {
   try {
     const res = await fetch(FEEDS_URL);
     const data = await res.json();
-    console.log("✅ [update.js] Approved feeds:", data.approvedFeeds?.length || 0);
+    console.log("✅ [update.js] Approved feeds loaded:", data.approvedFeeds?.length || 0);
     return data.approvedFeeds || [];
   } catch (err) {
-    console.error("❌ [update.js] Error loading feeds.json:", err);
+    console.error("❌ [update.js] Critical Error loading feeds.json map:", err);
     return [];
   }
 }
@@ -41,15 +41,31 @@ function countDaysSince(pubDate) {
 }
 
 export async function updateAllFeeds() {
-  console.log("🚀 [update.js] Starting updateAllFeeds...");
+  console.log("🚀 [update.js] Starting automated updateAllFeeds loop...");
 
   const feeds = await getApprovedFeeds();
   const apps = [];
 
   for (const url of feeds) {
     console.log(`\n🔄 Processing feed: ${url}`);
+    
+    // Outer automated block ensures that faults inside this step cleanly skip the file
     try {
-      const xml = await fetch(url + "?t=" + Date.now()).then(r => r.text());
+      const response = await fetch(url + "?t=" + Date.now());
+      
+      // SKIP RULE 1: Handle HTTP connection breaks (404, 500, down domains)
+      if (!response.ok) {
+        console.warn(`⚠️ [SKIP] URL skipped. Server returned HTTP Status ${response.status} for: ${url}`);
+        continue;
+      }
+
+      const xml = await response.text();
+      
+      // SKIP RULE 2: Protect against zero-byte payloads
+      if (!xml || !xml.trim()) {
+        console.warn(`⚠️ [SKIP] URL skipped. Extracted string payload is empty for: ${url}`);
+        continue;
+      }
 
       const json = await parseStringPromise(xml, {
         explicitArray: false,
@@ -59,11 +75,23 @@ export async function updateAllFeeds() {
         attrNameProcessors: [(name) => name.replace(/^(app|dev|social):/, "")]
       });
 
+      // SKIP RULE 3: Ensure syntax parsing structural parents resolve perfectly
       const channel = json?.rss?.channel || json?.rss?.rss?.channel;
-      if (!channel) continue;
+      if (!channel) {
+        console.warn(`⚠️ [SKIP] URL skipped. Missing valid <channel> path structure inside RSS block for: ${url}`);
+        continue;
+      }
 
       let items = channel.item;
       if (!Array.isArray(items)) items = items ? [items] : [];
+
+      // SKIP RULE 4: Ensure channel actually holds active tracking feeds items
+      if (items.length === 0) {
+        console.warn(`⚠️ [SKIP] URL skipped. Clean parse loop structural document contain 0 active item configurations inside: ${url}`);
+        continue;
+      }
+
+      console.log(`📡 [PARSER] Extracted ${items.length} items from feed channel. Checking entries...`);
 
       for (const item of items) {
         const title = (item.title || "Unknown App").toString().trim();
@@ -78,9 +106,7 @@ export async function updateAllFeeds() {
         const platform = getField("platform").toString().toLowerCase();
         if (platform && !platform.includes("android")) continue;
 
-        // FIXED: Lowercase XML Tag processor lookup wrapper bypass tracking
         let rawPubDate = item.pubdate || item["dc:date"] || item.pubDate;
-        
         if (rawPubDate && typeof rawPubDate === 'object') {
           rawPubDate = rawPubDate._ || rawPubDate.text || Object.values(rawPubDate)[0];
         }
@@ -116,11 +142,16 @@ export async function updateAllFeeds() {
 
         apps.push(appData);
       }
+      
+      console.log(`✅ Successfully structural elements appended into runtime object array memory layout from: ${url}`);
+
     } catch (err) {
-      console.error(`❌ Failed processing ${url}:`, err.message);
+      // Catch-all safety boundary allows pipeline execution loops to complete seamlessly
+      console.error(`❌ [AUTOMATION SKIP ERROR] Failed processing developer channel path [${url}]. Error context:`, err.message);
     }
   }
 
+  console.log(`\n🏁 [update.js] Automation loop completed safely. Total apps verified globally: ${apps.length}`);
   return {
     generatedAt: new Date().toISOString(),
     apps: apps
