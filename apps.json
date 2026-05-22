@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-21T03:51:27.019Z",
+  "generatedAt": "2026-05-22T03:24:42.353Z",
   "apps": {
-    "generatedAt": "2026-05-21T03:51:27.019Z",
+    "generatedAt": "2026-05-22T03:24:42.353Z",
     "apps": [
       {
         "slug": "daily-rosary",
@@ -13,8 +13,8 @@
         "testLink": "https://play.google.com/apps/testing/com.erickouassi.dailyrosary",
         "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
         "testingDuration": 25,
-        "daysInTesting": 7,
-        "daysLeft": 18,
+        "daysInTesting": 8,
+        "daysLeft": 17,
         "status": "open-testing",
         "languages": [
           "English",
@@ -41,8 +41,8 @@
         "testLink": "https://play.google.com/apps/testing/com.erickouassi.lerosaire.dailyrosary",
         "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
         "testingDuration": 25,
-        "daysInTesting": 7,
-        "daysLeft": 18,
+        "daysInTesting": 8,
+        "daysLeft": 17,
         "status": "open-testing",
         "languages": [
           "French"
