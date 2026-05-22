@@ -1,6 +1,6 @@
-/************************************
-  LIGHT THEME BASE
-*************************************/
+/*******************************************************************************
+  1. LIGHT THEME CONFIGURATION VARIABLES
+*******************************************************************************/
 :root {
   color-scheme: light;
   --bg: #f9fafb;
@@ -11,8 +11,16 @@
   --card-bg: #ffffff;
   --border: #e5e7eb;
   --shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.08);
   --radius: 12px;
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+}
+
+/*******************************************************************************
+  2. BASE LAYOUT & TYPOGRAPHY RESETS
+*******************************************************************************/
+* {
+  box-sizing: border-box;
 }
 
 body {
@@ -21,32 +29,41 @@ body {
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/************************************
-  HEADER
-*************************************/
+/*******************************************************************************
+  3. COMPONENT NAVIGATION: SITE HEADER
+*******************************************************************************/
 .site-header {
   padding: 16px 20px;
   border-bottom: 1px solid var(--border);
-  background: #fff;
+  background: #ffffff;
   box-shadow: var(--shadow);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 8px 16px;
+  position: relative;
+  z-index: 100;
 }
 
 .site-header h1 {
   margin: 0;
-  font-size: 1.4rem;
-  color: var(--accent);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
 }
 
-.subtitle {
-  font-size: 0.85rem;
+.site-header .subtitle {
+  margin: 0;
   color: var(--muted);
+  font-size: 0.9rem;
+  margin-right: auto;
 }
 
 .last-updated {
@@ -54,144 +71,206 @@ body {
   color: var(--muted);
 }
 
-/************************************
-  LAYOUT
-*************************************/
-.layout {
-  display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
-  gap: 16px;
-  padding: 16px 24px 32px;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.layout-single {
-  padding: 16px 24px 32px;
+/*******************************************************************************
+  4. INTERACTIVE DECENTRALIZED TOGGLE NAVIGATION (MOBILE CORES)
+*******************************************************************************/
+.menu-toggle-bar {
+  display: none;
+  background: #ffffff;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-/************************************
-  FILTERS
-*************************************/
-.filters {
-  border-right: 1px solid var(--border);
-  padding-right: 16px;
-}
-
-.filters-title {
+.hamburger-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
   font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
   color: var(--text);
+  transition: background 0.15s ease;
 }
 
-.filter-group {
-  margin-bottom: 16px;
+.hamburger-btn:active, .hamburger-btn:hover {
+  background: #f3f4f6;
 }
 
-.filter-label {
-  font-size: 0.8rem;
+/*******************************************************************************
+  5. SYSTEM LAYOUT PANELS (3-COLUMN ENGINE)
+*******************************************************************************/
+.hub-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+  flex: 1;
+}
+
+.sidebar {
+  display: block;
+}
+
+.filter-group h3 {
+  margin: 0 0 12px 0;
+  font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   color: var(--muted);
-  margin-bottom: 6px;
 }
 
 .filter-chips {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 6px;
 }
 
 .filter-chip {
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: #fff;
+  appearance: none;
+  background: transparent;
+  border: none;
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 8px;
   color: var(--text);
-  padding: 6px 12px;
-  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.15s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 .filter-chip:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  background: var(--border);
 }
 
 .filter-chip.active {
-  border-color: var(--accent);
   background: var(--accent-soft);
   color: var(--accent);
 }
 
-/************************************
-  APP CARDS
-*************************************/
-.apps-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 12px;
+/*******************************************************************************
+  6. DIRECTORY APPS GRID LAYOUT
+*******************************************************************************/
+.apps-section {
+  position: relative;
+  width: 100%;
 }
 
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+/*******************************************************************************
+  7. INDEPENDENT APP CARDS MATRIX STYLING
+*******************************************************************************/
 .app-card {
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
   background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
   box-shadow: var(--shadow);
-  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
 }
 
 .app-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
 }
 
-.app-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
+.card-completed {
+  background: #fdfdfd;
+  opacity: 0.85;
+  border-style: dashed;
+}
+
+.app-icon {
+  border: 1px solid var(--border);
+  background: #f3f4f6;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 }
 
 .app-title {
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 600;
   color: var(--text);
+  line-height: 1.25;
 }
 
 .app-meta {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--muted);
+  margin-top: 4px;
 }
 
-.app-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 4px;
+/* Custom Data Fields Meta chips */
+.dir-category {
+  background: #eef2ff;
+  color: #4338ca;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.dir-price {
+  color: #047857;
+  font-weight: 600;
 }
 
 .app-description {
   font-size: 0.9rem;
-  color: #374151;
-  max-height: 4.5em;
+  color: var(--muted);
+  margin: 14px 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .app-footer {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: flex-end;
   gap: 8px;
-  margin-top: 4px;
 }
 
 .app-timing {
-  font-size: 0.85rem;
-  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text);
 }
 
 .app-actions {
@@ -199,21 +278,66 @@ body {
   gap: 6px;
 }
 
-/************************************
-  BUTTONS
-*************************************/
-.btn {
-  border-radius: 999px;
-  border: 1px solid transparent;
-  padding: 6px 14px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  background: var(--accent);
-  color: #fff;
-  transition: all 0.15s ease;
+/*******************************************************************************
+  8. STATUS BADGES & TAG CHIPS
+*******************************************************************************/
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background: #f3f4f6;
+  color: #374151;
+  white-space: nowrap;
 }
 
-.btn:hover {
+.badge-status-active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-status-joined {
+  background: #eff6ff;
+  color: #1e40af;
+}
+
+.badge-status-completed {
+  background: #f3e8ff;
+  color: #6b21a8;
+}
+
+.badge-status-expired {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/*******************************************************************************
+  9. SYSTEM TYPOGRAPHY BUTTONS
+*******************************************************************************/
+.btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
   background: #4338ca;
 }
 
@@ -224,270 +348,120 @@ body {
 }
 
 .btn-ghost:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  background: #f3f4f6;
 }
 
-/************************************
-  BADGES
-*************************************/
-.badge {
-  border-radius: 999px;
-  padding: 3px 8px;
-  font-size: 0.75rem;
-  border: 1px solid var(--border);
+/*******************************************************************************
+  10. RUNTIME UI LOADING STATE HANDLERS
+*******************************************************************************/
+.loading, .empty {
+  padding: 40px;
+  text-align: center;
   color: var(--muted);
-  background: #f3f4f6;
-}
-
-.badge-status-active {
-  border-color: #10b981;
-  color: #065f46;
-  background: #d1fae5;
-}
-
-.badge-status-completed {
-  border-color: #6366f1;
-  color: #312e81;
-  background: #e0e7ff;
-}
-
-.badge-status-expired {
-  border-color: #ef4444;
-  color: #7f1d1d;
-  background: #fee2e2;
-}
-
-.badge-status-not-started {
-  border-color: #9ca3af;
-  color: #374151;
-  background: #f3f4f6;
-}
-
-.badge-status-closed {
-  border-color: #6b7280;
-  color: #374151;
-  background: #e5e7eb;
-}
-
-.badge-status-joined {
-  border-color: #0ea5e9;
-  color: #075985;
-  background: #e0f2fe;
-}
-
-.badge-android {
-  border-color: #10b981;
-  color: #065f46;
-  background: #d1fae5;
-}
-
-/************************************
-  PROGRESS BAR
-*************************************/
-.progress {
-  margin-top: 6px;
+  font-size: 0.95rem;
+  grid-column: 1 / -1;
   width: 100%;
-  height: 6px;
-  border-radius: 999px;
-  background: #e5e7eb;
-  overflow: hidden;
 }
 
-.progress-bar {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(to right, #4f46e5, #22c55e);
-  transition: width 0.3s ease-out;
+.hidden {
+  display: none !important;
 }
 
-/************************************
-  MODAL
-*************************************/
+/*******************************************************************************
+  11. SYSTEM WIDGET CARDS: PRO-TIPS MODULE
+*******************************************************************************/
+.pro-tip-card {
+  background: linear-gradient(135deg, #ffffff 0%, #fdfbf7 100%);
+  border: 1px solid #f59e0b;
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.pro-tip-header {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #d97706;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pro-tip-content {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #4b5563;
+}
+
+/*******************************************************************************
+  12. FLOATING OVERLAYS MODALS LAYERS
+*******************************************************************************/
 .modal {
   position: fixed;
   inset: 0;
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 40;
 }
 
 .modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(17, 24, 39, 0.4);
+  backdrop-filter: blur(4px);
 }
 
 .modal-content {
   position: relative;
-  background: #fff;
+  background: #ffffff;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
-  padding: 16px 18px;
-  max-width: 480px;
-  width: 92%;
-  max-height: 80vh;
-  overflow-y: auto;
-  z-index: 41;
-  box-shadow: var(--shadow);
+  width: 90%;
+  max-width: 500px;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  z-index: 1010;
 }
 
 .modal-close {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 12px;
+  right: 16px;
+  background: none;
   border: none;
-  background: transparent;
-  color: var(--muted);
+  font-size: 1.5rem;
   cursor: pointer;
-}
-
-.modal-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 10px 0;
-}
-
-/************************************
-  EMPTY + LOADING
-*************************************/
-.loading,
-.empty {
-  font-size: 0.9rem;
   color: var(--muted);
 }
 
-.hidden {
-  display: none;
-}
-
-/************************************
-  APP PAGE CONTAINER
-*************************************/
+/*******************************************************************************
+  13. STRUCTURAL CONTENT PAGES CLOSURES (ABOUT, DETAILS)
+*******************************************************************************/
 .app-page-container {
-  max-width: 640px;
-  margin: 0 auto;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
 }
 
-/************************************
-  MOBILE BREAKPOINTS
-*************************************/
-@media (max-width: 768px) {
-  .layout {
-    grid-template-columns: 1fr;
-    padding: 12px 16px 24px;
-  }
-
-  .filters {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 12px;
-    margin-bottom: 16px;
-  }
-
-  .app-card {
-    padding: 16px;
-  }
-
-  .app-title {
-    font-size: 1.1rem;
-  }
-
-  .app-description {
-    max-height: none;
-  }
-
-  .app-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .app-actions {
-    width: 100%;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .app-actions .btn,
-  .app-actions .btn-ghost {
-    width: 100%;
-  }
-
-  .modal-content {
-    width: 94%;
-    max-height: 85vh;
-  }
-}
-
-/************************************
-  SMALL PHONES
-*************************************/
-@media (max-width: 480px) {
-  .site-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-
-  .apps-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .filter-chip {
-    padding: 8px 14px;
-    font-size: 0.85rem;
-  }
-
-  .btn {
-    width: 100%;
-    text-align: center;
-  }
-
-  .app-card {
-    padding: 18px;
-    font-size: 0.95rem;
-  }
-
-  .modal-content {
-    width: 96%;
-    padding: 20px;
-  }
-}
-
-/************************************
-  ULTRA-SMALL DEVICES
-*************************************/
-@media (max-width: 360px) {
-  .app-title {
-    font-size: 1rem;
-  }
-
-  .filter-chip {
-    padding: 6px 10px;
-    font-size: 0.75rem;
-  }
-
-  .btn {
-    padding: 8px 12px;
-    font-size: 0.85rem;
-  }
-
-  .app-card {
-    padding: 14px;
-  }
+.app-info p {
+  margin: 10px 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 .site-footer {
-  margin-top: 40px;
-  padding: 20px;
-  text-align: center;
-  font-size: 0.9rem;
-  color: var(--muted);
+  width: 100%;
+  max-width: 1400px;
+  margin: auto auto 0 auto;
+  padding: 24px 20px;
   border-top: 1px solid var(--border);
-  background: #fff;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
 }
 
 .site-footer a {
@@ -498,11 +472,115 @@ body {
 .site-footer a:hover {
   text-decoration: underline;
 }
-/* Add to your styles.css file */
-#apps-container {
-  min-height: 60vh; /* Allocates vertical structural baseline space ahead of feed data */
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
-  content-visibility: auto; /* Optimizes off-screen element rendering layout costs */
+
+/*******************************************************************************
+  14. HIGH DESKTOP SCREEN LAYOUT OVERRIDES (3-COLUMNS RUNNER)
+*******************************************************************************/
+@media (min-width: 992px) {
+  .hub-main {
+    grid-template-columns: 240px 1fr 280px;
+    gap: 24px;
+    align-items: start;
+    padding: 24px 20px;
+  }
+  
+  #daily-pro-tip-container {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+/*******************************************************************************
+  15. MOBILE NAVIGATION SYSTEM INTERFACES (HAMBURGER BREAKPOINTS)
+*******************************************************************************/
+@media (max-width: 991px) {
+  .menu-toggle-bar {
+    display: flex;
+  }
+
+  .sidebar {
+    display: none; /* Controlled explicitly via user state JS toggles */
+    background: #ffffff;
+    border: 1px solid var(--border);
+    padding: 16px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    width: 100%;
+    animation: slideDown 0.2s ease-out;
+  }
+
+  .sidebar.active {
+    display: block;
+  }
+
+  .filter-chips {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .filter-chip {
+    padding: 12px 14px;
+  }
+}
+
+/*******************************************************************************
+  16. SMALL DEVICE MEDIA RESPONSIVENESS MATRIX
+*******************************************************************************/
+@media (max-width: 768px) {
+  .site-header {
+    text-align: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px 16px;
+  }
+  
+  .site-header .subtitle {
+    margin: 6px 0 12px 0;
+  }
+
+  .apps-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .app-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .app-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .app-page-container {
+    padding: 16px;
+  }
+
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+}
+
+/*******************************************************************************
+  17. RUNTIME UI RENDERER SYSTEM ANIMATIONS
+*******************************************************************************/
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
