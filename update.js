@@ -49,11 +49,9 @@ export async function updateAllFeeds() {
   for (const url of feeds) {
     console.log(`\n🔄 Processing feed: ${url}`);
     
-    // Outer automated block ensures that faults inside this step cleanly skip the file
     try {
       const response = await fetch(url + "?t=" + Date.now());
       
-      // SKIP RULE 1: Handle HTTP connection breaks (404, 500, down domains)
       if (!response.ok) {
         console.warn(`⚠️ [SKIP] URL skipped. Server returned HTTP Status ${response.status} for: ${url}`);
         continue;
@@ -61,7 +59,6 @@ export async function updateAllFeeds() {
 
       const xml = await response.text();
       
-      // SKIP RULE 2: Protect against zero-byte payloads
       if (!xml || !xml.trim()) {
         console.warn(`⚠️ [SKIP] URL skipped. Extracted string payload is empty for: ${url}`);
         continue;
@@ -75,7 +72,6 @@ export async function updateAllFeeds() {
         attrNameProcessors: [(name) => name.replace(/^(app|dev|social):/, "")]
       });
 
-      // SKIP RULE 3: Ensure syntax parsing structural parents resolve perfectly
       const channel = json?.rss?.channel || json?.rss?.rss?.channel;
       if (!channel) {
         console.warn(`⚠️ [SKIP] URL skipped. Missing valid <channel> path structure inside RSS block for: ${url}`);
@@ -85,7 +81,6 @@ export async function updateAllFeeds() {
       let items = channel.item;
       if (!Array.isArray(items)) items = items ? [items] : [];
 
-      // SKIP RULE 4: Ensure channel actually holds active tracking feeds items
       if (items.length === 0) {
         console.warn(`⚠️ [SKIP] URL skipped. Clean parse loop structural document contain 0 active item configurations inside: ${url}`);
         continue;
@@ -122,6 +117,12 @@ export async function updateAllFeeds() {
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/^-|-$/g, "") || `app-${Date.now()}`;
 
+        // Extracted attributes for the App Directory features safely
+        const category = getField("category").toString().trim() || "General";
+        const price = getField("price").toString().trim() || "Free";
+        const icon = getField("icon").toString().trim() || "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png";
+        const currentStatus = getField("status").toString().trim();
+
         const appData = {
           slug,
           title,
@@ -134,7 +135,10 @@ export async function updateAllFeeds() {
           testingDuration,
           daysInTesting,
           daysLeft,
-          status: getField("status") || (daysLeft > 0 ? "open-testing" : "testing-completed"),
+          status: currentStatus || (daysLeft > 0 ? "open-testing" : "testing-completed"),
+          category,
+          price,
+          icon,
           languages: extractArray(item.languages || item["app:languages"]),
           countries: extractArray(item.countries || item["app:countries"]),
           requirements: extractArray(item.requirements || item["app:requirements"])
@@ -146,7 +150,6 @@ export async function updateAllFeeds() {
       console.log(`✅ Successfully structural elements appended into runtime object array memory layout from: ${url}`);
 
     } catch (err) {
-      // Catch-all safety boundary allows pipeline execution loops to complete seamlessly
       console.error(`❌ [AUTOMATION SKIP ERROR] Failed processing developer channel path [${url}]. Error context:`, err.message);
     }
   }
@@ -170,4 +173,20 @@ function extractArray(field) {
     }
   }
   return [];
+}
+
+export function organizeHubApps(data) {
+  if (!data || !Array.isArray(data.apps)) {
+    console.warn("⚠️ No active apps array available to sort.");
+    return [];
+  }
+
+  const openApps = data.apps.filter(app => app.status === "open-testing");
+  const completedApps = data.apps.filter(app => app.status === "testing-completed");
+
+  openApps.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+  completedApps.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+  console.log(`📊 Sorted ${openApps.length} active apps and ${completedApps.length} completed apps.`);
+  return [...openApps, ...completedApps];
 }

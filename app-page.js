@@ -1,16 +1,10 @@
 console.log("🔥 app-page.js loaded");
 
-/* ---------------------------------------
-   API BASE (Smart Detection for Local Testing vs Production)
---------------------------------------- */
 const API_BASE_PAGE =
   location.hostname === "127.0.0.1" || location.hostname === "localhost"
     ? "https://app-testing-hub.vercel.app"
     : "";
 
-/* ---------------------------------------
-   DOM + Local Storage
---------------------------------------- */
 const container = document.getElementById("app-page-container");
 const STORAGE_KEY = "testingHubState";
 
@@ -109,17 +103,21 @@ async function loadAppPage() {
 
     container.innerHTML = `
       <article class="app-card">
-        <div class="app-header">
-          <div class="app-title">${app.title}</div>
-          <div class="app-meta">Android • v${app.version || '1.0.0'}</div>
+        <div class="app-header" style="display: flex; gap: 16px; align-items: center;">
+          <img src="${app.icon || 'https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png'}" alt="${app.title}" style="width: 64px; height: 64px; border-radius: 14px; object-fit: cover; background: #eee;">
+          <div>
+            <div class="app-title" style="font-size: 24px;">${app.title}</div>
+            <div class="app-meta">Category: ${app.category || 'General'} • Price: ${app.price || 'Free'}</div>
+            <div class="app-meta" style="margin-top: 2px;">Android • v${app.version || '1.0.0'}</div>
+          </div>
         </div>
 
-        <div class="app-description" style="max-height:none; white-space:pre-wrap;">
+        <div class="app-description" style="max-height:none; white-space:pre-wrap; margin-top: 20px;">
           ${app.description || 'No description available.'}
         </div>
 
-        <div class="app-info" style="margin: 15px 0;">
-          <p><strong>Status:</strong> ${app.status || 'Open for testers'}</p>
+        <div class="app-info" style="margin: 20px 0; padding: 15px; background: rgba(0,0,0,0.03); border-radius: 8px;">
+          <p><strong>Track Status:</strong> <span style="text-transform: capitalize;">${app.status || 'Open for testers'}</span></p>
           <p><strong>Days in testing:</strong> ${app.daysInTesting || 0}</p>
           <p><strong>Days left:</strong> ${app.daysLeft || 0}</p>
           <p><strong>Total testing duration:</strong> ${app.testingDuration || 0} days</p>

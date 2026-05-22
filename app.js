@@ -1,16 +1,10 @@
 console.log("🔥 app.js loaded");
 
-/* ---------------------------------------
-   API BASE (Smart Detection for Local Testing vs Production)
---------------------------------------- */
 const API_BASE =
   location.hostname === "127.0.0.1" || location.hostname === "localhost"
     ? "https://app-testing-hub.vercel.app"
     : "";
 
-/* ---------------------------------------
-   DOM ELEMENTS
---------------------------------------- */
 const appsContainer = document.getElementById("apps-container");
 const loadingEl = document.getElementById("apps-loading");
 const emptyEl = document.getElementById("apps-empty");
@@ -18,9 +12,6 @@ const appsCountLabel = document.getElementById("apps-count-label");
 const refreshBtn = document.getElementById("refresh-btn");
 const activityFilters = document.getElementById("activity-filters");
 
-/* ---------------------------------------
-   LOCAL STORAGE STATE
---------------------------------------- */
 const STORAGE_KEY = "testingHubState";
 
 function loadState() {
@@ -37,16 +28,9 @@ function saveState(state) {
 }
 
 let userState = loadState();
-
-/* ---------------------------------------
-   GLOBAL STATE
---------------------------------------- */
 let allApps = [];
 let currentActivityFilter = "all";
 
-/* ---------------------------------------
-   STATE HELPERS
---------------------------------------- */
 function toggleFlag(collection, slug) {
   userState[collection][slug] = !userState[collection][slug];
   saveState(userState);
@@ -57,9 +41,6 @@ function isFlagged(collection, slug) {
   return !!userState[collection][slug];
 }
 
-/* ---------------------------------------
-   UI HELPERS
---------------------------------------- */
 function setLoading(isLoading) {
   if (loadingEl) loadingEl.classList.toggle("hidden", !isLoading);
 }
@@ -68,9 +49,6 @@ function setEmpty(isEmpty) {
   if (emptyEl) emptyEl.classList.toggle("hidden", !isEmpty);
 }
 
-/* ---------------------------------------
-   JOIN TEST FLOW
---------------------------------------- */
 function joinTest(app) {
   const groupLink = app.groupLink?.trim();
   const testLink = app.testLink?.trim();
@@ -96,9 +74,6 @@ function joinTest(app) {
   }
 }
 
-/* ---------------------------------------
-   LABEL HELPERS
---------------------------------------- */
 function formatDaysLabel(app) {
   const { daysInTesting = 1, testingDuration = 0 } = app;
   if (testingDuration > 0) {
@@ -116,7 +91,8 @@ function statusBadge(app) {
 
   switch (app.status) {
     case "testing-completed":
-      return `<span class="badge badge-status-completed">Testing completed</span>`;
+    case "production-live":
+      return `<span class="badge badge-status-completed">${app.status === 'production-live' ? '🚀 Live' : 'Testing completed'}</span>`;
     case "expired":
       return `<span class="badge badge-status-expired">Expired</span>`;
     default:
@@ -124,16 +100,12 @@ function statusBadge(app) {
   }
 }
 
-/* ---------------------------------------
-   RENDER APPS WITH AUTOMATIC SORTING
---------------------------------------- */
 function renderApps() {
   if (!appsContainer) return;
   appsContainer.innerHTML = "";
 
   const appsToFilter = Array.isArray(allApps) ? allApps : [];
 
-  // Apply your activity filters first
   let filtered = appsToFilter.filter((app) => {
     if (currentActivityFilter === "all") return true;
     return isFlagged(currentActivityFilter, app.slug);
@@ -149,43 +121,36 @@ function renderApps() {
 
   setEmpty(false);
 
-  /* --- DYNAMIC SORTING LAYOUT --- */
-  // 1. Separate filtered list into Open vs Completed status tracks
-  const openApps = filtered.filter(app => app.status !== "testing-completed" && app.status !== "expired");
-  const completedApps = filtered.filter(app => app.status === "testing-completed" || app.status === "expired");
+  const openApps = filtered.filter(app => app.status !== "testing-completed" && app.status !== "expired" && app.status !== "production-live");
+  const completedApps = filtered.filter(app => app.status === "testing-completed" || app.status === "expired" || app.status === "production-live");
 
-  // 2. Sort Open Apps: Newest submission date (pubDate) first
   openApps.sort((a, b) => new Date(b.pubDate || 0) - new Date(a.pubDate || 0));
-
-  // 3. Sort Completed Apps: Newest finished first
   completedApps.sort((a, b) => new Date(b.pubDate || 0) - new Date(a.pubDate || 0));
 
-  // 4. Merge them together so open tracks are always on top
   const sortedApps = [...openApps, ...completedApps];
 
-  // Render the final sorted list
   sortedApps.forEach((app) => {
     const card = document.createElement("article");
     card.className = "app-card";
-    // Optional: Add a class if the track is finished to style it with CSS opacity
-    if (app.status === "testing-completed" || app.status === "expired") {
+    if (app.status === "testing-completed" || app.status === "expired" || app.status === "production-live") {
       card.classList.add("card-completed");
     }
     const slug = app.slug || "";
 
     card.innerHTML = `
-      <div class="app-header">
-        <div>
+      <div class="app-header" style="display: flex; gap: 12px; align-items: start;">
+        <img src="${app.icon || 'https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png'}" alt="${app.title} icon" class="app-icon" style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #eee;">
+        <div style="flex: 1;">
           <div class="app-title">${app.title}</div>
-          <div class="app-meta">Android • v${app.version}</div>
-          <div class="app-badges">
+          <div class="app-meta">v${app.version} • <span class="dir-category" style="opacity: 0.85; font-weight: 500;">${app.category || 'General'}</span> • <span class="dir-price" style="font-weight: 500;">${app.price || 'Free'}</span></div>
+          <div class="app-badges" style="margin-top: 4px;">
             ${statusBadge(app)}
             ${isFlagged("favorites", slug) ? '<span class="badge">★ Favorite</span>' : ""}
           </div>
         </div>
       </div>
 
-      <div class="app-description">${app.description}</div>
+      <div class="app-description" style="margin-top: 10px;">${app.description}</div>
 
       <div class="app-footer">
         <div class="app-timing">${formatDaysLabel(app)}</div>
@@ -200,9 +165,6 @@ function renderApps() {
   });
 }
 
-/* ---------------------------------------
-   LOAD APPS
---------------------------------------- */
 async function loadApps() {
   console.log("🚀 [app.js] loadApps() started");
   setLoading(true);
@@ -216,7 +178,6 @@ async function loadApps() {
     const data = await res.json();
     let appsList = [];
 
-    // Safely handle all backend API design variants
     if (data?.apps?.apps?.length) {
       appsList = data.apps.apps;
     } else if (data?.apps?.length) {
@@ -243,9 +204,6 @@ async function loadApps() {
   }
 }
 
-/* ---------------------------------------
-   FILTERS & REFRESH
---------------------------------------- */
 activityFilters?.addEventListener("click", (e) => {
   const btn = e.target.closest(".filter-chip");
   if (!btn) return;

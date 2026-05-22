@@ -1,66 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Developer Guidelines — App Testing Hub</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developer Guidelines - AppLaunch Hub</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --accent-color: #0066cc;
+      --bg-card: #f5f5f7;
+      --code-bg: #1e1e1e;
+      --code-text: #d4d4d4;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      color: #1d1d1f;
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background-color: #ffffff;
+    }
+    h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+    h2 { font-size: 22px; font-weight: 600; margin-top: 32px; border-bottom: 1px solid #d2d2d7; padding-bottom: 8px; }
+    h3 { font-size: 18px; font-weight: 600; margin-top: 24px; color: var(--accent-color); }
+    p, li { color: #424245; font-size: 16px; }
+    ul { padding-left: 20px; }
+    .subtitle { font-size: 18px; color: #6e6e73; margin-bottom: 32px; }
+    
+    /* Callout Box Layout */
+    .callout {
+      background-color: var(--bg-card);
+      border-left: 4px solid var(--accent-color);
+      padding: 20px;
+      border-radius: 0 12px 12px 0;
+      margin: 24px 0;
+    }
+    .callout-title { font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    
+    /* Visual Diagram Layout Simulation */
+    .diagram-container {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 24px;
+      border-radius: 12px;
+      font-family: monospace;
+      font-size: 13px;
+      margin: 24px 0;
+      overflow-x: auto;
+      border: 1px solid #334155;
+    }
+    .diagram-line { white-space: pre; margin: 2px 0; }
+    .diagram-highlight { color: #38bdf8; font-weight: bold; }
+    
+    /* Code Block Layout */
+    pre {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 14px;
+      border: 1px solid #333;
+    }
+    code { font-family: "SFMono-Regular", Consolas, Monaco, monospace; }
+    .inline-code { background: #f2f2f7; color: #bf1b00; padding: 2px 6px; border-radius: 4px; font-size: 14px; }
+    
+    .back-link { display: inline-block; margin-bottom: 24px; color: var(--accent-color); text-decoration: none; font-weight: 500; }
+    .back-link:hover { text-decoration: underline; }
+  </style>
 </head>
 <body>
 
-<div class="app-page-container">
-  <h1>Developer Guidelines</h1>
-  <p>Last updated: <strong>5/21/<span id="year"></span></strong></p>
+  <a href="index.html" class="back-link">← Back to Dashboard</a>
 
-  <h2>1. Feed Requirements</h2>
-  <p>Your RSS feed must:</p>
-  <ul>
-    <li>Be valid XML</li>
-    <li>Contain one or more &lt;item&gt;</li>
-    <li>Use the AppHub namespaces</li>
-    <li>Include platform, version, status, and testing links</li>
-    <li>Include a valid pubDate</li>
-  </ul>
+  <main>
+    <header>
+      <h1>Universal App Distribution Guidelines</h1>
+      <p class="subtitle">How to build one open-standard RSS XML file to automate your distribution everywhere.</p>
+    </header>
 
-  <h2>2. Allowed Status Values</h2>
-  <ul>
-    <li>open-testing</li>
-    <li>closed-testing</li>
-    <li>testing-completed</li>
-    <li>expired</li>
-    <li>not-started</li>
-    <li>internal</li>
-    <li>invite-only</li>
-    <li>marketplace</li>
-    <li>pre-registration</li>
-  </ul>
+    <section class="callout">
+      <div class="callout-title">💡 The Philosophy: One File to Rule Them All</div>
+      <p style="margin: 0;">Instead of forcing you to log into a closed dashboard and copy-paste your app metadata every time you push an update, AppLaunch Hub runs on an <strong>Open Syndication Standard</strong>. You host a single XML file in your own public repository. You own it, you control it, and any platform on the web can read it to keep your app listings synchronized instantly.</p>
+    </section>
 
-  <h2>3. Feed Submission</h2>
-  <p>
-    Submit your feed URL via GitHub pull request or email.
-    Once approved, it will be added to <code>feeds.json</code>.
-  </p>
+    <h2>Decentralized Distribution Architecture</h2>
+    <p>By publishing your structured feed URL to our registry, your build updates trigger a synchronized ripple effect across multiple tracking channels simultaneously:</p>
 
-  <h2>4. Removal Policy</h2>
-  <p>
-    Feeds may be removed if they are invalid, broken, misleading, or violate guidelines.
-  </p>
-</div>
+    <div class="diagram-container">
+      <div class="diagram-line">      [ <span class="diagram-highlight">Your Public App Repository</span> ] &lt;-- Your Single Source of Truth (`appfeed.xml`)</div>
+      <div class="diagram-line">                      |</div>
+      <div class="diagram-line">         +------------+------------+-----------------------+</div>
+      <div class="diagram-line">         |                         |                       |</div>
+      <div class="diagram-line">         v                         v                       v</div>
+      <div class="diagram-line">[ <span class="diagram-highlight">AppLaunch Hub Indexer</span> ]   [ <span class="diagram-highlight">Your Dev Portfolio</span> ]   [ <span class="diagram-highlight">No-Code Marketing Bots</span> ]</div>
+      <div class="diagram-line">  • Automated 14-day tracks  • Live Version Display    • Webhook Social Alerts</div>
+      <div class="diagram-line">  • App store marketplace    • Embedded UI layout       • Discord/Twitter logs</div>
+    </div>
 
-<footer class="site-footer">
-  <p><small>👉 This website contains ads and may earn commissions from clicks or purchases.</small></p>
-  <p>
-    © <span id="year"></span> |
-    <a href="/index.html">Home</a> |
-    <a href="privacy-policy.html">Privacy Policy</a> |
-    <a href="developer-guidelines.html">Developer Guidelines</a> |
-    <a href="about.html">About</a> |
-    Made by <a href="https://erickouassi.com/" target="_blank">Eric</a> with 🙏🏽.
-  </p>
-</footer>
+    <h2>1. Creating Your Application Feed</h2>
+    <p>To list your app, create an XML file (e.g., <code class="inline-code">appfeed.xml</code>) and host it publicly (GitHub Pages or raw repository paths work perfectly). Use our extended custom app namespace parameters inside your feed layout:</p>
 
-<script>
-  document.getElementById("year").textContent = new Date().getFullYear();
-</script>
+    <pre><code>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;rss version="2.0" xmlns:app="https://applaunchhub.com/schema/android"&gt;
+<span style="color: #6a9955;">&lt;!-- Custom namespace maps variables cleanly into our global scraper --&gt;</span>
+&lt;channel&gt;
+  &lt;title&gt;Developer Release Channel&lt;/title&gt;
+  &lt;link&gt;https://github.com/yourusername&lt;/link&gt;
+  &lt;description&gt;Production and testing tracks for independent modules&lt;/description&gt;
+
+  &lt;item&gt;
+    &lt;title&gt;Daily Rosary Moments&lt;/title&gt;
+    &lt;description&gt;An elegant audio companion app designed to keep track of daily meditation practices.&lt;/description&gt;
+    &lt;pubDate&gt;Fri, 22 May 2026 12:00:00 EST&lt;/pubDate&gt;
+    &lt;guid isPermaLink="false"&gt;com.xpdevotion.dailyrosary&lt;/guid&gt;
+    
+    <span style="color: #6a9955;">&lt;!-- Distribution Attributes --&gt;</span>
+    &lt;app:platform&gt;Android&lt;/app:platform&gt;
+    &lt;app:version&gt;1.2.0&lt;/app:version&gt;
+    &lt;app:status&gt;open-testing&lt;/app:status&gt; <span style="color: #6a9955;">&lt;!-- open-testing | testing-completed | production-live --&gt;</span>
+    
+    <span style="color: #6a9955;">&lt;!-- Action Endpoints --&gt;</span>
+    &lt;app:groupLink&gt;https://groups.google.com/g/your-testing-group&lt;/app:groupLink&gt;
+    &lt;app:testLink&gt;https://play.google.com/apps/testing/com.xpdevotion.dailyrosary&lt;/app:testLink&gt;
+    
+    <span style="color: #6a9955;">&lt;!-- Directory Enrichment Fields --&gt;</span>
+    &lt;app:category&gt;Lifestyle&lt;/app:category&gt;
+    &lt;app:price&gt;Free&lt;/app:price&gt;
+    &lt;app:icon&gt;https://raw.githubusercontent.com/yourusername/repo/main/assets/icon.png&lt;/app:icon&gt;
+  &lt;/item&gt;
+&lt;/channel&gt;
+&lt;/rss&gt;</code></pre>
+
+    <h2>2. Beyond AppLaunch Hub: Reusing Your Feed</h2>
+    <p>Because you own this structured XML dataset, you can utilize it to automate your own marketing operations completely for free:</p>
+
+    <h3>A. Automate Your Personal Portfolio Site</h3>
+    <p>Instead of manually changing HTML code every time you release a patch or update a project on your portfolio website, drop a simple JavaScript fetch block directly into your personal portfolio layout:</p>
+    <pre><code>fetch('https://raw.githubusercontent.com/yourusername/repo/main/appfeed.xml')
+  .then(res => res.text())
+  .then(xmlText => {
+     <span style="color: #6a9955;">// Parse your data and map it straight to your personal UI view</span>
+     console.log("Portfolio synchronized dynamically from open-source distribution RSS!");
+  });</code></pre>
+
+    <h3>B. Set Up Automated No-Code Social Alerts</h3>
+    <p>You can plug your raw XML feed directly into workflow automation services like <strong>Make.com</strong> or <strong>Zapier</strong> via their native "RSS Watcher" modules. Whenever you alter the version tag or publish date in your public file:</p>
+    <ul>
+      <li>Automatically broadcast promotional alerts directly to your Discord or Slack channels.</li>
+      <li>Publish update details instantly to your professional developer profile feeds.</li>
+      <li>Compile markdown logs and automatically dispatch email newsletters to subscribers.</li>
+    </ul>
+
+    <h3>C. Cross-Syndicate Across Alternative Open Directories</h3>
+    <p>As the indie developer movement scales up, multiple niche marketplaces can connect to the same registry endpoints. When you cross your 14-day tracking milestones and switch your tag status to <code class="inline-code">production-live</code>, every connected index updates simultaneously across the web on autopilot. No form re-submissions required.</p>
+
+    <h2>3. How to Submit Your Feed</h2>
+    <p>Once your feed is live on GitHub or a custom domain, simply open a Pull Request against our primary master repository registry map file located at <code class="inline-code">feeds.json</code>. Our automated backend engine updates indices globally once a day.</p>
+  </main>
+
+  <footer style="margin-top: 60px; padding-top: 20px; border-top: 1px solid #d2d2d7; color: #86868b; font-size: 13px; text-align: center;">
+    <p>AppLaunch Hub Open Distribution Protocol Specifications. Build robustly, scale globally.</p>
+  </footer>
 
 </body>
 </html>
