@@ -125,7 +125,7 @@ function statusBadge(app) {
 }
 
 /* ---------------------------------------
-   RENDER APPS
+   RENDER APPS WITH AUTOMATIC SORTING
 --------------------------------------- */
 function renderApps() {
   if (!appsContainer) return;
@@ -133,6 +133,7 @@ function renderApps() {
 
   const appsToFilter = Array.isArray(allApps) ? allApps : [];
 
+  // Apply your activity filters first
   let filtered = appsToFilter.filter((app) => {
     if (currentActivityFilter === "all") return true;
     return isFlagged(currentActivityFilter, app.slug);
@@ -148,9 +149,28 @@ function renderApps() {
 
   setEmpty(false);
 
-  filtered.forEach((app) => {
+  /* --- DYNAMIC SORTING LAYOUT --- */
+  // 1. Separate filtered list into Open vs Completed status tracks
+  const openApps = filtered.filter(app => app.status !== "testing-completed" && app.status !== "expired");
+  const completedApps = filtered.filter(app => app.status === "testing-completed" || app.status === "expired");
+
+  // 2. Sort Open Apps: Newest submission date (pubDate) first
+  openApps.sort((a, b) => new Date(b.pubDate || 0) - new Date(a.pubDate || 0));
+
+  // 3. Sort Completed Apps: Newest finished first
+  completedApps.sort((a, b) => new Date(b.pubDate || 0) - new Date(a.pubDate || 0));
+
+  // 4. Merge them together so open tracks are always on top
+  const sortedApps = [...openApps, ...completedApps];
+
+  // Render the final sorted list
+  sortedApps.forEach((app) => {
     const card = document.createElement("article");
     card.className = "app-card";
+    // Optional: Add a class if the track is finished to style it with CSS opacity
+    if (app.status === "testing-completed" || app.status === "expired") {
+      card.classList.add("card-completed");
+    }
     const slug = app.slug || "";
 
     card.innerHTML = `
@@ -187,7 +207,6 @@ async function loadApps() {
   console.log("🚀 [app.js] loadApps() started");
   setLoading(true);
 
-  // Uses the clean top-level base configuration safely
   const API_URL = `${API_BASE}/api/apps?t=${Date.now()}`;
 
   try {
@@ -197,12 +216,19 @@ async function loadApps() {
     const data = await res.json();
     let appsList = [];
 
+    // Safely handle all backend API design variants
     if (data?.apps?.apps?.length) {
       appsList = data.apps.apps;
     } else if (data?.apps?.length) {
       appsList = data.apps;
     } else if (Array.isArray(data)) {
-      appsList = data;
+      data.forEach(item => {
+         if (item?.apps && Array.isArray(item.apps)) {
+            appsList = appsList.concat(item.apps);
+         } else {
+            appsList.push(item);
+         }
+      });
     }
 
     allApps = appsList;
