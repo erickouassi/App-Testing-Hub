@@ -1,8 +1,15 @@
-const CACHE_NAME = "app-testing-hub-v1.0.0";
+const CACHE_NAME = "app-testing-hub-v1.0.1";
 const ASSETS = [
   "/",
   "/index.html",
   "/app.html",
+  "/offline.html",
+  "developer-guidelines.html",
+  "privacy-policy.html",
+  "terms-of-service.html",
+  "about.html",
+  "tools/app-hub-rss-feed-validator.html",
+  "tools/multi-feed-network-auditor.html",
   "/styles.css",
   "/app.js",
   "/app-page.js",
