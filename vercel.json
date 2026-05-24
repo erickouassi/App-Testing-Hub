@@ -2,9 +2,7 @@
   "version": 2,
   "builds": [
     { "src": "api/*.js", "use": "@vercel/node" },
-
     { "src": "public/**/*", "use": "@vercel/static" },
-
     { "src": "*.html", "use": "@vercel/static" },
     { "src": "*.css", "use": "@vercel/static" },
     { "src": "*.js", "use": "@vercel/static" },
@@ -12,9 +10,21 @@
     { "src": "*.xml", "use": "@vercel/static" },
     { "src": "*.txt", "use": "@vercel/static" }
   ],
+  "headers": [
+    {
+      "source": "/.well-known/assetlinks.json",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    }
+  ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1.js" },
-
+    
+    { "src": "/\\.well-known/assetlinks.json", "dest": "/public/.well-known/assetlinks.json" },
     { "src": "/\\.well-known/(.*)", "dest": "/.well-known/$1" },
 
     { "src": "/app", "dest": "/app.html" },
