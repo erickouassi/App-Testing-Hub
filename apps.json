@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-26T03:19:27.270Z",
+  "generatedAt": "2026-05-27T03:53:52.151Z",
   "apps": {
-    "generatedAt": "2026-05-26T03:19:27.270Z",
+    "generatedAt": "2026-05-27T03:53:52.151Z",
     "apps": [
       {
         "slug": "daily-rosary",
@@ -13,8 +13,8 @@
         "testLink": "https://play.google.com/apps/testing/com.erickouassi.dailyrosary",
         "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
         "testingDuration": 25,
-        "daysInTesting": 12,
-        "daysLeft": 13,
+        "daysInTesting": 13,
+        "daysLeft": 12,
         "status": "open-testing",
         "category": "General",
         "price": "Free",
@@ -44,8 +44,8 @@
         "testLink": "https://play.google.com/apps/testing/com.erickouassi.lerosaire.dailyrosary",
         "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
         "testingDuration": 25,
-        "daysInTesting": 12,
-        "daysLeft": 13,
+        "daysInTesting": 13,
+        "daysLeft": 12,
         "status": "open-testing",
         "category": "General",
         "price": "Free",
