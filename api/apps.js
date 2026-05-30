@@ -1,4 +1,4 @@
-import { updateAllFeeds } from "/update.js";
+import { updateAllFeeds } from "../update.js"; 
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
