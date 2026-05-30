@@ -1,116 +1,147 @@
-const CACHE_NAME = "app-testing-hub-v1.0.1";
+const CACHE_NAME = "app-testing-hub-v1.5.30.2026.1";
+console.log("Service Worker version:", CACHE_NAME);
+
+/* ---------------------------------------------------------
+   📦 ASSETS TO PRE-CACHE (ALL FEATURES INCLUDED)
+   - Relative paths only
+   - No external URLs
+   - Safe for addAll()
+--------------------------------------------------------- */
 const ASSETS = [
-  "/",
-  "/index.html",
-  "/app.html",
-  "/offline.html",
+  "index.html",
+  "app.html",
+  "offline.html",
   "developer-guidelines.html",
   "privacy-policy.html",
   "terms-of-service.html",
   "about.html",
-  "tools/app-hub-rss-feed-validator.html",
-  "tools/multi-feed-network-auditor.html",
-  "/styles.css",
-  "/app.js",
-  "/app-page.js",
-  "/manifest.json",
-  "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-192x192.png",
-  "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-192x192-maskable.png",
-  "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-256x256.png",
-  "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-512x512.png",
-  "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-512x512-maskable.png"
+  "styles.css",
+  "app.js",
+  "app-page.js",
+  "manifest.json",
+  "img/android-chrome-192x192.png",
+  "img/android-chrome-512x512.png",
+  "img/favicon.svg"
 ];
 
-// 🧩 INSTALL — Cache platform assets & activate immediately
-self.addEventListener("install", event => {
-  self.skipWaiting();
+// Debug missing assets (non-blocking)
+ASSETS.forEach(url => {
+  fetch(url)
+    .then(r => console.log(url, r.status))
+    .catch(() => console.log(url, "FAILED"));
+});
+
+/* ---------------------------------------------------------
+   🧩 INSTALL — Pre-cache core assets
+--------------------------------------------------------- */
+self.addEventListener("install", (event) => {
+  console.log("📥 [SW] Installing…");
+
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      console.log("📥 [Service Worker] Pre-caching core application assets");
+    caches.open(CACHE_NAME).then((cache) => {
+      ASSETS.forEach((url) => {
+        fetch(url).catch(() => console.warn("⚠️ Missing asset:", url));
+      });
+
       return cache.addAll(ASSETS);
     })
   );
 });
 
-// ⚙️ ACTIVATE — Remove old cache signatures & claim immediate clients control
-self.addEventListener("activate", event => {
+/* ---------------------------------------------------------
+   ⚙️ ACTIVATE — Clean old caches
+--------------------------------------------------------- */
+self.addEventListener("activate", (event) => {
+  console.log("🧹 [SW] Activating…");
+
   event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => {
-          console.log("🧹 [Service Worker] Removing obsolete cache store:", key);
-          return caches.delete(key);
-        })
-      );
-    }).then(() => self.clients.claim())
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => {
+            console.log("🗑️ Removing old cache:", key);
+            return caches.delete(key);
+          })
+      )
+    )
+  );
+
+  self.clients.claim();
+});
+
+/* ---------------------------------------------------------
+   🚦 FETCH STRATEGY (FULL FEATURE SET)
+   - Navigation → network-first
+   - Static assets → cache-first
+   - Offline fallback → offline.html
+   - Dynamic caching for new pages
+--------------------------------------------------------- */
+self.addEventListener("fetch", (event) => {
+  const req = event.request;
+
+  if (!req.url.startsWith(self.location.origin)) return;
+
+  // Navigation requests → network-first
+// Navigation requests → network-first
+if (req.mode === "navigate") {
+  event.respondWith(
+    fetch(req)
+      .then((res) => {
+        const resClone = res.clone(); // FIX: clone immediately
+
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(req, resClone);
+        });
+
+        return res;
+      })
+      .catch(() => {
+        console.log("📡 [SW] Navigation fallback triggered");
+        return caches.match("app.html") || caches.match("index.html");
+      })
+  );
+  return;
+}
+
+
+  // Static assets → cache-first
+  event.respondWith(
+    caches.match(req).then(
+      (cached) =>
+        cached ||
+        fetch(req)
+          .then((res) => {
+            // Dynamic caching for new assets
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(req, res.clone());
+            });
+            return res;
+          })
+          .catch(() => {
+            if (req.destination === "document") {
+              return caches.match("offline.html");
+            }
+          })
+    )
   );
 });
 
-/* -----------------------------------------------------------------------
-   🚦 FETCH STRATEGY
-   - Network-First with dynamic background cache-updating for Navigations 
-     (ensures developers' live closed tracks stay fully up-to-date).
-   - Cache-First fallback for static layout resources (CSS, JS, Icons).
------------------------------------------------------------------------ */
-self.addEventListener("fetch", event => {
-  // Skip cross-origin requests like fetching live feeds from Vercel API or GitHub
-  if (!event.request.url.startsWith(self.location.origin)) {
-    return;
-  }
+/* ---------------------------------------------------------
+   🛰️ PUSH NOTIFICATIONS (FULL FEATURE SET)
+--------------------------------------------------------- */
+self.addEventListener("push", (event) => {
+  console.log("📡 [SW] Push received");
 
-  if (event.request.mode === "navigate") {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          return caches.open(CACHE_NAME).then(cache => {
-            // Dynamically save down page structures for instant future offline boots
-            cache.put(event.request, response.clone());
-            return response;
-          });
-        })
-        .catch(() => {
-          console.log("📡 [Service Worker] Network fallback triggered on navigation loop");
-          // If a deep-linked app tracking route (e.g., /app.html?slug=xyz) fails offline,
-          // instantly load the offline-ready app shell asset structure gracefully instead
-          return caches.match("/app.html") || caches.match("/index.html");
-        })
-    );
-  } else {
-    event.respondWith(
-      caches.match(event.request).then(cachedResponse => {
-        return cachedResponse || fetch(event.request);
-      })
-    );
-  }
-});
-
-// 🔔 Handle explicit application patch update notifications safely
-self.addEventListener("message", event => {
-  if (event.data === "checkForUpdate") {
-    self.skipWaiting();
-  }
-});
-
-
-/**
- * 🛰️ Service Worker Push Messaging Extension
- * Handles background server push events and user click interactions.
- */
-
-// 1. Listen for background push events from your server
-self.addEventListener('push', (event) => {
-  console.log('📡 [Service Worker] Push message received.');
-
-  let title = 'Testing Hub Update';
+  let title = "Testing Hub Update";
   let options = {
-    body: 'A fellow developer needs testers! Check the active tracks.',
-    icon: 'https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/favicon.svg', // Match your project asset structure
-    badge: 'https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/favicon.svg',
-    tag: 'hub-push-alert', // Overwrites previous notifications to prevent spamming
-    data: { url: '/' }    // Context payload pass-through
+    body: "A fellow developer needs testers! Check the active tracks.",
+    icon: "img/favicon.svg",
+    badge: "img/favicon.svg",
+    tag: "hub-push-alert",
+    data: { url: "/" },
   };
 
-  // If your server sends a dynamic JSON string payload, parse it safely
   if (event.data) {
     try {
       const payload = event.data.json();
@@ -118,40 +149,43 @@ self.addEventListener('push', (event) => {
       options.body = payload.body || options.body;
       if (payload.icon) options.icon = payload.icon;
       if (payload.url) options.data.url = payload.url;
-    } catch (e) {
-      // Fallback to raw text if it's not JSON
+    } catch {
       options.body = event.data.text();
     }
   }
 
-  // Keep the service worker alive until the notification is displayed
-  event.waitUntil(
-    self.registration.showNotification(title, options)
-  );
+  event.waitUntil(self.registration.showNotification(title, options));
 });
 
-// 2. Action handler: Direct the tester to your app when they tap the notification
-self.addEventListener('notificationclick', (event) => {
-  console.log('👆 [Service Worker] Notification clicked.');
-  event.notification.close(); // Dimiss the banner instantly
+/* ---------------------------------------------------------
+   👆 NOTIFICATION CLICK HANDLER
+--------------------------------------------------------- */
+self.addEventListener("notificationclick", (event) => {
+  console.log("👆 [SW] Notification clicked");
+  event.notification.close();
 
-  // Grab the destination URL passed from the push payload
-  const targetUrl = event.notification.data?.url || '/';
+  const targetUrl = event.notification.data?.url || "/";
 
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-      // If a tab is already open, focus it and navigate to the target route
-      for (let client of windowClients) {
-        if (client.url.includes(location.host) && 'focus' in client) {
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientsList) => {
+      for (let client of clientsList) {
+        if (client.url.includes(location.host) && "focus" in client) {
           return client.focus().then(() => {
             if (client.navigate) return client.navigate(targetUrl);
           });
         }
       }
-      // Otherwise, open a brand new browser tab
-      if (clients.openWindow) {
-        return clients.openWindow(targetUrl);
-      }
+      return clients.openWindow(targetUrl);
     })
   );
+});
+
+/* ---------------------------------------------------------
+   🔄 UPDATE NOTIFIER — SKIP WAITING
+--------------------------------------------------------- */
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    console.log("🔄 User clicked Update — activating new service worker");
+    self.skipWaiting();
+  }
 });
