@@ -37,6 +37,8 @@
     { "src": "/\\.well-known/(.*)", "dest": "/.well-known/$1" },
 
     { "src": "/app", "dest": "/app.html" },
+    
+    { "src": "/tools/(.*)", "dest": "/tools/$1" },
     { "src": "/(.*\\.(html|css|js|json|xml|txt|png|jpg|jpeg|gif|svg))", "dest": "/$1" },
     { "src": "/(.*)", "dest": "/index.html" }
   ],
