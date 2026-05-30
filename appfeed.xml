@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+     xmlns:app="https://apphub.dev/rss/app"
+     xmlns:dev="https://apphub.dev/rss/developer"
+     xmlns:social="https://apphub.dev/rss/social">
+
+  <channel>
+    <title>App Testing Hub — App Test Feed</title>
+    <link>https://app-testing-hub.vercel.app/</link>
+    <description>Beta testing information for the App Testing Hub platform.</description>
+    <language>en</language>
+    <lastBuildDate>Sat, 30 May 2026 09:00:00 EST</lastBuildDate>
+
+    <dev:developer>
+      <dev:name>Eric Kouassi</dev:name>
+      <dev:email>hello@erickouassi.com</dev:email>
+      <dev:website>https://app-testing-hub.adminhq.cf/</dev:website>
+
+      <social:links>
+        <social:reddit>https://www.reddit.com/user/By_EK/</social:reddit>
+        <social:github>https://github.com/erickouassi</social:github>
+        <social:twitter>https://twitter.com/eric_kouassi</social:twitter>
+        <social:youtube>https://youtube.com/@eric_kouassi</social:youtube>
+      </social:links>
+    </dev:developer>
+
+    <item>
+      <title>App Testing Hub</title>
+      <guid isPermaLink="false">cf.adminhq.app_testing_hub.twa</guid>
+      <pubDate>Sat, 30 May 2026 09:00:00 -0500</pubDate>
+
+      <app:platform>Android</app:platform>
+      <app:version>1.0.0</app:version>
+      <app:status>open-testing</app:status>
+      <app:testingDuration>12</app:testingDuration>
+
+      <app:testLink>https://play.google.com/apps/testing/cf.adminhq.app_testing_hub.twa</app:testLink>
+      <app:groupLink>https://groups.google.com/g/daily-rosary-beta-testers</app:groupLink>
+      <app:groupMembers>-</app:groupMembers>
+
+      <description>
+        A centralized hub for managing, discovering, and testing Android apps built with Trusted Web Activity.
+      </description>
+
+      <app:requirements>
+        <app:requirement>Android phone</app:requirement>
+        <app:requirement>Google account</app:requirement>
+        <app:requirement>Keep installed 14 days +</app:requirement>
+      </app:requirements>
+
+      <app:languages>
+        <app:language>English</app:language>
+      </app:languages>
+
+      <app:countries>
+        <app:country>United States</app:country>
+      </app:countries>
+
+      <app:category>Lifestyle</app:category>
+      <app:price>Free</app:price>
+      <app:icon>https://www.image2url.com/r2/default/files/1780167872022-71fedbd1-7aa6-4f03-88e4-e9a4ad38b97d.png</app:icon>
+    </item>
+        
+
+  </channel>
+</rss>
