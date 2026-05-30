@@ -1,3 +1,5 @@
+import { updateAllFeeds } from "/update.js";
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -8,15 +10,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const url =
-      "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/apps.json";
+    const result = await updateAllFeeds();
 
-    const response = await fetch(url);
-    const json = await response.json();
-
-    return res.status(200).json(json);
+    // ✅ Return clean structure: { generatedAt: "...", apps: [ ... ] }
+    return res.status(200).json(result);
   } catch (err) {
-    console.log("❌ /api/apps error:", err);
-    return res.status(200).json({ generatedAt: null, apps: [] });
+    console.error("❌ /api/apps error:", err);
+    return res.status(500).json({ generatedAt: null, apps: [] });
   }
 }
