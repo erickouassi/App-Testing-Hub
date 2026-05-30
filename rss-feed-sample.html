@@ -1,14 +1,15 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Rosary — Example RSS Feed sample</title>
+  <title>Daily Rosary — Example RSS Feed</title>
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
   
   <style>
-    /* Apple Help Documentation Theme Colors & Typography */
+    /* Clean & Simple Documentation Typography */
     :root {
       --bg-color: #ffffff;
       --text-color: #1d1d1f;
@@ -19,117 +20,99 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: var(--bg-color);
       color: var(--text-color);
-      line-height: 1.47059;
-      font-weight: 400;
-      letter-spacing: -.022em;
+      line-height: 1.5;
       margin: 0;
       padding: 40px 20px;
       display: flex;
       justify-content: center;
     }
 
-    .wrapper {
-      max-width: 780px;
+    .container {
+      max-width: 800px;
       width: 100%;
     }
 
     h1 {
-      font-size: 32px;
-      line-height: 1.125;
+      font-size: 24px;
       font-weight: 700;
-      letter-spacing: .004em;
       color: var(--heading-color);
-      margin-top: 0;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     p {
-      font-size: 17px;
-      line-height: 1.47059;
-      font-weight: 400;
-      letter-spacing: -.022em;
-      margin-top: 0;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
-    .code-container {
-      position: relative;
-      background-color: var(--code-bg);
-      border: 1px solid var(--code-border);
-      border-radius: 8px;
-      margin-top: 24px;
-      margin-bottom: 24px;
-      overflow: hidden;
+    a {
+      color: var(--link-color);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
     }
 
     .code-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background-color: #e8e8ed;
-      padding: 8px 16px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #6e6e73;
-      border-bottom: 1px solid var(--code-border);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      margin-bottom: 8px;
     }
 
     .copy-btn {
       background: none;
-      border: none;
-      color: var(--link-color);
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 12px;
-      padding: 2px 8px;
+      border: 1px solid var(--code-border);
+      padding: 4px 12px;
+      font-size: 13px;
       border-radius: 4px;
+      cursor: pointer;
     }
 
     .copy-btn:hover {
-      background-color: rgba(0, 102, 204, 0.1);
+      background-color: var(--code-bg);
     }
 
-    /* Target block wrapper formatting */
     pre[class*="language-"] {
-      margin: 0 !important;
+      background: var(--code-bg) !important;
+      border: 1px solid var(--code-border);
+      border-radius: 8px;
       padding: 16px !important;
-      background: transparent !important;
-      font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      margin: 0 !important;
+    }
+
+    code[class*="language-"] {
+      color: var(--text-color) !important;
+      font-family: SFMono-Regular, Consolas, Monaco, monospace;
       font-size: 13px;
-      line-height: 1.6;
-      /* Soft wraps lines and forces bottom scrollbars away */
-      white-space: pre-wrap !important;       
-      word-wrap: break-word !important;       
-      word-break: break-word !important;       
     }
   </style>
 </head>
 <body>
 
-  <div class="wrapper">
-    <h1>Example RSS Feed sample</h1>
-    <p>Review this example of a well-formed RSS feed containing your custom app metadata and beta testing properties. You can copy the code snippet below to construct your own XML structure.</p>
+<div class="container">
+  <h1>Example RSS Feed Sample</h1>
+  <a href="index.html" class="back-link">← Back to Dashboard</a>
+  <p>
+    This sample shows how to format your remote channel feed for index matching. 
+    Review the <a href="developer-guidelines.html">Developer Guidelines</a> to learn more.
+  </p>
 
-    <div class="code-container">
-      <div class="code-header">
-        <span>xml</span>
-        <button class="copy-btn" onclick="copyCode()">Copy Code</button>
-      </div>
-      <pre><code id="xml-code" class="language-xml"></code></pre>
-    </div>
+  <div class="code-header">
+    <strong>feed-sample.xml</strong>
+    <button class="copy-btn" onclick="copyCode(this)">Copy Snippet</button>
   </div>
+  <pre><code id="xml-code" class="language-xml"></code></pre>
+</div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 
-  <script>
-    // Exact raw XML feed content
-    const rawXml = `<?xml version="1.0" encoding="UTF-8"?>
+<script>
+  // Raw RSS Data string to copy and escape cleanly
+  const rawXml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"
      xmlns:app="https://apphub.dev/rss/app"
      xmlns:dev="https://apphub.dev/rss/developer"
@@ -160,19 +143,15 @@
     <item>
       <title>Daily Rosary</title>
       <guid isPermaLink="false">com.erickouassi.dailyrosary</guid>
-
       <pubDate>Fri, 15 May 2026 09:00:00 -0500</pubDate>
 
       <app:platform>Android</app:platform>
       <app:version>1.0.0</app:version>
-
       <app:status>open-testing</app:status>
-
       <app:testingDuration>25</app:testingDuration>
 
       <app:testLink>https://play.google.com/apps/testing/com.erickouassi.dailyrosary</app:testLink>
       <app:groupLink>https://groups.google.com/g/daily-rosary-beta-testers</app:groupLink>
-
       <app:groupMembers>40</app:groupMembers>
 
       <description>
@@ -196,26 +175,71 @@
         <app:country>France</app:country>
       </app:countries>
 
+      <app:category>Lifestyle</app:category>
+      <app:price>Free</app:price>
+      <app:icon>https://raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/main/assets/icon.png</app:icon>
+   
+
     </item>
-     
+        
+    <item>
+      <title>Le Rosaire du Jour</title>
+      <guid isPermaLink="false">com.erickouassi.lerosaire</guid>
+      <pubDate>Fri, 15 May 2026 09:00:00 -0500</pubDate>
+
+      <app:platform>Android</app:platform>
+      <app:version>1.0.0</app:version>
+      <app:status>open-testing</app:status>
+      <app:testingDuration>25</app:testingDuration>
+
+      <app:testLink>https://play.google.com/apps/testing/com.erickouassi.lerosaire.dailyrosary</app:testLink>
+      <app:groupLink>https://groups.google.com/g/le-rosaire-du-jour-beta-testers</app:groupLink>
+      <app:groupMembers>40</app:groupMembers>
+
+      <description>
+        Version française du Rosaire quotidien, avec audio, mystère du jour automatique et suivi de prière.
+      </description>
+
+      <app:requirements>
+        <app:requirement>Connexion Internet</app:requirement>
+        <app:requirement>Navigateur moderne</app:requirement>
+      </app:requirements>
+
+      <app:languages>
+        <app:language>French</app:language>
+      </app:languages>
+
+      <app:countries>
+        <app:country>Cote D'Ivoire</app:country>
+        <app:country>France</app:country>
+        <app:country>Canada</app:country>
+        <app:country>United States</app:country>
+      </app:countries>
+
+      <app:category>Lifestyle</app:category>
+      <app:price>Free</app:price>
+      <app:icon>https://raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/main/assets/icon.png</app:icon>
+    </item>
+
   </channel>
 </rss>`;
 
-    // Insert text via textContent to securely escape characters automatically
-    const codeElement = document.getElementById('xml-code');
-    codeElement.textContent = rawXml;
+  // Insert text via textContent to securely escape HTML characters
+  const codeElement = document.getElementById('xml-code');
+  codeElement.textContent = rawXml;
 
-    // Trigger Prism engine to highlight the safe elements
-    Prism.highlightElement(codeElement);
+  // Trigger Prism highlighting pass
+  Prism.highlightElement(codeElement);
 
-    // Clipboard Copy Functionality
-    function copyCode() {
-      navigator.clipboard.writeText(rawXml).then(() => {
-        const btn = document.querySelector('.copy-btn');
-        btn.textContent = 'Copied!';
-        setTimeout(() => { btn.textContent = 'Copy Code'; }, 2000);
-      });
-    }
-  </script>
+  // Clipboard handler logic
+  function copyCode(button) {
+    navigator.clipboard.writeText(rawXml).then(() => {
+      button.textContent = "Copied!";
+      setTimeout(() => {
+        button.textContent = "Copy Snippet";
+      }, 2000);
+    });
+  }
+</script>
 </body>
 </html>

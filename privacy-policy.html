@@ -1,52 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Privacy Policy — App Testing Hub</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — AppLaunch Hub</title>
+  <meta name="theme-color" content="black">
+  <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .legal-content h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin-top: 28px;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    .legal-content p, .legal-content li {
+      line-height: 1.6;
+      color: var(--text);
+      opacity: 0.9;
+      font-size: 0.95rem;
+      margin-bottom: 14px;
+    }
+    .legal-content ul {
+      padding-left: 20px;
+    }
+  </style>
 </head>
 <body>
 
-<div class="app-page-container">
-  <h1>Privacy Policy</h1>
-  <p>Last updated: <strong><span id="year"></span></strong></p>
+  <header class="site-header">
+    <div>
+      <h1>AppLaunch Hub</h1>
+      <p class="subtitle">Privacy Policy & Disclosures</p>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="btn btn-ghost">⬅️ Back to Directory</a>
+    </div>
+  </header>
 
-  <h2>1. Information We Collect</h2>
-  <p>
-    We do not collect personal information. Your activity (saved apps, favorites, joined tests)
-    is stored locally on your device using browser storage.
-  </p>
+  <main class="hub-main">
+    
+    <aside class="sidebar">
+      <div class="filter-group">
+        <h3>Legal Documents</h3>
+        <div class="filter-chips">
+          <a href="index.html" class="filter-chip">All Apps</a>
+          <button class="filter-chip active">Privacy Policy</button>
+          <a href="terms-of-service.html" class="filter-chip">Terms of Service</a>
+        </div>
+      </div>
+    </aside>
 
-  <h2>2. Third‑Party Links</h2>
-  <p>
-    This website links to Google Groups, Google Play testing pages, and developer websites.
-    We are not responsible for their privacy practices.
-  </p>
+    <section class="apps-section">
+      <div class="app-page-container legal-content">
+        <h2 style="margin-top:0; font-size: 1.6rem;">Privacy Policy</h2>
+        <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 20px;">
+          Last updated: <strong><span id="update-year-1"></span></strong>
+        </p>
+        
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
 
-  <h2>3. Advertising</h2>
-  <p>
-    This website contains ads and may earn commissions from clicks or purchases.
-  </p>
+        <h2>1. Information We Collect</h2>
+        <p>
+          We strongly believe in privacy-respecting software systems. We do not collect, harvest, or store personal information or tracking profiles on remote servers. 
+        </p>
+        <p>
+          Any personalization activity you perform—such as selecting favorites, saving applications, or checking off joined test statuses—is saved entirely within your own local sandbox environment using standard browser <strong>Local Storage</strong>. This details track never leaves your device.
+        </p>
 
-  <h2>4. Cookies</h2>
-  <p>
-    We do not use cookies. Local storage is used only to save your preferences.
-  </p>
+        <h2>2. Third‑Party Platform Links</h2>
+        <p>
+          This public testing directory references outward action nodes pointing straight to external properties managed by independent third parties. These include:
+        </p>
+        <ul>
+          <li>Google Groups registration lists</li>
+          <li>Google Play Console pre-release opt-in landing portals</li>
+          <li>Custom external development websites, repositories, or source trails</li>
+        </ul>
+        <p>
+          We possess absolutely zero jurisdiction or authority over the security, structural code, or privacy policies maintained across external target spaces.
+        </p>
 
-  <h2>5. Contact</h2>
-  <p>
-    For questions, email: <a href="mailto:hello@erickouassi.com">hello@erickouassi.com</a>
-  </p>
-</div>
+        <h2>3. Advertising &amp; Affiliate Disclosure</h2>
+        <p>
+          To maintain zero listing fees for independent mobile software creators, this platform displays third-party programmatic advertisements and may yield affiliate revenue splits or commission streams resulting from outbound developer platform clicks or promotional interactions.
+        </p>
 
-<footer class="site-footer">
-  <p><small>👉 This website contains ads and may earn commissions from clicks or purchases.</small></p>
-  <p>© <span id="year"></span> | <a href="privacy-policy.html">Privacy Policy</a> | Made by <a href="https://erickouassi.com/" target="_blank">Eric</a> with 🙏🏽.</p>
-</footer>
+        <h2>4. Cookie Policies</h2>
+        <p>
+          We do not deploy traditional tracking cookies. We utilize browser-native local configuration keys to record user layout choices. Programmatic ad infrastructure modules embedded inside the platform layout may query generic browser environment details to supply relevant target parameters safely.
+        </p>
 
-<script>
-  document.getElementById("year").textContent = new Date().getFullYear();
-</script>
+        <h2>5. Developer Context Contacts</h2>
+        <p>
+          For diagnostic inquiries, metadata corrections, or operational questions, you can reach out via email directly to the lead web developer at: 
+          <a href="mailto:hello@erickouassi.com" style="color: var(--accent); font-weight: 500;">hello@erickouassi.com</a>.
+        </p>
+      </div>
+    </section>
 
+    <div id="daily-pro-tip-container">
+      <div class="pro-tip-card">
+        <div class="pro-tip-header">🔒 Safe &amp; Transparent</div>
+        <div class="pro-tip-content">
+          Your saved apps and tracking selections are saved 100% locally on your machine. Clearing browser cache resets your personalized dashboard view instantly.
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <p><small>👉 This website contains ads and may earn commissions from clicks or purchases.</small></p>
+    <p>
+      © <span id="year"></span> |
+      <a href="index.html">Directory Home</a> |
+      <a href="terms-of-service.html">Terms of Service</a> |
+      <a href="about.html">About</a> |
+      <a href="developer-guidelines.html">Guidelines</a>
+    </p>
+  </footer>
+
+  <script>
+    const currentYear = new Date().getFullYear();
+    document.getElementById("year").textContent = currentYear;
+    document.getElementById("update-year-1").textContent = currentYear;
+  </script>
 </body>
 </html>

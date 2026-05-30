@@ -1,63 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Terms of Service — App Testing Hub</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — AppLaunch Hub</title>
+  <meta name="theme-color" content="black">
+  <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/favicon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .legal-content h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin-top: 28px;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    .legal-content p, .legal-content li {
+      line-height: 1.6;
+      color: var(--text);
+      opacity: 0.9;
+      font-size: 0.95rem;
+      margin-bottom: 14px;
+    }
+    .legal-content ul {
+      padding-left: 20px;
+    }
+  </style>
 </head>
 <body>
 
-<div class="app-page-container">
-  <h1>Terms of Service</h1>
-  <p>Last updated: <strong><span id="year"></span></strong></p>
+  <header class="site-header">
+    <div>
+      <h1>AppLaunch Hub</h1>
+      <p class="subtitle">Platform Terms of Service</p>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="btn btn-ghost">⬅️ Back to Directory</a>
+    </div>
+  </header>
 
-  <h2>1. Overview</h2>
-  <p>
-    App Testing Hub provides a directory of Android beta testing opportunities.
-    By using this website, you agree to these Terms of Service.
-  </p>
+  <main class="hub-main">
+    
+    <aside class="sidebar">
+      <div class="filter-group">
+        <h3>Legal Documents</h3>
+        <div class="filter-chips">
+          <a href="index.html" class="filter-chip">All Apps</a>
+          <a href="privacy-policy.html" class="filter-chip">Privacy Policy</a>
+          <button class="filter-chip active">Terms of Service</button>
+        </div>
+      </div>
+    </aside>
 
-  <h2>2. No Affiliation with Google</h2>
-  <p>
-    This website is not affiliated with Google, Google Play, or any app developer listed here.
-    All trademarks belong to their respective owners.
-  </p>
+    <section class="apps-section">
+      <div class="app-page-container legal-content">
+        <h2 style="margin-top:0; font-size: 1.6rem;">Terms of Service</h2>
+        <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 20px;">
+          Last updated: <strong><span id="update-year-2"></span></strong>
+        </p>
+        
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 20px 0;">
 
-  <h2>3. Developer Submissions</h2>
-  <p>
-    Developers may submit RSS feeds for inclusion. All feeds must follow the
-    <a href="developer-guidelines.html">Developer Guidelines</a>.
-    We reserve the right to approve, reject, or remove any feed.
-  </p>
+        <h2>1. Platform Overview</h2>
+        <p>
+          AppLaunch Hub handles public open directory maps linking developers navigating mobile lifecycle stages to passionate independent product testers. By entering, browsing, or utilizing this static site index, you express full, binding consent to these operating conditions.
+        </p>
 
-  <h2>4. No Guarantees</h2>
-  <p>
-    We do not guarantee acceptance into any beta program, nor do we guarantee
-    the accuracy of developer-provided information.
-  </p>
+        <h2>2. Total Independence from Google Ecosystems</h2>
+        <p>
+          This website is a wholly independent project. It is <strong>not affiliated with, endorsed by, or structurally sponsored by Google LLC</strong>, the Android Open Source Project, or the official Google Play Console system. All brand visuals, product screenshots, package links, and trademarks exist strictly for identification purposes.
+        </p>
 
-  <h2>5. Limitation of Liability</h2>
-  <p>
-    App Testing Hub is provided “as is.” We are not responsible for any issues
-    arising from participation in third‑party testing programs.
-  </p>
-</div>
+        <h2>3. Developer Registry Feeds &amp; Submissions</h2>
+        <p>
+          Independent creators may submit custom syndication feeds to maintain their app dashboard nodes. All inbound distribution streams must strictly adhere to the standards set out in our <a href="developer-guidelines.html" style="color: var(--accent); font-weight: 500;">Developer Guidelines</a>. We preserve absolute rights to verify, suspend, filter, or purge directory nodes if instructions are missing or terms are broken.
+        </p>
 
-<footer class="site-footer">
-  <p><small>👉 This website contains ads and may earn commissions from clicks or purchases.</small></p>
-  <p>
-    © <span id="year"></span> |
-    <a href="/index.html">Home</a> |
-    <a href="privacy-policy.html">Privacy Policy</a> |
-    <a href="developer-guidelines.html">Developer Guidelines</a> |
-    <a href="about.html">About</a> |
-    Made by <a href="https://erickouassi.com/" target="_blank">Eric</a> with 🙏🏽.
-  </p>
-</footer>
+        <h2>4. Absolute Absence of Guarantees</h2>
+        <p>
+          We do not guarantee that your application will cross benchmarks or secure immediate beta tracks. We act purely as a connection platform. Content accuracy lies completely with listing managers.
+        </p>
 
-<script>
-  document.getElementById("year").textContent = new Date().getFullYear();
-</script>
+        <h2>5. Limitation of Liability</h2>
+        <p>
+          AppLaunch Hub is built and maintained as an "as-is" index toolset. We are not liable for software bugs, diagnostic damage, console balance alterations, or issues arising from testing third-party applications linked in the directory.
+        </p>
+      </div>
+    </section>
 
+    <div id="daily-pro-tip-container">
+      <div class="pro-tip-card">
+        <div class="pro-tip-header">⚖️ Operational Clarity</div>
+        <div class="pro-tip-content">
+          By engaging in exchange testing tracks across this indexing layer, you commit to providing clean developer communication to your peers.
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <p><small>👉 This website contains ads and may earn commissions from clicks or purchases.</small></p>
+    <p>
+      © <span id="year"></span> |
+      <a href="index.html">Directory Home</a> |
+      <a href="privacy-policy.html">Privacy Policy</a> |
+      <a href="about.html">About</a> |
+      <a href="developer-guidelines.html">Guidelines</a>
+    </p>
+  </footer>
+
+  <script>
+    const currentYear = new Date().getFullYear();
+    document.getElementById("year").textContent = currentYear;
+    document.getElementById("update-year-2").textContent = currentYear;
+  </script>
 </body>
 </html>

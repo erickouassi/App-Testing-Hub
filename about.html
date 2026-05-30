@@ -1,97 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>About the Platform — App Testing Hub</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - AppLaunch Hub</title>
+    <meta name="theme-color" content="black">
+    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/favicon.svg">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="app-page-container">
-  <h1>About App Testing Hub</h1>
-  <p>Last updated: <strong><span id="year"></span></strong></p>
+  <header class="site-header">
+    <div>
+      <h1>AppLaunch Hub</h1>
+      <p class="subtitle">About Our Mission</p>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="btn btn-ghost">⬅️ Back to Directory</a>
+    </div>
+  </header>
 
-  <h2>What is App Testing Hub?</h2>
-  <p>
-    App Testing Hub is a simple, developer‑friendly platform that helps Android users
-    discover open and closed beta testing opportunities. Developers publish a small
-    XML feed, and the platform automatically pulls their testing information into a
-    clean, mobile‑friendly directory.
-  </p>
+  <main class="hub-main" style="grid-template-columns: 1fr; max-width: 800px;">
+    <section class="apps-section">
+      <div class="app-page-container">
+        <h2 style="margin-top:0;">Bridging Independent Creators & Passionate Testers</h2>
+        <p style="line-height: 1.6; font-size: 1.05rem;">
+          Navigating the modern requirements of mobile app deployment can be tough for independent developers. 
+          <strong>AppLaunch Hub</strong> was built as a dedicated space to streamline this transition—connecting Android developers managing closed testing loops directly with an engaged community of peer testers.
+        </p>
 
-  <h2>Why This Platform Exists</h2>
-  <p>
-    Many developers struggle to recruit testers, and many users never hear about
-    exciting new apps until they’re already released. App Testing Hub bridges that gap:
-  </p>
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 24px 0;">
 
-  <ul>
-    <li>Developers get visibility for their beta programs</li>
-    <li>Testers get early access to new apps</li>
-    <li>Everyone benefits from a clean, ad‑supported, privacy‑respecting experience</li>
-  </ul>
+        <h3>Our Intentions</h3>
+        <p style="line-height: 1.5; color: var(--muted);">
+          We believe in human-driven web tools, storytelling, and open collaboration. Rather than relying on faceless bot networks or click farms, this directory encourages community engagement where actual app creators download, evaluate, and sustain active mutual testing footprints.
+        </p>
 
-  <h2>How It Works</h2>
-  <p>
-    Developers host a small RSS feed (usually on GitHub). Once approved, their feed is
-    added to <code>feeds.json</code>. The platform automatically:
-  </p>
+        <div style="background: var(--bg); border: 1px solid var(--border); padding: 16px; border-radius: var(--radius); margin-top: 24px; display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 2rem;">🛠️</span>
+          <div>
+            <h4 style="margin: 0 0 4px 0;">Built for Creators</h4>
+            <p style="margin: 0; font-size: 0.85rem; color: var(--muted);">Clean, lightweight layouts engineered to help indie creators push past constraints and launch straight into production.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-  <ul>
-    <li>Fetches each feed</li>
-    <li>Parses app metadata</li>
-    <li>Calculates testing progress</li>
-    <li>Displays the app in the directory</li>
-  </ul>
+  <footer class="site-footer">
+    <p>
+      © <span id="year"></span> |
+      <a href="index.html">Directory Home</a> |
+      <a href="terms-of-service.html">Terms of Service</a> |
+      <a href="privacy-policy.html">Privacy Policy</a> |
+      <a href="developer-guidelines.html">Guidelines</a>
+    </p>
+  </footer>
 
-  <p>
-    Users can browse apps, join Google Groups, open testing links, save favorites,
-    and track their joined or completed tests — all stored locally on their device.
-  </p>
-
-  <h2>What Data We Store</h2>
-  <p>
-    App Testing Hub does not collect personal data. Your activity (saved apps,
-    favorites, joined tests) is stored only in your browser’s local storage.
-  </p>
-
-  <h2>Who Built This?</h2>
-  <p>
-    App Testing Hub is created and maintained by
-    <a href="https://erickouassi.com/" target="_blank">Eric Kouassi</a>.
-    The goal is to support developers, testers, and the Android community with a
-    clean, accessible, and transparent testing directory.
-  </p>
-
-  <h2>Want to Submit Your App?</h2>
-  <p>
-    Developers can follow the
-    <a href="developer-guidelines.html">Developer Guidelines</a>
-    to create a valid feed and request approval.
-  </p>
-
-  <h2>Support the Platform</h2>
-  <p>
-    This website contains ads and may earn commissions from clicks or purchases.
-    This helps keep the platform free for everyone.
-  </p>
-</div>
-
-<footer class="site-footer">
-  <p><small>👉 This website contains ads and may earn commissions from clicks or purchases.</small></p>
-  <p>
-    © <span id="year"></span> |
-    <a href="terms-of-service.html">Terms of Service</a> |
-    <a href="privacy-policy.html">Privacy Policy</a> |
-    <a href="developer-guidelines.html">Developer Guidelines</a> |
-    <a href="about.html">About</a> |
-    Made by <a href="https://erickouassi.com/" target="_blank">Eric</a> with 🙏🏽.
-  </p>
-</footer>
-
-<script>
-  document.getElementById("year").textContent = new Date().getFullYear();
-</script>
-
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>

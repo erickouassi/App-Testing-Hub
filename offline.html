@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline — App Testing Hub</title>
+    <meta name="theme-color" content="black">
+    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="site-header" style="text-align: center; justify-content: center;">
+    <div>
+        <h1>App Testing Hub</h1>
+        <p class="subtitle">Network Connectivity Notice</p>
+    </div>
+  </header>
+
+  <main class="hub-main" style="display: flex; justify-content: center; align-items: center; min-height: 50vh; padding: 24px; box-sizing: border-box;">
+    <section style="background: var(--card-bg); border: 1px solid var(--border); max-width: 440px; width: 100%; text-align: center; padding: 40px 24px; border-radius: var(--radius); box-shadow: var(--shadow);">
+       <div style="font-size: 3rem; margin-bottom: 16px;">📡</div>
+       <h2 style="margin-top: 0; margin-bottom: 12px; font-weight: 600;">You are currently offline</h2>
+       <p style="color: var(--text); opacity: 0.8; margin-bottom: 24px; line-height: 1.5; font-size: 0.95rem;">
+         Please verify your device data settings or network environment configuration connection to continue browsing indie app directory listings.
+       </p>
+       <button class="btn btn-primary" onclick="window.location.reload()" style="width: 100%; box-sizing: border-box; justify-content: center;">
+         🔄 Retry Connection
+       </button>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="year"></span> | App Testing Hub Network Sandbox Mode</p>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

@@ -4,28 +4,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail: App Testing Hub</title>
-    <meta name="album" content="Daily Rosary +">
-    <meta name="artist" content="Eric Kouassi">
-    <meta name="title" content="Rosary Moments">
     <meta name="apple-mobile-web-app-status-bar" content="#aa7700">
     <meta name="theme-color" content="black">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" sizes="180x180" href=".https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png">
-    <meta name="description" content="The Daily Rosary Audio App is designed to be simple, beautiful, and unobtrusive so you can focus on prayer.">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png">
+    <meta name="description" content="Discover Android applications from closed testing stages to live production releases. Support indie creators and get early beta access.">
     <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/favicon.svg">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Single app view context adjustments */
+        @media (min-width: 992px) {
+            .hub-main.single-view {
+                display: grid;
+                grid-template-columns: 1fr 280px;
+                gap: 24px;
+                align-items: start;
+            }
+            #daily-pro-tip-container {
+                position: sticky;
+                top: 24px;
+            }
+        }
+        @media (max-width: 991px) {
+            .hub-main.single-view {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                padding: 16px;
+            }
+        }
+    </style>
 </head>
 <body>
+
   <header class="site-header">
-    <h1>App Details</h1>
-    <a href="index.html" class="btn btn-ghost">← Back to apps</a>
+    <div>
+        <h1>App Details</h1>
+        <p class="subtitle">Ecosystem Deployment Profile</p>
+    </div>
+    <div class="header-actions">
+        <a href="index.html" class="btn btn-ghost">⬅️ Back to Directory</a>
+    </div>
   </header>
 
-  <main class="layout-single">
-    <section id="app-page-container" class="app-page-container">
-      <div class="loading">Loading app…</div>
+  <main class="hub-main single-view">
+    
+    <section class="apps-section">
+      <div id="app-page-container" class="app-page-container" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);">
+        <div class="loading">Parsing directory metadata node...</div>
+      </div>
     </section>
+
+    <div id="daily-pro-tip-container">
+      <div class="pro-tip-card">
+        <div class="pro-tip-header">💡 Engagement Rule</div>
+        <div class="pro-tip-content">
+          To ensure valid testing statuses, keep joined platform applications installed on your test devices until production verification tags are granted.
+        </div>
+      </div>
+    </div>
   </main>
+
+  <footer class="site-footer">
+    <p><small>👉 This website contains ads and may earn commissions from clicks or purchases.</small></p>
+    <p>
+      © <span id="year"></span> |
+      <a href="index.html">Directory Home</a> |
+      <a href="terms-of-service.html">Terms of Service</a> |
+      <a href="privacy-policy.html">Privacy Policy</a> |
+      <a href="developer-guidelines.html">Guidelines</a>
+    </p>
+  </footer>
+
+  <script>
+    // System Year Script Insertion
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 
   <script src="app-page.js"></script>
 </body>

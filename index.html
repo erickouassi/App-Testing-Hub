@@ -111,26 +111,32 @@
     </style>
 </head>
 <body>
+
   <header class="site-header">
-    <h1>AppLaunch Hub</h1>
-    <p class="subtitle">Unified Android Testing & Application Directory</p>
-    <div id="last-updated" class="last-updated"></div>
+    <div>
+        <h1>AppLaunch Hub</h1>
+        <p class="subtitle">Android Testing + Application Directory</p>
+        <div id="last-updated" class="last-updated"></div>
+    </div>
     <div class="header-actions">
       <button id="refresh-btn" class="btn btn-ghost">🔄 Refresh Index</button>
+      <a href="submit-an-app.html#submission-form-wrapper" class="btn btn-ghost" style="text-decoration: none;">➕ Submit App</a>
+      <a href="about.html" class="btn btn-ghost">ℹ️ About</a>
     </div>
   </header>
 
   <div class="menu-toggle-bar">
     <button class="hamburger-btn" id="menu-hamburger-trigger" onclick="toggleMobileMenu()">
-      <span>☰</span> Filter Ecosystem
+      <span>☰</span> Filter
     </button>
     <span class="last-updated" style="font-size:0.75rem;">-</span>
   </div>
 
   <main class="hub-main">
+    
     <aside class="sidebar" id="dashboard-sidebar-drawer">
       <div class="filter-group">
-        <h3 style="margin-bottom: 12px;">Filter Ecosystem</h3>
+        <h3 style="margin-bottom: 12px;">Filter</h3>
         <div id="activity-filters" class="filter-chips">
           <button class="filter-chip active" data-filter="all">All Apps <span id="apps-count-label"></span></button>
           <button class="filter-chip" data-filter="saved">Favorites</button>
@@ -161,6 +167,9 @@
     </p>
   </footer>
 
+  <!-- Update Notifier Component -->
+  <update-notifier></update-notifier>
+
   <div id="details-modal" class="modal hidden">
     <div class="modal-backdrop" onclick="closeModal()"></div>
     <div class="modal-content">
@@ -184,7 +193,7 @@
       if(drawer.classList.contains("active")) {
         button.innerHTML = "<span>✕</span> Close Filters";
       } else {
-        button.innerHTML = "<span>☰</span> Filter Ecosystem";
+        button.innerHTML = "<span>☰</span> Filter";
       }
     }
 
@@ -198,6 +207,7 @@
 
   <script src="app.js"></script>
   <script src="milestone-notifier.js"></script>
+  <script src="/update-notifier.js" type="module"></script>
   <script src="/pwaInstaller.js" defer></script>
 </body>
 </html>

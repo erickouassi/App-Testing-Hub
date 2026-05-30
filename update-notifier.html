@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Updates - AppLaunch Hub</title>
+    <meta name="theme-color" content="black">
+    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/favicon.svg">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Dedicated layout overrides to perfectly sync with index styling matrices */
+        .changelog-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .changelog-tag {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+            display: inline-block;
+        }
+
+        .update-version {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .update-date {
+            font-size: 0.85rem;
+            color: var(--muted);
+            font-weight: normal;
+        }
+
+        .update-list {
+            margin: 14px 0 0 0;
+            padding-left: 20px;
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .update-list li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div>
+        <h1>AppLaunch Hub</h1>
+        <p class="subtitle">Platform Updates & Changelog</p>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="btn btn-ghost">⬅️ Back to Directory</a>
+    </div>
+  </header>
+
+  <main class="hub-main">
+    
+    <aside class="sidebar">
+      <div class="filter-group">
+        <h3>Navigation</h3>
+        <div class="filter-chips">
+          <a href="index.html" class="filter-chip">All Apps</a>
+          <button class="filter-chip active">Platform Updates</button>
+          <a href="developer-guidelines.html" class="filter-chip">Developer Guidelines</a>
+        </div>
+      </div>
+    </aside>
+
+    <section class="apps-section">
+      
+      <div class="app-page-container" style="background: linear-gradient(135deg, #eef2ff 0%, #faf5ff 100%); border-color: var(--accent-soft);">
+        <h2 style="margin-top:0; font-size: 1.4rem; color: #4338ca;">What's New?</h2>
+        <p style="color: #374151; font-size: 0.95rem; line-height: 1.5; margin-bottom: 0;">
+            Track the deployment timeline of runtime directory builds, feature upgrades, and backend crawl index patches across the system ecosystem.
+        </p>
+      </div>
+
+      <div class="changelog-card">
+        <span class="changelog-tag">System Upgrade</span>
+        <h3 class="update-version">v1.2.0 <span class="update-date">• May 2026</span></h3>
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 12px 0;">
+        <ul class="update-list">
+          <li><strong>Responsive Core:</strong> Refined mobile navigation layers featuring smooth animated CSS dropdown drawers.</li>
+          <li><strong>Directory Optimization:</strong> Improved caching parameters for index arrays to drastically cut loading screen delays.</li>
+          <li><strong>PWA Matrix:</strong> Upgraded manifest architecture properties for seamless web deployment environments.</li>
+        </ul>
+      </div>
+
+      <div class="changelog-card">
+        <span class="changelog-tag">Maintenance Fix</span>
+        <h3 class="update-version">v1.1.5 <span class="update-date">• April 2026</span></h3>
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 12px 0;">
+        <ul class="update-list">
+          <li>Adjusted dynamic category micro-chips for enhanced parsing layouts on ultra-wide screens.</li>
+          <li>Resolved styling overflow quirks that impacted web view rendering context on compact mobile viewports.</li>
+        </ul>
+      </div>
+
+    </section>
+
+    <div id="daily-pro-tip-container">
+      <div class="pro-tip-card">
+        <div class="pro-tip-header">💡 Developer Note</div>
+        <div class="pro-tip-content">
+          Are you testing app builds on the Play Store? Ensure your testing crew keeps applications installed until production approval is formally signed off.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p><small>👉 This website contains ads and may earn commissions from clicks or purchases.</small></p>
+    <p>
+      © <span id="year"></span> |
+      <a href="index.html">Directory Home</a> |
+      <a href="terms-of-service.html">Terms of Service</a> |
+      <a href="privacy-policy.html">Privacy Policy</a> |
+      <a href="about.html">About</a>
+    </p>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
