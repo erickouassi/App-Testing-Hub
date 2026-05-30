@@ -18,10 +18,7 @@ const ASSETS = [
   "styles.css",
   "app.js",
   "app-page.js",
-  "manifest.json",
-  "img/android-chrome-192x192.png",
-  "img/android-chrome-512x512.png",
-  "img/favicon.svg"
+  "manifest.json"
 ];
 
 // Debug missing assets (non-blocking)
