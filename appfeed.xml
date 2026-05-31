@@ -35,7 +35,7 @@
       <app:testingDuration>12</app:testingDuration>
 
       <app:testLink>https://play.google.com/apps/testing/cf.adminhq.app_testing_hub.twa</app:testLink>
-      <app:groupLink>https://groups.google.com/g/daily-rosary-beta-testers</app:groupLink>
+      <app:groupLink>https://groups.google.com/g/app-testing-hub-beta-testers</app:groupLink>
       <app:groupMembers>-</app:groupMembers>
 
       <description>
