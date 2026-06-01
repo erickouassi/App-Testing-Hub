@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-30T03:04:41.344Z",
+  "generatedAt": "2026-06-01T03:07:33.327Z",
   "apps": {
-    "generatedAt": "2026-05-30T03:04:41.344Z",
+    "generatedAt": "2026-06-01T03:07:33.327Z",
     "apps": [
       {
         "slug": "daily-rosary",
@@ -13,8 +13,8 @@
         "testLink": "https://play.google.com/apps/testing/com.erickouassi.dailyrosary",
         "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
         "testingDuration": 25,
-        "daysInTesting": 16,
-        "daysLeft": 9,
+        "daysInTesting": 18,
+        "daysLeft": 7,
         "status": "open-testing",
         "category": "General",
         "price": "Free",
@@ -44,8 +44,8 @@
         "testLink": "https://play.google.com/apps/testing/com.erickouassi.lerosaire.dailyrosary",
         "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
         "testingDuration": 25,
-        "daysInTesting": 16,
-        "daysLeft": 9,
+        "daysInTesting": 18,
+        "daysLeft": 7,
         "status": "open-testing",
         "category": "General",
         "price": "Free",
@@ -62,6 +62,34 @@
         "requirements": [
           "Connexion Internet",
           "Navigateur moderne"
+        ]
+      },
+      {
+        "slug": "app-testing-hub",
+        "title": "App Testing Hub",
+        "description": "A centralized hub for managing, discovering, and testing Android apps built with Trusted Web Activity.",
+        "platform": "Android",
+        "version": "1.0.0",
+        "groupLink": "https://groups.google.com/g/app-testing-hub-beta-testers",
+        "testLink": "https://play.google.com/apps/testing/cf.adminhq.app_testing_hub.twa",
+        "pubDate": "Sat, 30 May 2026 09:00:00 -0500",
+        "testingDuration": 12,
+        "daysInTesting": 3,
+        "daysLeft": 9,
+        "status": "open-testing",
+        "category": "Lifestyle",
+        "price": "Free",
+        "icon": "https://www.image2url.com/r2/default/files/1780167872022-71fedbd1-7aa6-4f03-88e4-e9a4ad38b97d.png",
+        "languages": [
+          "English"
+        ],
+        "countries": [
+          "United States"
+        ],
+        "requirements": [
+          "Android phone",
+          "Google account",
+          "Keep installed 14 days +"
         ]
       }
     ]
