@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>AppLaunch Hub - Android App Testing Directory</title>
+    <title>AppLaunch Hub — Closed Testing Directory</title>
     <meta name="apple-mobile-web-app-status-bar" content="#aa7700">
     <meta name="theme-color" content="#ffffff">
     <link rel="manifest" href="manifest.json">
@@ -11,203 +11,80 @@
     <meta name="description" content="Discover Android applications from closed testing stages to live production releases. Support indie creators and get early beta access.">
     <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/favicon.svg">
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* --- MOBILE HAMBURGER NAVIGATION CORE DESIGN --- */
-        .menu-toggle-bar {
-            display: none;
-            background: #fff;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 90;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-
-        .hamburger-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-            color: var(--text);
-        }
-
-        .hamburger-btn:active {
-            background: #f3f4f6;
-        }
-
-        /* --- 3-COLUMN RESPONSIVE LAYOUT MATRIX --- */
-        @media (min-width: 992px) {
-            .hub-main {
-                display: grid;
-                grid-template-columns: 240px 1fr 280px;
-                gap: 24px;
-                align-items: start;
-            }
-            #daily-pro-tip-container {
-                position: sticky;
-                top: 24px;
-            }
-            .sidebar {
-                display: block !important;
-            }
-        }
-        
-        /* --- MOBILE CONTROLS DOWNFALL INTERFACE --- */
-        @media (max-width: 991px) {
-            .hub-main {
-                display: flex;
-                flex-direction: column;
-                gap: 16px;
-                padding: 16px;
-            }
-
-            .menu-toggle-bar {
-                display: flex;
-            }
-
-            .sidebar {
-                display: none; /* Controlled via Hamburger State JS Toggle */
-                background: #fff;
-                border: 1px solid var(--border);
-                padding: 16px;
-                border-radius: var(--radius);
-                box-shadow: var(--shadow);
-                animation: slideDown 0.2s ease-out;
-            }
-
-            .sidebar.active {
-                display: block;
-            }
-
-            .filter-chips {
-                flex-direction: column !important;
-                gap: 4px;
-            }
-
-            .filter-chip {
-                width: 100%;
-                padding: 12px 14px;
-                box-sizing: border-box;
-            }
-
-            .apps-grid {
-                grid-template-columns: 1fr !important;
-            }
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
 </head>
 <body>
 
+  <!-- Platform System Main Header -->
   <header class="site-header">
     <div>
         <h1>AppLaunch Hub</h1>
-        <p class="subtitle">Android Testing + Application Directory</p>
-        <div id="last-updated" class="last-updated"></div>
+        <p class="subtitle">Ecosystem Deployment Directory</p>
     </div>
     <div class="header-actions">
-      <button id="refresh-btn" class="btn btn-ghost">🔄 Refresh Index</button>
-      <a href="submit-an-app.html#submission-form-wrapper" class="btn btn-ghost" style="text-decoration: none;">➕ Submit App</a>
-      <a href="about.html" class="btn btn-ghost">ℹ️ About</a>
+        <button id="theme-toggle" class="btn btn-ghost" aria-label="Toggle Theme">🌓 Theme</button>
     </div>
   </header>
 
-  <div class="menu-toggle-bar">
-    <button class="hamburger-btn" id="menu-hamburger-trigger" onclick="toggleMobileMenu()">
-      <span>☰</span> Filter
-    </button>
-    <span class="last-updated" style="font-size:0.75rem;">-</span>
-  </div>
-
+  <!-- Split Multi-Column Space Layout Matrix -->
   <main class="hub-main">
     
-    <aside class="sidebar" id="dashboard-sidebar-drawer">
+    <!-- Left Navigation Sidebar Track Container -->
+    <aside class="sidebar">
       <div class="filter-group">
-        <h3 style="margin-bottom: 12px;">Filter</h3>
-        <div id="activity-filters" class="filter-chips">
-          <button class="filter-chip active" data-filter="all">All Apps <span id="apps-count-label"></span></button>
+        <h3>Track Filters</h3>
+        <div class="filter-chips" id="filter-container">
+          <button class="filter-chip active" data-filter="all">All Tracks</button>
+          <button class="filter-chip" data-filter="joined">Joined Tracks</button>
+          <button class="filter-chip" data-filter="completed">Completed</button>
           <button class="filter-chip" data-filter="saved">Favorites</button>
-          <button class="filter-chip" data-filter="joined">Joined Track</button>
-          <button class="filter-chip" data-filter="completed">Launched</button>
         </div>
+      </div>
+
+      <!-- Streamlined RSS Feed Link -->
+      <div class="filter-group" style="margin-top: 28px;">
+        <h3>📡 RSS Track Feed</h3>
+        <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+            Subscribe to get real-time updates when new closed testing tracks open up.
+        </p>
+        <a href="https://app-testing-hub.vercel.app/api/feed.xml" target="_blank" class="filter-chip" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; font-weight: 500; text-decoration: none; width: fit-content;">
+            <span>🌐</span> Open Feed XML
+        </a>
       </div>
     </aside>
 
+    <!-- Central Dynamic Apps Grid System Grid Container -->
     <section class="apps-section">
-      <div id="apps-loading" class="loading">Crawl index updates in progress…</div>
-      <div id="apps-empty" class="empty hidden">No matching apps found in directory arrays.</div>
-      <div id="apps-container" class="apps-grid"></div>
+      <div class="apps-grid" id="apps-container">
+        <div class="loading">Parsing directory metadata nodes...</div>
+      </div>
     </section>
 
-    <div id="daily-pro-tip-container"></div>
+    <!-- Side Layout Tracking Box Matrix -->
+    <aside id="daily-pro-tip-container">
+      <div class="pro-tip-card">
+        <div class="pro-tip-header">💡 Engagement Rule</div>
+        <div class="pro-tip-content">
+          To ensure valid testing statuses, keep joined platform applications installed on your test devices until production verification tags are granted.
+        </div>
+      </div>
+    </aside>
   </main>
 
+  <!-- Central Shared Grounding Footer Component -->
   <footer class="site-footer">
     <p><small>👉 This website contains ads and may earn commissions from clicks or purchases.</small></p>
     <p>
       © <span id="year"></span> |
+      <a href="index.html">Directory Home</a> |
       <a href="terms-of-service.html">Terms of Service</a> |
       <a href="privacy-policy.html">Privacy Policy</a> |
-      <a href="developer-guidelines.html">Developer Guidelines</a> |
-      <a href="about.html">About</a> |
-      Made by <a href="https://erickouassi.com/" target="_blank">Eric</a> with 🙏🏽.
+      <a href="developer-guidelines.html">Guidelines</a>
     </p>
   </footer>
 
-  <!-- Update Notifier Component -->
-  <update-notifier></update-notifier>
-
-  <div id="details-modal" class="modal hidden">
-    <div class="modal-backdrop" onclick="closeModal()"></div>
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeModal()">×</button>
-      <div id="modal-body-content"></div>
-    </div>
-  </div>
-
   <script>
-    // Universal Year Inserter Script
     document.getElementById("year").textContent = new Date().getFullYear();
-
-    // Responsive Hamburger Menu Handling
-    function toggleMobileMenu() {
-      const drawer = document.getElementById("dashboard-sidebar-drawer");
-      const button = document.getElementById("menu-hamburger-trigger");
-      
-      drawer.classList.toggle("active");
-      
-      // Update visual indicator state cleanly
-      if(drawer.classList.contains("active")) {
-        button.innerHTML = "<span>✕</span> Close Filters";
-      } else {
-        button.innerHTML = "<span>☰</span> Filter";
-      }
-    }
-
-    // Automatically dismiss dropdown overlay menu context when a filter item button is pressed on mobile viewports
-    document.getElementById("activity-filters").addEventListener("click", (e) => {
-      if(window.innerWidth < 992 && e.target.closest(".filter-chip")) {
-        setTimeout(toggleMobileMenu, 150);
-      }
-    });
   </script>
-
   <script src="app.js"></script>
-  <script src="milestone-notifier.js"></script>
-  <script src="/update-notifier.js" type="module"></script>
-  <script src="/pwaInstaller.js" defer></script>
 </body>
 </html>

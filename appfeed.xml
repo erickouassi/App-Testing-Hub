@@ -52,7 +52,7 @@
       <app:testing>
         <app:testLink>https://play.google.com/apps/testing/cf.adminhq.app_testing_hub.twa</app:testLink>
         <app:groupLink>https://groups.google.com/g/app-testing-hub-beta-testers</app:groupLink>
-        <app:groupMembers>0</app:groupMembers>
+        <app:groupMembers>12</app:groupMembers>
       </app:testing>
 
       <description>

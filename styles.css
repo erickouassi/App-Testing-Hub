@@ -1,7 +1,7 @@
 /*******************************************************************************
-  1. LIGHT THEME CONFIGURATION VARIABLES
+  1. THEME CONFIGURATION VARIABLES (LIGHT & DARK SYSTEM MATRICES)
 *******************************************************************************/
-:root {
+:root, [data-theme="light"] {
   color-scheme: light;
   --bg: #f9fafb;
   --text: #111827;
@@ -14,6 +14,19 @@
   --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.08);
   --radius: 12px;
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b0f19;
+  --text: #f3f4f6;
+  --muted: #9ca3af;
+  --accent: #6366f1;
+  --accent-soft: #312e81;
+  --card-bg: #111827;
+  --border: #1f2937;
+  --shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 /*******************************************************************************
@@ -33,6 +46,7 @@ body {
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 /*******************************************************************************
@@ -42,7 +56,7 @@ body {
   /* FIXED FOR ANDROID 15: Adapts top padding to seamlessly clear hardware status bars */
   padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 16px 20px;
   border-bottom: 1px solid var(--border);
-  background: #ffffff;
+  background: var(--card-bg);
   box-shadow: var(--shadow);
   display: flex;
   flex-wrap: wrap;
@@ -51,6 +65,7 @@ body {
   gap: 8px 16px;
   position: relative;
   z-index: 100;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .site-header h1 {
@@ -83,7 +98,7 @@ body {
 *******************************************************************************/
 .menu-toggle-bar {
   display: none;
-  background: #ffffff;
+  background: var(--card-bg);
   /* FIXED FOR ANDROID 15: Protects navigation elements in landscape/portrait scenarios */
   padding: calc(12px + env(safe-area-inset-top, 0px)) calc(16px + env(safe-area-inset-right, 0px)) 12px calc(16px + env(safe-area-inset-left, 0px));
   border-bottom: 1px solid var(--border);
@@ -93,6 +108,7 @@ body {
   top: 0;
   z-index: 90;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .hamburger-btn {
@@ -107,11 +123,11 @@ body {
   gap: 8px;
   font-weight: 500;
   color: var(--text);
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .hamburger-btn:active, .hamburger-btn:hover {
-  background: #f3f4f6;
+  background: var(--border);
 }
 
 /*******************************************************************************
@@ -199,7 +215,7 @@ body {
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease, border-color 0.3s ease;
   position: relative;
 }
 
@@ -209,14 +225,13 @@ body {
 }
 
 .card-completed {
-  background: #fdfdfd;
   opacity: 0.85;
   border-style: dashed;
 }
 
 .app-icon {
   border: 1px solid var(--border);
-  background: #f3f4f6;
+  background: var(--bg);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
 }
@@ -236,8 +251,8 @@ body {
 
 /* Custom Data Fields Meta chips */
 .dir-category {
-  background: #eef2ff;
-  color: #4338ca;
+  background: var(--accent-soft);
+  color: var(--accent);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -246,6 +261,10 @@ body {
 .dir-price {
   color: #047857;
   font-weight: 600;
+}
+
+[data-theme="dark"] .dir-price {
+  color: #34d399;
 }
 
 .app-description {
@@ -292,8 +311,8 @@ body {
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: 9999px;
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--border);
+  color: var(--text);
   white-space: nowrap;
 }
 
@@ -302,9 +321,19 @@ body {
   color: #065f46;
 }
 
+[data-theme="dark"] .badge-status-active {
+  background: #064e3b;
+  color: #a7f3d0;
+}
+
 .badge-status-joined {
   background: #eff6ff;
   color: #1e40af;
+}
+
+[data-theme="dark"] .badge-status-joined {
+  background: #1e3a8a;
+  color: #bfdbfe;
 }
 
 .badge-status-completed {
@@ -312,9 +341,19 @@ body {
   color: #6b21a8;
 }
 
+[data-theme="dark"] .badge-status-completed {
+  background: #581c87;
+  color: #e9d5ff;
+}
+
 .badge-status-expired {
   background: #fee2e2;
   color: #991b1b;
+}
+
+[data-theme="dark"] .badge-status-expired {
+  background: #7f1d1d;
+  color: #fca5a5;
 }
 
 /*******************************************************************************
@@ -345,6 +384,10 @@ body {
   background: #4338ca;
 }
 
+[data-theme="dark"] .btn-primary:hover {
+  background: #4f46e5;
+}
+
 .btn-ghost {
   background: transparent;
   border-color: var(--border);
@@ -352,7 +395,7 @@ body {
 }
 
 .btn-ghost:hover {
-  background: #f3f4f6;
+  background: var(--border);
 }
 
 /*******************************************************************************
@@ -375,11 +418,15 @@ body {
   11. SYSTEM WIDGET CARDS: PRO-TIPS MODULE
 *******************************************************************************/
 .pro-tip-card {
-  background: linear-gradient(135deg, #ffffff 0%, #fdfbf7 100%);
+  background: var(--card-bg);
   border: 1px solid #f59e0b;
   border-radius: var(--radius);
   padding: 16px;
   box-shadow: var(--shadow);
+}
+
+[data-theme="light"] .pro-tip-card {
+  background: linear-gradient(135deg, #ffffff 0%, #fdfbf7 100%);
 }
 
 .pro-tip-header {
@@ -395,7 +442,7 @@ body {
 .pro-tip-content {
   font-size: 0.85rem;
   line-height: 1.45;
-  color: #4b5563;
+  color: var(--text);
 }
 
 /*******************************************************************************
@@ -413,19 +460,21 @@ body {
 .modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(17, 24, 39, 0.4);
+  background: rgba(11, 15, 25, 0.5);
   backdrop-filter: blur(4px);
 }
 
 .modal-content {
   position: relative;
-  background: #ffffff;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   width: 90%;
   max-width: 500px;
   padding: 24px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
   z-index: 1010;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .modal-close {
@@ -449,6 +498,7 @@ body {
   padding: 32px;
   box-shadow: var(--shadow);
   margin-bottom: 24px;
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .app-info p {
@@ -467,6 +517,7 @@ body {
   text-align: center;
   color: var(--muted);
   font-size: 0.85rem;
+  transition: border-color 0.3s ease;
 }
 
 .site-footer a {
@@ -505,7 +556,7 @@ body {
 
   .sidebar {
     display: none;
-    background: #ffffff;
+    background: var(--card-bg);
     border: 1px solid var(--border);
     padding: 16px;
     border-radius: var(--radius);

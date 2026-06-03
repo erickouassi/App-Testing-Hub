@@ -2,36 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail: App Testing Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>App Details — AppLaunch Hub</title>
     <meta name="apple-mobile-web-app-status-bar" content="#aa7700">
-    <meta name="theme-color" content="black">
+    <meta name="theme-color" content="#ffffff">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png">
     <meta name="description" content="Discover Android applications from closed testing stages to live production releases. Support indie creators and get early beta access.">
     <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/favicon.svg">
     <link rel="stylesheet" href="styles.css">
+    <script>
+        // Immediate Theme Sync Logic to prevent page flashing
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
     <style>
-        /* Single app view context adjustments */
-        @media (min-width: 992px) {
-            .hub-main.single-view {
-                display: grid;
-                grid-template-columns: 1fr 280px;
-                gap: 24px;
-                align-items: start;
-            }
-            #daily-pro-tip-container {
-                position: sticky;
-                top: 24px;
-            }
+        .details-wrapper {
+            max-width: 800px; 
+            width: 100%;
         }
-        @media (max-width: 991px) {
-            .hub-main.single-view {
-                display: flex;
-                flex-direction: column;
-                gap: 16px;
-                padding: 16px;
-            }
+        .spec-blueprint-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        .spec-blueprint-box strong {
+            color: var(--text);
+            font-weight: 700;
+        }
+        .spec-blueprint-box span {
+            color: var(--muted);
         }
     </style>
 </head>
@@ -39,30 +48,53 @@
 
   <header class="site-header">
     <div>
-        <h1>App Details</h1>
+        <h1>App Profile</h1>
         <p class="subtitle">Ecosystem Deployment Profile</p>
     </div>
-    <div class="header-actions">
-        <a href="index.html" class="btn btn-ghost">⬅️ Back to Directory</a>
+    <div class="header-actions" style="display: flex; gap: 8px; align-items: center;">
+        <button id="theme-toggle" class="btn btn-ghost" aria-label="Toggle Theme">🌓 Theme</button>
+        <a href="index.html" class="btn btn-ghost">⬅️ Back</a>
     </div>
   </header>
 
-  <main class="hub-main single-view">
-    
+  <main class="hub-main">
+    <aside class="sidebar">
+      <div class="filter-group">
+        <h3>Navigation</h3>
+        <div class="filter-chips">
+          <a href="index.html" class="filter-chip">All Apps Directory</a>
+          <button class="filter-chip active">Profile Inspection</button>
+        </div>
+      </div>
+
+      <!-- Global Track RSS Feed Link -->
+      <div class="filter-group" style="margin-top: 28px;">
+        <h3>📡 RSS Track Feed</h3>
+        <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+            Subscribe to get real-time updates when new closed testing tracks open up.
+        </p>
+        <a href="https://app-testing-hub.vercel.app/api/feed.xml" target="_blank" class="filter-chip" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; font-weight: 500; text-decoration: none; width: fit-content;">
+            <span>🌐</span> Open Global XML
+        </a>
+      </div>
+    </aside>
+
     <section class="apps-section">
-      <div id="app-page-container" class="app-page-container" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);">
-        <div class="loading">Parsing directory metadata node...</div>
+      <div class="details-wrapper">
+        <div id="app-page-container" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow);">
+          <div class="loading">Parsing directory metadata node...</div>
+        </div>
       </div>
     </section>
 
-    <div id="daily-pro-tip-container">
+    <aside id="daily-pro-tip-container">
       <div class="pro-tip-card">
         <div class="pro-tip-header">💡 Engagement Rule</div>
         <div class="pro-tip-content">
           To ensure valid testing statuses, keep joined platform applications installed on your test devices until production verification tags are granted.
         </div>
       </div>
-    </div>
+    </aside>
   </main>
 
   <footer class="site-footer">
@@ -75,11 +107,6 @@
       <a href="developer-guidelines.html">Guidelines</a>
     </p>
   </footer>
-
-  <script>
-    // System Year Script Insertion
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
 
   <script src="app-page.js"></script>
 </body>

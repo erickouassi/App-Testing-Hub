@@ -64,18 +64,30 @@ export async function updateAllFeeds() {
         continue;
       }
 
+      // Safe option configurations to catch both standard and namespaced atom:link properties
       const json = await parseStringPromise(xml, {
         explicitArray: false,
         mergeAttrs: true,
         normalizeTags: true,
-        tagNameProcessors: [(name) => name.replace(/^(app|dev|social):/, "").toLowerCase()],
-        attrNameProcessors: [(name) => name.replace(/^(app|dev|social):/, "")]
+        tagNameProcessors: [(name) => name.replace(/^(app|dev|social|atom):/, "").toLowerCase()],
+        attrNameProcessors: [(name) => name.replace(/^(app|dev|social|atom):/, "")]
       });
 
       const channel = json?.rss?.channel || json?.rss?.rss?.channel;
       if (!channel) {
         console.warn(`⚠️ [SKIP] URL skipped. Missing valid <channel> path structure inside RSS block for: ${url}`);
         continue;
+      }
+
+      // --- DYNAMIC LINK DISCOVERY SETUP ---
+      // We read the parsed node array to locate canonical standalone routing signatures
+      let channelFeedUrl = "";
+      if (channel.link) {
+        const linkNodes = Array.isArray(channel.link) ? channel.link : [channel.link];
+        const canonicalAtomNode = linkNodes.find(l => l && l.rel === "self" && l.href);
+        if (canonicalAtomNode) {
+          channelFeedUrl = canonicalAtomNode.href.toString().trim();
+        }
       }
 
       let items = channel.item;
@@ -117,11 +129,20 @@ export async function updateAllFeeds() {
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/^-|-$/g, "") || `app-${Date.now()}`;
 
-        // Extracted attributes for the App Directory features safely
         const category = getField("category").toString().trim() || "General";
         const price = getField("price").toString().trim() || "Free";
         const icon = getField("icon").toString().trim() || "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png";
         const currentStatus = getField("status").toString().trim();
+
+        // Fallback validation processing directly targeting individual entry scopes
+        let itemFeedUrl = channelFeedUrl;
+        if (!itemFeedUrl && item.link) {
+          const itemLinkNodes = Array.isArray(item.link) ? item.link : [item.link];
+          const itemAtomNode = itemLinkNodes.find(l => l && l.rel === "self" && l.href);
+          if (itemAtomNode) {
+            itemFeedUrl = itemAtomNode.href.toString().trim();
+          }
+        }
 
         const appData = {
           slug,
@@ -143,6 +164,11 @@ export async function updateAllFeeds() {
           countries: extractArray(item.countries || item["app:countries"]),
           requirements: extractArray(item.requirements || item["app:requirements"])
         };
+
+        // Attach parsed link URL string values seamlessly if discovered during iteration
+        if (itemFeedUrl) {
+          appData.feedUrl = itemFeedUrl;
+        }
 
         apps.push(appData);
       }

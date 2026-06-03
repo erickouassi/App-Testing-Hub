@@ -5,14 +5,32 @@ const API_BASE =
     ? "https://app-testing-hub.vercel.app"
     : "";
 
-const appsContainer = document.getElementById("apps-container");
-const loadingEl = document.getElementById("apps-loading");
-const emptyEl = document.getElementById("apps-empty");
-const appsCountLabel = document.getElementById("apps-count-label");
-const refreshBtn = document.getElementById("refresh-btn");
-const activityFilters = document.getElementById("activity-filters");
-
 const STORAGE_KEY = "testingHubState";
+const appsContainer = document.getElementById("apps-container");
+const filterContainer = document.getElementById("filter-container");
+
+let allApps = [];
+let currentFilter = "all";
+
+function initThemeEngine() {
+  const toggleBtn = document.getElementById("theme-toggle");
+  if (!toggleBtn) {
+    console.warn("⚠️ [Theme Engine] #theme-toggle button not found in current DOM.");
+    return;
+  }
+
+  const savedTheme = localStorage.getItem("theme") || "light";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  toggleBtn.onclick = () => {
+    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+    
+    document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("theme", newTheme);
+    console.log(`🌓 [Theme Engine] Theme switched to: ${newTheme}`);
+  };
+}
 
 function loadState() {
   try {
@@ -28,193 +46,190 @@ function saveState(state) {
 }
 
 let userState = loadState();
-let allApps = [];
-let currentActivityFilter = "all";
 
-function toggleFlag(collection, slug) {
+window.toggleCardFlag = function (collection, slug) {
   userState[collection][slug] = !userState[collection][slug];
   saveState(userState);
   renderApps();
-}
+};
 
 function isFlagged(collection, slug) {
   return !!userState[collection][slug];
 }
 
-function setLoading(isLoading) {
-  if (loadingEl) loadingEl.classList.toggle("hidden", !isLoading);
-}
-
-function setEmpty(isEmpty) {
-  if (emptyEl) emptyEl.classList.toggle("hidden", !isEmpty);
-}
-
-function joinTest(app) {
-  const groupLink = app.groupLink?.trim();
-  const testLink = app.testLink?.trim();
-
-  if (!groupLink) {
-    alert("This app requires joining the Google Group first.");
-    return;
+function getStatusBadgeMarkup(app, slug) {
+  if (isFlagged("completed", slug)) {
+    return `<span class="badge badge-status-completed" style="background-color: #f3e8ff; color: #6b21a8; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Completed</span>`;
   }
-
-  window.open(groupLink, "_blank");
-
-  if (testLink) {
-    setTimeout(() => {
-      const proceed = confirm("After joining the Google Group, click OK to open the testing link.");
-      if (proceed) window.open(testLink, "_blank");
-    }, 1200);
+  if (isFlagged("joined", slug)) {
+    return `<span class="badge badge-status-joined" style="background-color: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Joined Track</span>`;
   }
-
-  if (app.slug) {
-    userState.joined[app.slug] = true;
-    saveState(userState);
-    renderApps();
-  }
-}
-
-function formatDaysLabel(app) {
-  const { daysInTesting = 1, testingDuration = 0 } = app;
-  if (testingDuration > 0) {
-    return `Day ${daysInTesting} of ${testingDuration}`;
-  }
-  return `Day ${daysInTesting} in testing`;
-}
-
-function statusBadge(app) {
-  const slug = app.slug || "";
-  if (isFlagged("completed", slug))
-    return `<span class="badge badge-status-completed">Completed</span>`;
-  if (isFlagged("joined", slug))
-    return `<span class="badge badge-status-joined">Joined</span>`;
 
   switch (app.status) {
     case "testing-completed":
     case "production-live":
-      return `<span class="badge badge-status-completed">${app.status === 'production-live' ? '🚀 Live' : 'Testing completed'}</span>`;
+      return `<span class="badge badge-status-completed" style="background-color: #f3e8ff; color: #6b21a8; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">${app.status === 'production-live' ? '🚀 Live' : 'Completed'}</span>`;
     case "expired":
-      return `<span class="badge badge-status-expired">Expired</span>`;
+      return `<span class="badge badge-status-expired" style="background-color: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Expired</span>`;
     default:
-      return `<span class="badge badge-status-active">Open for testers</span>`;
+      return `<span class="badge badge-status-active" style="background-color: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Open for testers</span>`;
   }
 }
 
+window.joinCardTestFlow = function(appJsonEscaped) {
+  try {
+    const app = JSON.parse(decodeURIComponent(appJsonEscaped));
+    const groupLink = app.groupLink?.trim();
+    const testLink = app.testLink?.trim();
+
+    if (!groupLink) {
+      alert("This application requires joining a Google Group workspace framework first.");
+      return;
+    }
+
+    window.open(groupLink, "_blank");
+
+    if (testLink) {
+      setTimeout(() => {
+        const proceed = confirm("After joining the Google Group, click OK to open the testing pipeline link.");
+        if (proceed) window.open(testLink, "_blank");
+      }, 1200);
+    }
+
+    if (app.slug) {
+      userState.joined[app.slug] = true;
+      saveState(userState);
+      renderApps();
+    }
+  } catch(e) {
+    console.error("Error executing dynamic test stream routing:", e);
+  }
+};
+
 function renderApps() {
   if (!appsContainer) return;
-  appsContainer.innerHTML = "";
 
-  const appsToFilter = Array.isArray(allApps) ? allApps : [];
-
-  let filtered = appsToFilter.filter((app) => {
-    if (currentActivityFilter === "all") return true;
-    return isFlagged(currentActivityFilter, app.slug);
+  const filteredApps = allApps.filter((app) => {
+    if (!app || !app.slug) return false;
+    if (currentFilter === "all") return true;
+    if (currentFilter === "joined") return isFlagged("joined", app.slug);
+    if (currentFilter === "completed") return isFlagged("completed", app.slug) || app.status === "testing-completed" || app.status === "production-live";
+    if (currentFilter === "saved") return isFlagged("saved", app.slug);
+    return true;
   });
 
-  if (appsCountLabel)
-    appsCountLabel.textContent = `(${filtered.length} app${filtered.length === 1 ? "" : "s"})`;
-
-  if (filtered.length === 0) {
-    setEmpty(true);
+  if (filteredApps.length === 0) {
+    appsContainer.innerHTML = `
+      <div class="empty" style="text-align: center; padding: 40px var(--padding); grid-column: 1 / -1; color: var(--muted);">
+        No applications found matching the selected track criteria filters.
+      </div>
+    `;
     return;
   }
 
-  setEmpty(false);
+  appsContainer.innerHTML = filteredApps.map((app) => {
+    const slug = app.slug;
+    const escapedAppJson = encodeURIComponent(JSON.stringify(app));
+    const durationLabel = app.testingDuration ? `Day ${app.daysInTesting || 1} of ${app.testingDuration}` : `Day ${app.daysInTesting || 1} in testing`;
 
-  const openApps = filtered.filter(app => app.status !== "testing-completed" && app.status !== "expired" && app.status !== "production-live");
-  const completedApps = filtered.filter(app => app.status === "testing-completed" || app.status === "expired" || app.status === "production-live");
+    // CONSUMES PARSED FIELD: Direct standalone target routing, with query tracking as a fallback.
+    const dynamicFeedUrl = app.feedUrl || `${API_BASE}/api/feed.xml?slug=${slug}`;
 
-  openApps.sort((a, b) => new Date(b.pubDate || 0) - new Date(a.pubDate || 0));
-  completedApps.sort((a, b) => new Date(b.pubDate || 0) - new Date(a.pubDate || 0));
+    return `
+      <div class="app-card" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+        <div>
+          <div style="display: flex; gap: 12px; align-items: start; margin-bottom: 12px;">
+            <img src="${app.icon || 'https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png'}" 
+                 alt="${app.title}" 
+                 style="width: 48px; height: 48px; border-radius: 10px; object-fit: cover; background: #0b4cb4; border: 1px solid var(--border);">
+            <div style="flex: 1;">
+              <h4 style="font-size: 1.1rem; font-weight: 600; margin: 0 0 2px 0; color: var(--text); line-height: 1.3;">${app.title}</h4>
+              <div style="font-size: 0.78rem; color: var(--muted);">
+                v${app.version || '1.0.0'} • <span style="color: var(--primary); font-weight: 500;">${app.category || 'General'}</span> • ${app.price || 'Free'}
+              </div>
+            </div>
+          </div>
 
-  const sortedApps = [...openApps, ...completedApps];
+          <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; align-items: center;">
+            ${getStatusBadgeMarkup(app, slug)}
+            ${isFlagged("saved", slug) ? '<span class="badge" style="background: #e6c200; color: #111; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 500;">★ Favorite</span>' : ""}
+            
+            <a href="${dynamicFeedUrl}" target="_blank" title="Subscribe to ${app.title} real-time tracking xml feeds" style="display: inline-flex; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; text-decoration: none; align-items: center; gap: 2px;">
+               📡 RSS
+            </a>
+          </div>
 
-  sortedApps.forEach((app) => {
-    const card = document.createElement("article");
-    card.className = "app-card";
-    if (app.status === "testing-completed" || app.status === "expired" || app.status === "production-live") {
-      card.classList.add("card-completed");
-    }
-    const slug = app.slug || "";
+          <p style="font-size: 0.88rem; color: var(--text); opacity: 0.85; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 16px; margin-top: 4px;">
+            ${app.description || 'No additional deployment tracking criteria profiles provided.'}
+          </p>
+        </div>
 
-    card.innerHTML = `
-      <div class="app-header" style="display: flex; gap: 12px; align-items: start;">
-        <img src="${app.icon || 'https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png'}" alt="${app.title} icon" class="app-icon" style="width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #eee;">
-        <div style="flex: 1;">
-          <div class="app-title">${app.title}</div>
-          <div class="app-meta">v${app.version} • <span class="dir-category" style="opacity: 0.85; font-weight: 500;">${app.category || 'General'}</span> • <span class="dir-price" style="font-weight: 500;">${app.price || 'Free'}</span></div>
-          <div class="app-badges" style="margin-top: 4px;">
-            ${statusBadge(app)}
-            ${isFlagged("favorites", slug) ? '<span class="badge">★ Favorite</span>' : ""}
+        <div style="border-top: 1px solid var(--border); padding-top: 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
+          <span style="color: var(--muted); font-weight: 500;">${durationLabel}</span>
+          <div style="display: flex; gap: 6px;">
+            <a href="app.html?slug=${slug}" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.8rem; border: 1px solid var(--border); text-decoration: none; border-radius: 6px; display: inline-block;">Details</a>
+            <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px;" onclick="joinCardTestFlow('${escapedAppJson}')">Join test</button>
           </div>
         </div>
       </div>
-
-      <div class="app-description" style="margin-top: 10px;">${app.description}</div>
-
-      <div class="app-footer">
-        <div class="app-timing">${formatDaysLabel(app)}</div>
-        <div class="app-actions">
-          <a href="app.html?slug=${slug}" class="btn btn-ghost">Details</a>
-          <button class="btn btn-primary" onclick='joinTest(${JSON.stringify(app).replace(/'/g, "&apos;")})'>Join test</button>
-        </div>
-      </div>
     `;
+  }).join('');
+}
 
-    appsContainer.appendChild(card);
+function setupFilters() {
+  if (!filterContainer) return;
+
+  filterContainer.addEventListener("click", (e) => {
+    const targetButton = e.target.closest(".filter-chip");
+    if (!targetButton) return;
+
+    filterContainer.querySelectorAll(".filter-chip").forEach((btn) => btn.classList.remove("active"));
+    targetButton.classList.add("active");
+    currentFilter = targetButton.getAttribute("data-filter") || "all";
+    renderApps();
   });
 }
 
 async function loadApps() {
   console.log("🚀 [app.js] loadApps() started");
-  setLoading(true);
-
-  const API_URL = `${API_BASE}/api/apps?t=${Date.now()}`;
+  const yearElement = document.getElementById("year");
+  if (yearElement) yearElement.textContent = new Date().getFullYear();
 
   try {
+    const API_URL = `${API_BASE}/api/apps?t=${Date.now()}`;
     const res = await fetch(API_URL);
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-    
-    const data = await res.json();
-    let appsList = [];
 
-    if (data?.apps?.apps?.length) {
-      appsList = data.apps.apps;
-    } else if (data?.apps?.length) {
-      appsList = data.apps;
+    if (!res.ok) throw new Error(`HTTP error structure! Status context: ${res.status}`);
+    const data = await res.json();
+    
+    if (data && Array.isArray(data.apps)) {
+      allApps = data.apps;
+    } else if (data && data.apps && Array.isArray(data.apps.apps)) {
+      allApps = data.apps.apps;
     } else if (Array.isArray(data)) {
-      data.forEach(item => {
-         if (item?.apps && Array.isArray(item.apps)) {
-            appsList = appsList.concat(item.apps);
-         } else {
-            appsList.push(item);
-         }
-      });
+      allApps = data;
+    } else if (data && typeof data === 'object' && data.apps) {
+      allApps = Array.isArray(data.apps.apps) ? data.apps.apps : [];
     }
 
-    allApps = appsList;
     console.log(`✅ Successfully loaded ${allApps.length} apps`);
     renderApps();
   } catch (err) {
-    console.error("❌ Error loading apps:", err);
-    setEmpty(true);
-  } finally {
-    setLoading(false);
-    console.log("🏁 loadApps() completed");
+    console.error("❌ Critical breakdown error processing apps array feed node stack:", err);
+    if (appsContainer) {
+      appsContainer.innerHTML = `<div class="empty" style="color: red;">Failed to parse platform architecture components. Please retry later.</div>`;
+    }
   }
 }
 
-activityFilters?.addEventListener("click", (e) => {
-  const btn = e.target.closest(".filter-chip");
-  if (!btn) return;
-
-  currentActivityFilter = btn.getAttribute("data-filter");
-  [...activityFilters.querySelectorAll(".filter-chip")].forEach((chip) =>
-    chip.classList.toggle("active", chip === btn)
-  );
-
-  renderApps();
+document.addEventListener("DOMContentLoaded", () => {
+  initThemeEngine();
+  setupFilters();
+  loadApps();
 });
 
-refreshBtn?.addEventListener("click", loadApps);
-loadApps();
+if (document.readyState === "interactive" || document.readyState === "complete") {
+  initThemeEngine();
+  setupFilters();
+  loadApps();
+}
