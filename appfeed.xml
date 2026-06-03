@@ -2,15 +2,21 @@
 <rss version="2.0"
      xmlns:app="https://apphub.dev/rss/app"
      xmlns:dev="https://apphub.dev/rss/developer"
-     xmlns:social="https://apphub.dev/rss/social">
+     xmlns:social="https://apphub.dev/rss/social"
+     xmlns:atom="http://www.w3.org/2005/Atom">
 
   <channel>
     <title>App Testing Hub — App Test Feed</title>
+
+    <!-- Canonical feed URL (required for validators and crawlers) -->
+    <atom:link href="https://app-testing-hub.vercel.app/feed.xml" rel="self" type="application/rss+xml" />
+
     <link>https://app-testing-hub.vercel.app/</link>
     <description>Beta testing information for the App Testing Hub platform.</description>
     <language>en</language>
-    <lastBuildDate>Sat, 30 May 2026 09:00:00 EST</lastBuildDate>
+    <lastBuildDate>Sat, 30 May 2026 09:00:00 -0500</lastBuildDate>
 
+    <!-- Developer Metadata -->
     <dev:developer>
       <dev:name>Eric Kouassi</dev:name>
       <dev:email>hello@erickouassi.com</dev:email>
@@ -24,19 +30,30 @@
       </social:links>
     </dev:developer>
 
+    <!-- ===================================================== -->
+    <!-- 1) TESTING RELEASE                                    -->
+    <!-- ===================================================== -->
     <item>
-      <title>App Testing Hub</title>
-      <guid isPermaLink="false">cf.adminhq.app_testing_hub.twa</guid>
+      <title>App Testing Hub — Version 1.0.0 (Testing)</title>
+      <guid isPermaLink="false">cf.adminhq.app_testing_hub.twa-1.0.0</guid>
+
       <pubDate>Sat, 30 May 2026 09:00:00 -0500</pubDate>
+      <app:lastUpdated>Sat, 30 May 2026 09:00:00 -0500</app:lastUpdated>
 
       <app:platform>Android</app:platform>
       <app:version>1.0.0</app:version>
+      <app:category>Lifestyle</app:category>
+      <app:price>Free</app:price>
+      <app:icon>https://www.image2url.com/r2/default/files/1780167872022-71fedbd1-7aa6-4f03-88e4-e9a4ad38b97d.png</app:icon>
+
       <app:status>open-testing</app:status>
       <app:testingDuration>12</app:testingDuration>
 
-      <app:testLink>https://play.google.com/apps/testing/cf.adminhq.app_testing_hub.twa</app:testLink>
-      <app:groupLink>https://groups.google.com/g/app-testing-hub-beta-testers</app:groupLink>
-      <app:groupMembers>-</app:groupMembers>
+      <app:testing>
+        <app:testLink>https://play.google.com/apps/testing/cf.adminhq.app_testing_hub.twa</app:testLink>
+        <app:groupLink>https://groups.google.com/g/app-testing-hub-beta-testers</app:groupLink>
+        <app:groupMembers>0</app:groupMembers>
+      </app:testing>
 
       <description>
         A centralized hub for managing, discovering, and testing Android apps built with Trusted Web Activity.
@@ -55,12 +72,7 @@
       <app:countries>
         <app:country>United States</app:country>
       </app:countries>
-
-      <app:category>Lifestyle</app:category>
-      <app:price>Free</app:price>
-      <app:icon>https://www.image2url.com/r2/default/files/1780167872022-71fedbd1-7aa6-4f03-88e4-e9a4ad38b97d.png</app:icon>
     </item>
-        
 
   </channel>
 </rss>

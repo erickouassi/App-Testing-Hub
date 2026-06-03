@@ -5,11 +5,7 @@
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "window-controls-overlay"
-  ],
-  "orientation": "portrait",
+  "display_override": ["standalone", "window-controls-overlay"],
   "description": "Discover early access Android apps and join closed testing tracks to help indie developers meet Google Play Store requirements.",
   "lang": "en",
   "dir": "ltr",
@@ -63,12 +59,7 @@
       "label": "App Testing Hub Desktop Dashboard"
     }
   ],
-  "categories": [
-    "developer",
-    "utilities",
-    "productivity",
-    "tools"
-  ],
+  "categories": ["developer", "utilities", "productivity", "tools"],
   "shortcuts": [
     {
       "name": "My Joined Tracks",

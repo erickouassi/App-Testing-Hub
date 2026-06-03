@@ -198,259 +198,241 @@
   </div>
 
   <script>
-    const ALLOWED_STATUSES = ['open-testing', 'closed-testing', 'testing-completed', 'expired', 'not-started', 'internal', 'invite-only', 'marketplace', 'pre-registration'];
+   const ALLOWED_STATUSES = [
+  'open-testing', 'closed-testing', 'testing-completed',
+  'expired', 'not-started', 'internal',
+  'invite-only', 'marketplace', 'pre-registration',
+  'production'
+];
 
-    function cleanSyntaxHighlighterNoise(rawText) {
-      console.log("[CLEANER] Processing text stream patterns...");
-      if (!rawText) return "";
-      let output = rawText;
-      output = output.replace(/class=["']?c-(tag|comment|keyword|string|attr)["']?/gi, '');
-      output = output.replace(/<(?!\/?\w+:?\w*\s*)[^>]*>/g, '');
-      output = output.replace(/>>/g, '>');
-      return output;
+function getGuidPrefix(guid) {
+  return guid.split('-')[0];
+}
+
+function cleanSyntaxHighlighterNoise(rawText) {
+  if (!rawText) return "";
+  let output = rawText;
+  output = output.replace(/class=["']?c-(tag|comment|keyword|string|attr)["']?/gi, '');
+  output = output.replace(/<(?!\/?\w+:?\w*\s*)[^>]*>/g, '');
+  output = output.replace(/>>/g, '>');
+  return output;
+}
+
+async function fetchResourceText(url) {
+  try {
+    let res = await fetch(url);
+    if (!res.ok) throw new Error();
+    return await res.text();
+  } catch (err) {
+    let proxyRes = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+    let jsonWrapper = await proxyRes.json();
+    return jsonWrapper.contents;
+  }
+}
+
+async function crawlAndValidateAllFeeds() {
+  const masterUrl = document.getElementById('master-json-url').value.trim();
+  const banner = document.getElementById('status-banner');
+  const log = document.getElementById('audit-log');
+  const btn = document.getElementById('exec-btn');
+
+  console.clear();
+  log.innerHTML = '';
+  banner.className = 'status-banner idle';
+  banner.textContent = 'Crawling Manifest Registry Map...';
+  btn.disabled = true;
+
+  let feedUrlsToScan = [];
+
+  try {
+    const rawMapPayload = await fetchResourceText(masterUrl);
+    const cleanMapText = cleanSyntaxHighlighterNoise(rawMapPayload);
+    const parsedMap = JSON.parse(cleanMapText);
+
+    if (parsedMap && Array.isArray(parsedMap.approvedFeeds)) {
+      feedUrlsToScan = parsedMap.approvedFeeds;
+    } else if (Array.isArray(parsedMap)) {
+      feedUrlsToScan = parsedMap;
+    } else {
+      throw new Error("Unable to locate feed list under 'approvedFeeds' or top-level array.");
+    }
+  } catch (e) {
+    banner.className = 'status-banner fail';
+    banner.textContent = 'Registry Map Parse Aborted';
+    btn.disabled = false;
+    return;
+  }
+
+  let totalFeedsValid = true;
+
+  function logSectionHeader(title, badgeText = '', isPass = true) {
+    const div = document.createElement('div');
+    div.className = 'section-divider';
+    let badgeHtml = badgeText ? `<span class="feed-summary-badge ${isPass ? 'badge-pass' : 'badge-fail'}">${badgeText}</span>` : '';
+    div.innerHTML = `<span>${title}</span>${badgeHtml}`;
+    log.appendChild(div);
+  }
+
+  function logLineItem(title, success, type = 'required', details = '') {
+    const li = document.createElement('li');
+    li.className = 'validation-item';
+    let icon = success ? '<span class="icon valid">✓</span>' : (type === 'required' ? '<span class="icon invalid">✕</span>' : '<span class="icon optional">⚠</span>');
+    let info = details ? `<div class="item-details">${details}</div>` : '';
+    li.innerHTML = `${icon}<div class="item-text"><strong>${title}</strong>${info}</div>`;
+    log.appendChild(li);
+  }
+
+  logSectionHeader(`Discovered ${feedUrlsToScan.length} Active Stream Links`);
+
+  for (let i = 0; i < feedUrlsToScan.length; i++) {
+    let targetFeedUrl = String(feedUrlsToScan[i]).trim();
+    let cleanDisplayLabel = targetFeedUrl.substring(targetFeedUrl.lastIndexOf('/') + 1);
+
+    if (!/^https?:\/\//i.test(targetFeedUrl)) {
+      targetFeedUrl = "https://" + targetFeedUrl;
     }
 
-    async function fetchResourceText(url) {
-      console.log(`[FETCH] Resolving target: ${url}`);
-      try {
-        let res = await fetch(url);
-        if(!res.ok) throw new Error();
-        return await res.text();
-      } catch (err) {
-        console.log(`[FETCH-PROXY] Executing secondary proxy hop fallback routing mechanism...`);
-        let proxyRes = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
-        let jsonWrapper = await proxyRes.json();
-        return jsonWrapper.contents;
+    let feedPassedValidation = true;
+    let uniqueTracking = { 
+      guid: new Set(), 
+      title: new Set(), 
+      description: new Set(), 
+      testLink: new Map() 
+    };
+
+    function verifyTagValue(parent, tagName, displayLabel, isRequired = true) {
+      const node = parent.getElementsByTagName(tagName)[0];
+      const val = node ? node.textContent.trim() : '';
+      if (isRequired && (!node || val === '')) {
+        logLineItem(`Field error: <${tagName}>`, false, 'required', `${displayLabel} missing or empty.`);
+        feedPassedValidation = false;
+        totalFeedsValid = false;
+        return null;
+      }
+      return val;
+    }
+
+    function verifyUniqueness(tagKey, val, displayLabel) {
+      if (!val) return;
+      if (uniqueTracking[tagKey].has(val)) {
+        logLineItem(`Duplication Error: ${displayLabel}`, false, 'required', `Duplicate value: "${val}"`);
+        feedPassedValidation = false;
+        totalFeedsValid = false;
+      } else {
+        uniqueTracking[tagKey].add(val);
       }
     }
 
-    async function crawlAndValidateAllFeeds() {
-      const masterUrl = document.getElementById('master-json-url').value.trim();
-      const banner = document.getElementById('status-banner');
-      const log = document.getElementById('audit-log');
-      const btn = document.getElementById('exec-btn');
+    try {
+      const rawXmlString = await fetchResourceText(targetFeedUrl);
+      const cleanXmlText = cleanSyntaxHighlighterNoise(rawXmlString);
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(cleanXmlText, "text/xml");
 
-      console.clear();
-      console.log("%c=== INITIALIZING MULTI-FEED SCANNER VIA TARGET METRICS ===", "color: #0066cc; font-weight: bold; font-size: 14px;");
+      const channel = xmlDoc.getElementsByTagName("channel")[0];
+      const items = channel.getElementsByTagName("item");
 
-      log.innerHTML = '';
-      banner.className = 'status-banner idle';
-      banner.textContent = 'Crawling Manifest Registry Map...';
-      btn.disabled = true;
+      for (let j = 0; j < items.length; j++) {
+        const item = items[j];
 
-      let feedUrlsToScan = [];
-      
-      try {
-        const rawMapPayload = await fetchResourceText(masterUrl);
-        const cleanMapText = cleanSyntaxHighlighterNoise(rawMapPayload);
-        const parsedMap = JSON.parse(cleanMapText);
+        const currentTitle = verifyTagValue(item, "title", "App Title");
+        verifyUniqueness('title', currentTitle, 'App Title');
 
-        console.log("[MASTER ENTRY] JSON structured data mapped:", parsedMap);
+        const currentGuid = verifyTagValue(item, "guid", "App GUID");
+        const currentGuidPrefix = getGuidPrefix(currentGuid);
+        verifyUniqueness('guid', currentGuid, 'App GUID');
 
-        // Targeted object adjustment block handling
-        if (parsedMap && Array.isArray(parsedMap.approvedFeeds)) {
-          console.log(`[MASTER ENTRY] Target structural key matches! Extraction profile: parsedMap.approvedFeeds`);
-          feedUrlsToScan = parsedMap.approvedFeeds;
-        } else if (Array.isArray(parsedMap)) {
-          console.log(`[MASTER ENTRY] Top-level fallback matched: pure layout list structure array detected.`);
-          feedUrlsToScan = parsedMap;
-        } else {
-          throw new Error("Unable to locate a loop tracking parameter list layout matrix under 'approvedFeeds' or top-level entries.");
-        }
+        const currentDesc = verifyTagValue(item, "description", "App Description");
+        verifyUniqueness('description', currentDesc, 'App Description');
 
-        console.log(`[MASTER ENTRY] Confirmed! System ready to process execution array list. Count: ${feedUrlsToScan.length} targets.`);
-      } catch (e) {
-        console.error("[MASTER ENTRY] Fatal layout validation crash: ", e);
-        banner.className = 'status-banner fail';
-        banner.textContent = 'Registry Map Parse Aborted';
-        const li = document.createElement('li');
-        li.className = 'validation-item';
-        li.innerHTML = `<span class="icon invalid">✕</span><div class="item-text"><strong>Master Directory JSON Error</strong><div class="item-details">${e.message}</div></div>`;
-        log.appendChild(li);
-        btn.disabled = false;
-        return;
-      }
+        verifyTagValue(item, "pubDate", "Item pubDate");
+        verifyTagValue(item, "app:platform", "App Platform");
+        verifyTagValue(item, "app:version", "App Version");
 
-      let totalFeedsValid = true;
+        const statusVal = verifyTagValue(item, "app:status", "App Status");
+        const isProduction = statusVal === 'production';
 
-      function logSectionHeader(title, badgeText = '', isPass = true) {
-        const div = document.createElement('div');
-        div.className = 'section-divider';
-        let badgeHtml = badgeText ? `<span class="feed-summary-badge ${isPass ? 'badge-pass' : 'badge-fail'}">${badgeText}</span>` : '';
-        div.innerHTML = `<span>${title}</span>${badgeHtml}`;
-        log.appendChild(div);
-      }
-
-      function logLineItem(title, success, type = 'required', details = '') {
-        const li = document.createElement('li');
-        li.className = 'validation-item';
-        let icon = success ? '<span class="icon valid">✓</span>' : (type === 'required' ? '<span class="icon invalid">✕</span>' : '<span class="icon optional">⚠</span>');
-        let info = details ? `<div class="item-details">${details}</div>` : '';
-        li.innerHTML = `${icon}<div class="item-text"><strong>${title}</strong>${info}</div>`;
-        log.appendChild(li);
-      }
-
-      logSectionHeader(`Discovered ${feedUrlsToScan.length} Active Stream Links`);
-
-      for (let i = 0; i < feedUrlsToScan.length; i++) {
-        let targetFeedUrl = String(feedUrlsToScan[i]).trim();
-        
-        // Extract a clean display descriptor from the raw filename structure
-        let cleanDisplayLabel = targetFeedUrl.substring(targetFeedUrl.lastIndexOf('/') + 1);
-
-        console.log(`\n%c--- [PROCESSING TRACK LOOP ENTRY ${i+1}/${feedUrlsToScan.length}]: ${cleanDisplayLabel} ---`, "font-weight: bold; color: #4a5568;");
-        console.log(`[RUN PARAMETERS] Loading target remote URL configuration node: "${targetFeedUrl}"`);
-
-        if (!targetFeedUrl) {
-          logLineItem(`Element Slot [${i}] Error`, false, 'required', "The listing target entry resolution line was parsed blank.");
+        if (statusVal && !ALLOWED_STATUSES.includes(statusVal)) {
+          logLineItem("Status Keyword Validation", false, 'required', `Unauthorized status: "${statusVal}"`);
+          feedPassedValidation = false;
           totalFeedsValid = false;
-          continue;
         }
 
-        if (!/^https?:\/\//i.test(targetFeedUrl)) {
-          targetFeedUrl = "https://" + targetFeedUrl;
-        }
+        verifyTagValue(item, "app:testingDuration", "Testing Duration", !isProduction);
 
-        let feedPassedValidation = true;
-        let uniqueTracking = { guid: new Set(), title: new Set(), description: new Set(), testLink: new Set() };
+        const testLinkVal = verifyTagValue(item, "app:testLink", "Google Play Link", !isProduction);
 
-        function verifyTagValue(parent, tagName, displayLabel, isRequired = true) {
-          const node = parent.getElementsByTagName(tagName)[0];
-          const val = node ? node.textContent.trim() : '';
-          if (isRequired) {
-            if (!node || val === '') {
-              console.warn(`  [TAG AUDIT WARNING] Node component missing or unassigned matching rules: <${tagName}>`);
-              logLineItem(`Field error: &lt;${tagName}&gt;`, false, 'required', `${displayLabel} target parameter missing or left empty.`);
-              feedPassedValidation = false;
-              totalFeedsValid = false;
-              return null;
-            }
-            return val;
-          }
-          return val;
-        }
+        if (testLinkVal) {
+          const isGooglePlay =
+            /^https:\/\/play\.google\.com\//i.test(testLinkVal) ||
+            /^https:\/\/play\.google\.com\/store\/apps\/details/i.test(testLinkVal);
 
-        function verifyUniqueness(tagKey, val, displayLabel) {
-          if (!val) return;
-          if (uniqueTracking[tagKey].has(val)) {
-            console.error(`  [UNIQUENESS ALERT] Critical collision match observed: category type "${tagKey}" duplication: "${val}"`);
-            logLineItem(`Duplication Error: ${displayLabel}`, false, 'required', `CRITICAL COLLISION: Reused entity identifier text parameters flag system anomalies: "${val}"`);
-            feedPassedValidation = false;
-            totalFeedsValid = false;
-          } else {
-            uniqueTracking[tagKey].add(val);
-          }
-        }
-
-        try {
-          const rawXmlString = await fetchResourceText(targetFeedUrl);
-          if (!rawXmlString || !rawXmlString.trim()) throw new Error("Server response dropped completely empty content text variables.");
-
-          const cleanXmlText = cleanSyntaxHighlighterNoise(rawXmlString);
-          const parser = new DOMParser();
-          const xmlDoc = parser.parseFromString(cleanXmlText, "text/xml");
-          const parseError = xmlDoc.getElementsByTagName("parsererror")[0];
-
-          if (parseError) {
-            throw new Error(`XML Layout parsing error thrown: ${parseError.textContent}`);
-          }
-
-          const channel = xmlDoc.getElementsByTagName("channel")[0];
-          if (!channel) {
-            throw new Error("Missing parent structural <channel> tracking blocks inside current feed text scope layout models.");
-          }
-
-          const items = channel.getElementsByTagName("item");
-          console.log(`[PARSING STATUS] Endpoint channel read matches okay. Found ${items.length} child <item> nodes.`);
-          
-          if(items.length === 0) {
-            logLineItem("Channel Dataset Check", false, 'required', "The remote endpoint target returned zero registered product item tags.");
+          if (!isGooglePlay) {
+            logLineItem("Protocol Verification: app:testLink", false, 'required', `Invalid Play Store URL: ${testLinkVal}`);
             feedPassedValidation = false;
             totalFeedsValid = false;
           }
 
-          for (let j = 0; j < items.length; j++) {
-            const item = items[j];
-            
-            const currentTitle = verifyTagValue(item, "title", "App Title");
-            verifyUniqueness('title', currentTitle, 'App Title text element string parameters');
+          if (!isProduction) {
+            const previousGuidPrefix = uniqueTracking.testLink.get(testLinkVal);
 
-            const currentGuid = verifyTagValue(item, "guid", "App GUID");
-            verifyUniqueness('guid', currentGuid, 'App GUID Key tracking maps');
-
-            const currentDesc = verifyTagValue(item, "description", "App Description");
-            verifyUniqueness('description', currentDesc, 'App Description contextual string tags');
-
-            verifyTagValue(item, "pubDate", "Item pubDate");
-            verifyTagValue(item, "app:platform", "App Platform");
-            verifyTagValue(item, "app:version", "App Version");
-            verifyTagValue(item, "app:testingDuration", "Testing Duration");
-
-            const statusVal = verifyTagValue(item, "app:status", "App Status");
-            if (statusVal && !ALLOWED_STATUSES.includes(statusVal)) {
-              logLineItem("Status Keyword Validation", false, 'required', `Unauthorized platform structural state visibility keyword registered: "${statusVal}"`);
-              feedPassedValidation = false;
-              totalFeedsValid = false;
-            }
-
-            const testLinkVal = verifyTagValue(item, "app:testLink", "Google Play Link");
-            if (testLinkVal) {
-              if (!/^https:\/\/play\.google\.com\//i.test(testLinkVal)) {
-                logLineItem("Protocol Verification: app:testLink", false, 'required', `Redirection link metrics must point directly down official play store paths: ${testLinkVal}`);
+            if (!previousGuidPrefix) {
+              uniqueTracking.testLink.set(testLinkVal, currentGuidPrefix);
+            } else {
+              if (previousGuidPrefix !== currentGuidPrefix) {
+                logLineItem("Duplication Error: Google Play Link", false, 'required', `Duplicate testLink used by different apps: "${testLinkVal}"`);
                 feedPassedValidation = false;
                 totalFeedsValid = false;
               }
-              verifyUniqueness('testLink', testLinkVal, 'Google Play unique landing links tracking addresses');
-            }
-
-            const groupLinkVal = verifyTagValue(item, "app:groupLink", "Google Group Link");
-            if (groupLinkVal && !/^https:\/\/groups\.google\.com\//i.test(groupLinkVal)) {
-              logLineItem("Protocol Verification: app:groupLink", false, 'required', `Support tracking addresses are limited to strict google groups domains infrastructure: ${groupLinkVal}`);
-              feedPassedValidation = false;
-              totalFeedsValid = false;
-            }
-
-            const reqs = item.getElementsByTagName("app:requirement");
-            if (reqs.length === 0 || reqs[0].textContent.trim() === "") {
-              logLineItem("Requirements Configuration Check", false, 'required', "Every structured target deployment object item must specify at least one text criteria detail rule line.");
-              feedPassedValidation = false;
-              totalFeedsValid = false;
             }
           }
+        }
 
-          if (feedPassedValidation) {
-            console.log(`[AUDIT COMPLETED] %cPASS: Clean parse loops verified for node: ${cleanDisplayLabel}`, "color: green; font-weight: bold;");
-            logSectionHeader(`Feed: ${cleanDisplayLabel}`, 'VALIDATED', true);
-            logLineItem(`Source Location: ${targetFeedUrl}`, true, 'required', `Successfully monitored ${items.length} items without generating warnings.`);
-          } else {
-            console.error(`[AUDIT COMPLETED] FAIL: Validation checks flag active errors on target node: ${cleanDisplayLabel}`);
-            logSectionHeader(`Feed: ${cleanDisplayLabel}`, 'CRITICAL ERRORS', false);
-            logLineItem(`Source Location: ${targetFeedUrl}`, false, 'required', "Deep parameter layout tests caught structural errors. View terminal execution records.");
-          }
+        const groupLinkVal = verifyTagValue(item, "app:groupLink", "Google Group Link", !isProduction);
+        if (groupLinkVal && !/^https:\/\/groups\.google\.com\//i.test(groupLinkVal)) {
+          logLineItem("Protocol Verification: app:groupLink", false, 'required', `Invalid Google Groups URL: ${groupLinkVal}`);
+          feedPassedValidation = false;
+          totalFeedsValid = false;
+        }
 
-        } catch (feedException) {
-          console.error(`[AUDIT CRAWL CRASH] Exception thrown crawling target repository map positions:`, feedException);
-          logSectionHeader(`Feed: ${cleanDisplayLabel}`, 'FETCH REJECTED', false);
-          logLineItem(`Source Location: ${targetFeedUrl}`, false, 'required', `Network handshake aborted or failed scheme: ${feedException.message}`);
+        const reqs = item.getElementsByTagName("app:requirement");
+        if (reqs.length === 0 || reqs[0].textContent.trim() === "") {
+          logLineItem("Requirements Configuration Check", false, 'required', "Each item must include at least one <app:requirement>.");
           feedPassedValidation = false;
           totalFeedsValid = false;
         }
       }
 
-      logSectionHeader("Global Synchronization Review");
-      if (totalFeedsValid) {
-        console.log("%c[GLOBAL SYSTEM STATE] HEALTH STATE: OK. Production networks sync clean.", "color: green; font-weight: bold; font-size: 13px;");
-        banner.className = 'status-banner pass';
-        banner.textContent = 'All Networks Verified and Healthy';
-        logLineItem("System Health Certificate Status", true, 'required', "Every remote mapping route referenced in feeds data arrays registers 100% operational.");
+      if (feedPassedValidation) {
+        logSectionHeader(`Feed: ${cleanDisplayLabel}`, 'VALIDATED', true);
+        logLineItem(`Source Location: ${targetFeedUrl}`, true, 'required', `Successfully validated ${items.length} items.`);
       } else {
-        console.warn("[GLOBAL SYSTEM STATE] WARNING: Integrity checks discovered faulty properties inside distribution nodes.");
-        banner.className = 'status-banner fail';
-        banner.textContent = 'Anomalies Flagged in Distribution Channels';
-        logLineItem("System Health Certificate Status", false, 'required', "Crawl sequences detected functional issues or invalid tags. Check developer channel sources.");
+        logSectionHeader(`Feed: ${cleanDisplayLabel}`, 'CRITICAL ERRORS', false);
+        logLineItem(`Source Location: ${targetFeedUrl}`, false, 'required', "Errors detected. Check console logs.");
       }
-      btn.disabled = false;
+
+    } catch (feedException) {
+      logSectionHeader(`Feed: ${cleanDisplayLabel}`, 'FETCH REJECTED', false);
+      logLineItem(`Source Location: ${targetFeedUrl}`, false, 'required', `Error: ${feedException.message}`);
+      feedPassedValidation = false;
+      totalFeedsValid = false;
     }
+  }
+
+  logSectionHeader("Global Synchronization Review");
+  if (totalFeedsValid) {
+    banner.className = 'status-banner pass';
+    banner.textContent = 'All Networks Verified and Healthy';
+    logLineItem("System Health Certificate Status", true, 'required', "All feeds validated successfully.");
+  } else {
+    banner.className = 'status-banner fail';
+    banner.textContent = 'Anomalies Flagged in Distribution Channels';
+    logLineItem("System Health Certificate Status", false, 'required', "Some feeds contain errors.");
+  }
+
+  btn.disabled = false;
+}
+
   </script>
 </body>
 </html>

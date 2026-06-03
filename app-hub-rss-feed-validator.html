@@ -300,267 +300,302 @@
   </div>
 
   <script>
-    const ALLOWED_STATUSES = [
-      'open-testing', 'closed-testing', 'testing-completed', 
-      'expired', 'not-started', 'internal', 
-      'invite-only', 'marketplace', 'pre-registration'
-    ];
+const ALLOWED_STATUSES = [
+  'open-testing', 'closed-testing', 'testing-completed',
+  'expired', 'not-started', 'internal',
+  'invite-only', 'marketplace', 'pre-registration',
+  'production'
+];
 
-    let activeTabId = 'url-tab';
+let activeTabId = 'url-tab';
 
-    function switchTab(tabId) {
-      activeTabId = tabId;
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.input-group').forEach(group => group.classList.remove('active'));
+function switchTab(tabId) {
+  activeTabId = tabId;
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.input-group').forEach(group => group.classList.remove('active'));
+  
+  if (tabId === 'url-tab') {
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+    document.getElementById('url-tab').classList.add('active');
+  } else {
+    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    document.getElementById('paste-tab').classList.add('active');
+  }
+}
+
+function clearFeed() {
+  document.getElementById('xml-input').value = '';
+  document.getElementById('feed-url').value = '';
+  const banner = document.getElementById('status-banner');
+  banner.className = "status-banner idle";
+  banner.textContent = "Awaiting Input";
+  document.getElementById('checklist').innerHTML = `
+    <li class="validation-item"><span class="item-text">Provide a path target or raw xml profile text code to compute metrics.</span></li>
+  `;
+}
+
+function addDivider(container, text) {
+  const div = document.createElement('div');
+  div.className = 'section-divider';
+  div.innerText = text;
+  container.appendChild(div);
+}
+
+async function handleValidationExecution() {
+  const banner = document.getElementById('status-banner');
+  const checklistContainer = document.getElementById('checklist');
+  const submitBtn = document.getElementById('submit-btn');
+
+  if (activeTabId === 'paste-tab') {
+    const rawXml = document.getElementById('xml-input').value;
+    runValidationCore(rawXml);
+    return;
+  }
+
+  let urlInput = document.getElementById('feed-url').value.trim();
+  if (!urlInput) {
+    banner.className = "status-banner idle";
+    banner.textContent = "Empty URL Reference Address";
+    checklistContainer.innerHTML = `<li class="validation-item"><span class="item-text">Please input a real valid web directory tracking url pointer link first.</span></li>`;
+    return;
+  }
+
+  if (!/^https?:\/\//i.test(urlInput)) {
+    urlInput = "https://" + urlInput;
+  }
+
+  banner.className = "status-banner idle";
+  banner.textContent = "Fetching Remote Assets...";
+  submitBtn.disabled = true;
+
+  try {
+    let response = await fetch(urlInput);
+    if (!response.ok) throw new Error("Direct asset mapping error profile detected.");
+    let xmlText = await response.text();
+    runValidationCore(xmlText);
+  } catch (err) {
+    try {
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urlInput)}`;
+      let proxyResponse = await fetch(proxyUrl);
+      if (!proxyResponse.ok) throw new Error();
+      let proxyData = await proxyResponse.json();
       
-      if(tabId === 'url-tab') {
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.getElementById('url-tab').classList.add('active');
+      if (proxyData.contents) {
+        runValidationCore(proxyData.contents);
       } else {
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        document.getElementById('paste-tab').classList.add('active');
+        throw new Error();
       }
+    } catch (proxyErr) {
+      banner.className = "status-banner fail";
+      banner.textContent = "Network Connection Error";
+      checklistContainer.innerHTML = `
+        <li class="validation-item">
+          <span class="icon invalid">✕</span>
+          <div class="item-text">
+            <strong>Unable to capture feed from destination URL</strong>
+            <div class="item-details">Verify spelling paths, check network rules or manually paste data inside the standard text editor canvas tab instead. <br><br>Target evaluated: ${urlInput}</div>
+          </div>
+        </li>`;
+    }
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
+
+function runValidationCore(xmlString) {
+  const checklistContainer = document.getElementById('checklist');
+  const banner = document.getElementById('status-banner');
+  
+  checklistContainer.innerHTML = ''; 
+  
+  if (!xmlString || !xmlString.trim()) {
+    banner.className = "status-banner fail";
+    banner.textContent = "Empty Target Document Payload";
+    return;
+  }
+
+  let overallPassed = true;
+  let uniqueTracking = { 
+    guid: new Set(), 
+    title: new Set(), 
+    description: new Set(), 
+    testLink: new Map() 
+  };
+
+  function appendResult(label, success, type = 'required', info = '') {
+    if (!success && type === 'required') overallPassed = false;
+    
+    const li = document.createElement('li');
+    li.className = 'validation-item';
+    let iconHtml = success ? '<span class="icon valid">✓</span>' : (type === 'required' ? '<span class="icon invalid">✕</span>' : '<span class="icon optional">⚠</span>');
+    let detailsHtml = info ? `<div class="item-details">${info}</div>` : '';
+    li.innerHTML = `${iconHtml}<div class="item-text"><strong>${label}</strong>${detailsHtml}</div>`;
+    checklistContainer.appendChild(li);
+  }
+
+  function verifyTagValue(parent, tagName, displayLabel, isRequired = true) {
+    const node = parent.getElementsByTagName(tagName)[0];
+    const val = node ? node.textContent.trim() : '';
+    if (isRequired) {
+      if (!node || val === '') {
+        appendResult(`${displayLabel} (<${tagName}>)`, false, 'required', 'Value missing or blank!');
+        return null;
+      }
+      appendResult(`${displayLabel} verified`, true, 'required', `Found: "${val}"`);
+      return val;
+    } else {
+      appendResult(`${displayLabel} (Optional)`, true, 'optional', val ? `Found: "${val}"` : "Not provided");
+      return val;
+    }
+  }
+
+  function getGuidPrefix(guid) {
+    return guid.split('-')[0];
+  }
+
+  function verifyUniqueness(tagKey, val, displayLabel) {
+    if (!val) return;
+    if (uniqueTracking[tagKey].has(val)) {
+      appendResult(`Uniqueness Violation: Duplicated ${displayLabel}`, false, 'required', `CRITICAL REJECTION: Multiple items share identical data values: "${val}"`);
+    } else {
+      uniqueTracking[tagKey].add(val);
+      appendResult(`Uniqueness check: ${displayLabel}`, true, 'required', 'Value is distinct and unique.');
+    }
+  }
+
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+  const parseError = xmlDoc.getElementsByTagName("parsererror")[0];
+
+  if (parseError) {
+    banner.className = "status-banner fail";
+    banner.textContent = "XML Syntax Error";
+    appendResult("Malformed XML Structure Structure", false, 'required', parseError.textContent);
+    return;
+  }
+
+  addDivider(checklistContainer, "Feed Environment Headers");
+  appendResult("Valid XML syntax rules", true, 'required');
+
+  const rssNode = xmlDoc.getElementsByTagName("rss")[0];
+  appendResult("Root <rss version=\"2.0\"> present", (rssNode && rssNode.getAttribute("version") === "2.0"));
+
+  const channel = xmlDoc.getElementsByTagName("channel")[0];
+  if (!channel) {
+    appendResult("Parent <channel> element present", false, 'required');
+    banner.className = "status-banner fail";
+    return;
+  }
+  appendResult("Parent <channel> element present", true, 'required');
+
+  verifyTagValue(channel, "title", "Channel Title");
+  verifyTagValue(channel, "link", "Channel Link");
+  verifyTagValue(channel, "description", "Channel Description");
+  verifyTagValue(channel, "language", "Channel Language");
+  verifyTagValue(channel, "lastBuildDate", "Channel Last Build Date");
+
+  const devNode = channel.getElementsByTagName("dev:developer")[0];
+  if (!devNode) {
+    appendResult("Metadata Block <dev:developer>", false, 'required', "Missing whole element block");
+  } else {
+    verifyTagValue(devNode, "dev:name", "Developer Name");
+    verifyTagValue(devNode, "dev:email", "Developer Email");
+    verifyTagValue(devNode, "dev:website", "Developer Website", false);
+  }
+
+  const items = channel.getElementsByTagName("item");
+  appendResult("Contains testing items", items.length > 0, 'required', `Total count found: ${items.length}`);
+
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const itemTitleNode = item.getElementsByTagName("title")[0];
+    const itemIdentifier = (itemTitleNode && itemTitleNode.textContent.trim()) ? itemTitleNode.textContent.trim() : `Index #${i}`;
+    
+    addDivider(checklistContainer, `Item Block Content Loop: ${itemIdentifier}`);
+
+    const currentTitle = verifyTagValue(item, "title", "Item Title");
+    verifyUniqueness('title', currentTitle, 'App Title');
+
+    const currentGuid = verifyTagValue(item, "guid", "Item GUID");
+    const currentGuidPrefix = getGuidPrefix(currentGuid);
+    verifyUniqueness('guid', currentGuid, 'App GUID Key');
+
+    const currentDesc = verifyTagValue(item, "description", "Item Description");
+    verifyUniqueness('description', currentDesc, 'App Description');
+
+    verifyTagValue(item, "pubDate", "Item pubDate");
+    verifyTagValue(item, "app:platform", "App Platform");
+    verifyTagValue(item, "app:version", "App Version");
+
+    const statusVal = verifyTagValue(item, "app:status", "App Status Keyword");
+    const isProduction = statusVal === 'production';
+
+    if (statusVal) {
+      const isValid = ALLOWED_STATUSES.includes(statusVal);
+      appendResult("Valid status keyword matching array rule", isValid, 'required', isValid ? `Passed: "${statusVal}"` : `Failed: "${statusVal}" is unauthorized.`);
     }
 
-    function clearFeed() {
-      document.getElementById('xml-input').value = '';
-      document.getElementById('feed-url').value = '';
-      const banner = document.getElementById('status-banner');
-      banner.className = "status-banner idle";
-      banner.textContent = "Awaiting Input";
-      document.getElementById('checklist').innerHTML = `
-        <li class="validation-item"><span class="item-text">Provide a path target or raw xml profile text code to compute metrics.</span></li>
-      `;
-    }
+    verifyTagValue(item, "app:testingDuration", "Testing Duration", !isProduction);
 
-    function addDivider(container, text) {
-      const div = document.createElement('div');
-      div.className = 'section-divider';
-      div.innerText = text;
-      container.appendChild(div);
-    }
+    const testLinkVal = verifyTagValue(item, "app:testLink", "Google Play Testing Link", !isProduction);
 
-    async function handleValidationExecution() {
-      const banner = document.getElementById('status-banner');
-      const checklistContainer = document.getElementById('checklist');
-      const submitBtn = document.getElementById('submit-btn');
+    if (testLinkVal) {
+      const isGooglePlay =
+        /^https:\/\/play\.google\.com\//i.test(testLinkVal) ||
+        /^https:\/\/play\.google\.com\/store\/apps\/details/i.test(testLinkVal);
 
-      if (activeTabId === 'paste-tab') {
-        const rawXml = document.getElementById('xml-input').value;
-        runValidationCore(rawXml);
-        return;
-      }
+      appendResult("Play Store strict domain protocol matching", isGooglePlay, 'required', isGooglePlay ? `Valid: ${testLinkVal}` : "Rejected: URL must begin with https://play.google.com/");
 
-      // URL Execution block execution handling
-      let urlInput = document.getElementById('feed-url').value.trim();
-      if(!urlInput) {
-        banner.className = "status-banner idle";
-        banner.textContent = "Empty URL Reference Address";
-        checklistContainer.innerHTML = `<li class="validation-item"><span class="item-text">Please input a real valid web directory tracking url pointer link first.</span></li>`;
-        return;
-      }
+      if (!isProduction) {
 
-      // Sanitize standard endpoint prefix protocols automatically
-      if (!/^https?:\/\//i.test(urlInput)) {
-        urlInput = "https://" + urlInput;
-      }
+        console.log("---- TESTLINK CHECK ----");
+        console.log("Current testLink:", testLinkVal);
 
-      banner.className = "status-banner idle";
-      banner.textContent = "Fetching Remote Assets...";
-      submitBtn.disabled = true;
+        if (!uniqueTracking.testLink.has(testLinkVal)) {
+          console.log("New testLink detected. Storing GUID prefix:", currentGuidPrefix);
+          uniqueTracking.testLink.set(testLinkVal, currentGuidPrefix);
+          appendResult("Uniqueness check: Google Play track link URL", true, 'required', 'Value is distinct and unique.');
+        } else {
+          const previousGuidPrefix = uniqueTracking.testLink.get(testLinkVal);
 
-      try {
-        let response = await fetch(urlInput);
-        
-        // Dynamic Fallback proxy route injection if CORS limits intercept browser threads natively
-        if (!response.ok) {
-          throw new Error("Direct asset mapping error profile detected.");
-        }
-        
-        let xmlText = await response.text();
-        runValidationCore(xmlText);
+          console.log("Duplicate testLink detected.");
+          console.log("Previous GUID prefix:", previousGuidPrefix);
+          console.log("Current GUID prefix:", currentGuidPrefix);
 
-      } catch (err) {
-        // Fallback using public runtime resource pipelines if local origins bounce
-        try {
-          const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(urlInput)}`;
-          let proxyResponse = await fetch(proxyUrl);
-          if(!proxyResponse.ok) throw new Error();
-          let proxyData = await proxyResponse.json();
-          
-          if(proxyData.contents) {
-            runValidationCore(proxyData.contents);
+          if (previousGuidPrefix === currentGuidPrefix) {
+            console.log("Duplicate allowed: same app.");
+            appendResult("Uniqueness check: Google Play track link URL", true, 'required', 'Duplicate allowed within same app.');
           } else {
-            throw new Error();
+            console.log("Duplicate rejected: different apps.");
+            appendResult("Uniqueness Violation: Google Play track link URL", false, 'required', `CRITICAL REJECTION: Duplicate testLink used by different apps: "${testLinkVal}"`);
           }
-        } catch(proxyErr) {
-          banner.className = "status-banner fail";
-          banner.textContent = "Network Connection Error";
-          checklistContainer.innerHTML = `
-            <li class="validation-item">
-              <span class="icon invalid">✕</span>
-              <div class="item-text">
-                <strong>Unable to capture feed from destination URL</strong>
-                <div class="item-details">Verify spelling paths, check network rules or manually paste data inside the standard text editor canvas tab instead. <br><br>Target evaluated: ${urlInput}</div>
-              </div>
-            </li>`;
         }
-      } finally {
-        submitBtn.disabled = false;
       }
     }
 
-    function runValidationCore(xmlString) {
-      const checklistContainer = document.getElementById('checklist');
-      const banner = document.getElementById('status-banner');
-      
-      checklistContainer.innerHTML = ''; 
-      
-      if(!xmlString || !xmlString.trim()) {
-        banner.className = "status-banner fail";
-        banner.textContent = "Empty Target Document Payload";
-        return;
-      }
-
-      let overallPassed = true;
-      let uniqueTracking = { guid: new Set(), title: new Set(), description: new Set(), testLink: new Set() };
-
-      function appendResult(label, success, type = 'required', info = '') {
-        if (!success && type === 'required') overallPassed = false;
-        
-        const li = document.createElement('li');
-        li.className = 'validation-item';
-        let iconHtml = success ? '<span class="icon valid">✓</span>' : (type === 'required' ? '<span class="icon invalid">✕</span>' : '<span class="icon optional">⚠</span>');
-        let detailsHtml = info ? `<div class="item-details">${info}</div>` : '';
-        li.innerHTML = `${iconHtml}<div class="item-text"><strong>${label}</strong>${detailsHtml}</div>`;
-        checklistContainer.appendChild(li);
-      }
-
-      function verifyTagValue(parent, tagName, displayLabel, isRequired = true) {
-        const node = parent.getElementsByTagName(tagName)[0];
-        const val = node ? node.textContent.trim() : '';
-        if (isRequired) {
-          if (!node || val === '') {
-            appendResult(`${displayLabel} (&lt;${tagName}&gt;)`, false, 'required', 'Value missing or blank!');
-            return null;
-          }
-          appendResult(`${displayLabel} verified`, true, 'required', `Found: "${val}"`);
-          return val;
-        } else {
-          appendResult(`${displayLabel} (Optional)`, true, 'optional', val ? `Found: "${val}"` : "Not provided");
-          return val;
-        }
-      }
-
-      function verifyUniqueness(tagKey, val, displayLabel) {
-        if (!val) return;
-        if (uniqueTracking[tagKey].has(val)) {
-          appendResult(`Uniqueness Violation: Duplicated ${displayLabel}`, false, 'required', `CRITICAL REJECTION: Multiple items share identical data values: "${val}"`);
-        } else {
-          uniqueTracking[tagKey].add(val);
-          appendResult(`Uniqueness check: ${displayLabel}`, true, 'required', 'Value is distinct and unique.');
-        }
-      }
-
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(xmlString, "text/xml");
-      const parseError = xmlDoc.getElementsByTagName("parsererror")[0];
-
-      if (parseError) {
-        banner.className = "status-banner fail";
-        banner.textContent = "XML Syntax Error";
-        appendResult("Malformed XML Structure Structure", false, 'required', parseError.textContent);
-        return;
-      }
-
-      addDivider(checklistContainer, "Feed Environment Headers");
-      appendResult("Valid XML syntax rules", true, 'required');
-
-      const rssNode = xmlDoc.getElementsByTagName("rss")[0];
-      appendResult("Root &lt;rss version=\"2.0\"&gt; present", (rssNode && rssNode.getAttribute("version") === "2.0"));
-
-      const channel = xmlDoc.getElementsByTagName("channel")[0];
-      if (!channel) {
-        appendResult("Parent &lt;channel&gt; element present", false, 'required');
-        banner.className = "status-banner fail";
-        return;
-      }
-      appendResult("Parent &lt;channel&gt; element present", true, 'required');
-
-      verifyTagValue(channel, "title", "Channel Title");
-      verifyTagValue(channel, "link", "Channel Link");
-      verifyTagValue(channel, "description", "Channel Description");
-      verifyTagValue(channel, "language", "Channel Language");
-      verifyTagValue(channel, "lastBuildDate", "Channel Last Build Date");
-
-      const devNode = channel.getElementsByTagName("dev:developer")[0];
-      if (!devNode) {
-        appendResult("Metadata Block &lt;dev:developer&gt;", false, 'required', "Missing whole element block");
-      } else {
-        verifyTagValue(devNode, "dev:name", "Developer Name");
-        verifyTagValue(devNode, "dev:email", "Developer Email");
-        verifyTagValue(devNode, "dev:website", "Developer Website", false);
-      }
-
-      const items = channel.getElementsByTagName("item");
-      appendResult("Contains testing items", items.length > 0, 'required', `Total count found: ${items.length}`);
-
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        const itemTitleNode = item.getElementsByTagName("title")[0];
-        const itemIdentifier = (itemTitleNode && itemTitleNode.textContent.trim()) ? itemTitleNode.textContent.trim() : `Index #${i}`;
-        
-        addDivider(checklistContainer, `Item Block Content Loop: ${itemIdentifier}`);
-
-        const currentTitle = verifyTagValue(item, "title", "Item Title");
-        verifyUniqueness('title', currentTitle, 'App Title');
-
-        const currentGuid = verifyTagValue(item, "guid", "Item GUID");
-        verifyUniqueness('guid', currentGuid, 'App GUID Key');
-
-        const currentDesc = verifyTagValue(item, "description", "Item Description");
-        verifyUniqueness('description', currentDesc, 'App Description');
-
-        verifyTagValue(item, "pubDate", "Item pubDate");
-        verifyTagValue(item, "app:platform", "App Platform");
-        verifyTagValue(item, "app:version", "App Version");
-        verifyTagValue(item, "app:testingDuration", "Testing Duration");
-
-        const statusVal = verifyTagValue(item, "app:status", "App Status Keyword");
-        if (statusVal) {
-          const isValid = ALLOWED_STATUSES.includes(statusVal);
-          appendResult("Valid status keyword matching array rule", isValid, 'required', isValid ? `Passed: "${statusVal}"` : `Failed: "${statusVal}" is unauthorized.`);
-        }
-
-        const testLinkVal = verifyTagValue(item, "app:testLink", "Google Play Testing Link");
-        if (testLinkVal) {
-          const isGooglePlay = /^https:\/\/play\.google\.com\//i.test(testLinkVal);
-          appendResult("Play Store strict domain protocol matching", isGooglePlay, 'required', isGooglePlay ? `Valid: ${testLinkVal}` : "Rejected: URL must begin with https://play.google.com/");
-          verifyUniqueness('testLink', testLinkVal, 'Google Play track link URL');
-        }
-
-        const groupLinkVal = verifyTagValue(item, "app:groupLink", "Google Group Link");
-        if (groupLinkVal) {
-          const isGoogleGroups = /^https:\/\/groups\.google\.com\//i.test(groupLinkVal);
-          appendResult("Google Groups strict domain protocol matching", isGoogleGroups, 'required', isGoogleGroups ? `Valid: ${groupLinkVal}` : "Rejected: URL must begin with https://groups.google.com/");
-        }
-
-        const reqs = item.getElementsByTagName("app:requirement");
-        if (reqs.length === 0 || reqs[0].textContent.trim() === "") {
-          appendResult("Requirements Node List", false, 'required', "Each active application item needs at least one text requirement tag.");
-        } else {
-          appendResult("Requirements Node List", true, 'required', `Passed: ${reqs.length} entries registered.`);
-        }
-      }
-
-      if (overallPassed) {
-        banner.className = "status-banner pass";
-        banner.textContent = "Feed Schema Validated Successfully";
-      } else {
-        banner.className = "status-banner fail";
-        banner.textContent = "Validation Checklist Failed";
-      }
+    const groupLinkVal = verifyTagValue(item, "app:groupLink", "Google Group Link", !isProduction);
+    if (groupLinkVal) {
+      const isGoogleGroups = /^https:\/\/groups\.google\.com\//i.test(groupLinkVal);
+      appendResult("Google Groups strict domain protocol matching", isGoogleGroups, 'required', isGoogleGroups ? `Valid: ${groupLinkVal}` : "Rejected: URL must begin with https://groups.google.com/");
     }
+
+    const reqs = item.getElementsByTagName("app:requirement");
+    if (reqs.length === 0 || reqs[0].textContent.trim() === "") {
+      appendResult("Requirements Node List", false, 'required', "Each active application item needs at least one text requirement tag.");
+    } else {
+      appendResult("Requirements Node List", true, 'required', `Passed: ${reqs.length} entries registered.`);
+    }
+  }
+
+  if (overallPassed) {
+    banner.className = "status-banner pass";
+    banner.textContent = "Feed Schema Validated Successfully";
+  } else {
+    banner.className = "status-banner fail";
+    banner.textContent = "Validation Checklist Failed";
+  }
+}
+
   </script>
 </body>
 </html>

@@ -1,0 +1,22 @@
+{
+  "packageId": "cf.adminhq.app_testing_hub.twa",
+  "host": "app-testing-hub.adminhq.cf",
+  "name": "App Testing Hub",
+  "launcherName": "App Testing Hub",
+  "display": "standalone",
+  "themeColor": "#000000",
+  "backgroundColor": "#F44336",
+  "startUrl": "/?source=pwa",
+  "iconUrl": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-512x512.png",
+  "maskableIconUrl": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/android-chrome-512x512-maskable.png",
+  "webManifestUrl": "https://app-testing-hub.adminhq.cf/manifest.json",
+  "enableNotifications": true,
+  "splashScreenFadeOutDuration": 300,
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": { "enabled": true },
+    "notifications": { "enabled": true }
+  },
+  "shortcuts": [],
+  "generatorApp": "pwabuilder"
+}
