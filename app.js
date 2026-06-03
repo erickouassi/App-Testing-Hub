@@ -1,5 +1,6 @@
 console.log("🔥 app.js loaded");
 
+// Configuration and state management
 const API_BASE =
   location.hostname === "127.0.0.1" || location.hostname === "localhost"
     ? "https://app-testing-hub.vercel.app"
@@ -12,6 +13,7 @@ const filterContainer = document.getElementById("filter-container");
 let allApps = [];
 let currentFilter = "all";
 
+// 1. Theme Engine Core System Sync Logic
 function initThemeEngine() {
   const toggleBtn = document.getElementById("theme-toggle");
   if (!toggleBtn) {
@@ -32,6 +34,7 @@ function initThemeEngine() {
   };
 }
 
+// 2. Persisted Storage Utilities
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -50,13 +53,14 @@ let userState = loadState();
 window.toggleCardFlag = function (collection, slug) {
   userState[collection][slug] = !userState[collection][slug];
   saveState(userState);
-  renderApps();
+  renderApps(); 
 };
 
 function isFlagged(collection, slug) {
   return !!userState[collection][slug];
 }
 
+// 3. Status Badge Generation
 function getStatusBadgeMarkup(app, slug) {
   if (isFlagged("completed", slug)) {
     return `<span class="badge badge-status-completed" style="background-color: #f3e8ff; color: #6b21a8; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Completed</span>`;
@@ -76,6 +80,7 @@ function getStatusBadgeMarkup(app, slug) {
   }
 }
 
+// 4. Automated Testing Flow Actions Matrix
 window.joinCardTestFlow = function(appJsonEscaped) {
   try {
     const app = JSON.parse(decodeURIComponent(appJsonEscaped));
@@ -106,6 +111,7 @@ window.joinCardTestFlow = function(appJsonEscaped) {
   }
 };
 
+// 5. App Render Templates Engine
 function renderApps() {
   if (!appsContainer) return;
 
@@ -132,8 +138,8 @@ function renderApps() {
     const escapedAppJson = encodeURIComponent(JSON.stringify(app));
     const durationLabel = app.testingDuration ? `Day ${app.daysInTesting || 1} of ${app.testingDuration}` : `Day ${app.daysInTesting || 1} in testing`;
 
-    // CONSUMES PARSED FIELD: Direct standalone target routing, with query tracking as a fallback.
-    const dynamicFeedUrl = app.feedUrl || `${API_BASE}/api/feed.xml?slug=${slug}`;
+    // DECENTRALIZED FIX: Point directly to the untouched external feed source URL
+    const dynamicFeedUrl = app.feedSourceUrl || "#";
 
     return `
       <div class="app-card" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
@@ -154,7 +160,7 @@ function renderApps() {
             ${getStatusBadgeMarkup(app, slug)}
             ${isFlagged("saved", slug) ? '<span class="badge" style="background: #e6c200; color: #111; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 500;">★ Favorite</span>' : ""}
             
-            <a href="${dynamicFeedUrl}" target="_blank" title="Subscribe to ${app.title} real-time tracking xml feeds" style="display: inline-flex; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; text-decoration: none; align-items: center; gap: 2px;">
+            <a href="${dynamicFeedUrl}" target="_blank" title="Subscribe to original source feed XML directly from the developer" style="display: inline-flex; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; text-decoration: none; align-items: center; gap: 2px;">
                📡 RSS
             </a>
           </div>
@@ -176,6 +182,7 @@ function renderApps() {
   }).join('');
 }
 
+// 6. Navigation Filters Registration Engine
 function setupFilters() {
   if (!filterContainer) return;
 
@@ -186,12 +193,15 @@ function setupFilters() {
     filterContainer.querySelectorAll(".filter-chip").forEach((btn) => btn.classList.remove("active"));
     targetButton.classList.add("active");
     currentFilter = targetButton.getAttribute("data-filter") || "all";
+    
     renderApps();
   });
 }
 
+// 7. Data Fetch Asynchronous Initialization
 async function loadApps() {
   console.log("🚀 [app.js] loadApps() started");
+  
   const yearElement = document.getElementById("year");
   if (yearElement) yearElement.textContent = new Date().getFullYear();
 
@@ -200,6 +210,7 @@ async function loadApps() {
     const res = await fetch(API_URL);
 
     if (!res.ok) throw new Error(`HTTP error structure! Status context: ${res.status}`);
+
     const data = await res.json();
     
     if (data && Array.isArray(data.apps)) {
@@ -217,11 +228,12 @@ async function loadApps() {
   } catch (err) {
     console.error("❌ Critical breakdown error processing apps array feed node stack:", err);
     if (appsContainer) {
-      appsContainer.innerHTML = `<div class="empty" style="color: red;">Failed to parse platform architecture components. Please retry later.</div>`;
+      appsContainer.innerHTML = `<div class="empty" style="color: red;">Failed to safely parse platform architecture components. Please retry later.</div>`;
     }
   }
 }
 
+// 8. Dom Lifecycle Hook Deployments Execution
 document.addEventListener("DOMContentLoaded", () => {
   initThemeEngine();
   setupFilters();

@@ -47,7 +47,7 @@ export async function updateAllFeeds() {
   const apps = [];
 
   for (const url of feeds) {
-    console.log(`\n🔄 Processing feed: ${url}`);
+    console.log(`\n🔄 Processing feed source: ${url}`);
     
     try {
       const response = await fetch(url + "?t=" + Date.now());
@@ -64,7 +64,6 @@ export async function updateAllFeeds() {
         continue;
       }
 
-      // Safe option configurations to catch both standard and namespaced atom:link properties
       const json = await parseStringPromise(xml, {
         explicitArray: false,
         mergeAttrs: true,
@@ -79,26 +78,15 @@ export async function updateAllFeeds() {
         continue;
       }
 
-      // --- DYNAMIC LINK DISCOVERY SETUP ---
-      // We read the parsed node array to locate canonical standalone routing signatures
-      let channelFeedUrl = "";
-      if (channel.link) {
-        const linkNodes = Array.isArray(channel.link) ? channel.link : [channel.link];
-        const canonicalAtomNode = linkNodes.find(l => l && l.rel === "self" && l.href);
-        if (canonicalAtomNode) {
-          channelFeedUrl = canonicalAtomNode.href.toString().trim();
-        }
-      }
-
       let items = channel.item;
       if (!Array.isArray(items)) items = items ? [items] : [];
 
       if (items.length === 0) {
-        console.warn(`⚠️ [SKIP] URL skipped. Clean parse loop structural document contain 0 active item configurations inside: ${url}`);
+        console.warn(`⚠️ [SKIP] URL skipped. Channel contains 0 items inside: ${url}`);
         continue;
       }
 
-      console.log(`📡 [PARSER] Extracted ${items.length} items from feed channel. Checking entries...`);
+      console.log(`📡 [PARSER] Extracted ${items.length} items from feed channel.`);
 
       for (const item of items) {
         const title = (item.title || "Unknown App").toString().trim();
@@ -134,17 +122,7 @@ export async function updateAllFeeds() {
         const icon = getField("icon").toString().trim() || "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png";
         const currentStatus = getField("status").toString().trim();
 
-        // Fallback validation processing directly targeting individual entry scopes
-        let itemFeedUrl = channelFeedUrl;
-        if (!itemFeedUrl && item.link) {
-          const itemLinkNodes = Array.isArray(item.link) ? item.link : [item.link];
-          const itemAtomNode = itemLinkNodes.find(l => l && l.rel === "self" && l.href);
-          if (itemAtomNode) {
-            itemFeedUrl = itemAtomNode.href.toString().trim();
-          }
-        }
-
-        const appData = {
+        apps.push({
           slug,
           title,
           description: (item.description?._ || item.description || "").toString().trim(),
@@ -162,25 +140,21 @@ export async function updateAllFeeds() {
           icon,
           languages: extractArray(item.languages || item["app:languages"]),
           countries: extractArray(item.countries || item["app:countries"]),
-          requirements: extractArray(item.requirements || item["app:requirements"])
-        };
-
-        // Attach parsed link URL string values seamlessly if discovered during iteration
-        if (itemFeedUrl) {
-          appData.feedUrl = itemFeedUrl;
-        }
-
-        apps.push(appData);
+          requirements: extractArray(item.requirements || item["app:requirements"]),
+          
+          // DECENTRALIZED FIX: Keep the exact pristine external feed submission URL "as is"
+          feedSourceUrl: url.trim()
+        });
       }
       
-      console.log(`✅ Successfully structural elements appended into runtime object array memory layout from: ${url}`);
+      console.log(`✅ Appended raw feed nodes into output schema matrix for source: ${url}`);
 
     } catch (err) {
-      console.error(`❌ [AUTOMATION SKIP ERROR] Failed processing developer channel path [${url}]. Error context:`, err.message);
+      console.error(`❌ [AUTOMATION SKIP ERROR] Failed processing developer feed [${url}]. Error:`, err.message);
     }
   }
 
-  console.log(`\n🏁 [update.js] Automation loop completed safely. Total apps verified globally: ${apps.length}`);
+  console.log(`\n🏁 [update.js] Sync cycle finished. Total applications registered: ${apps.length}`);
   return {
     generatedAt: new Date().toISOString(),
     apps: apps
@@ -213,6 +187,5 @@ export function organizeHubApps(data) {
   openApps.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
   completedApps.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
-  console.log(`📊 Sorted ${openApps.length} active apps and ${completedApps.length} completed apps.`);
   return [...openApps, ...completedApps];
 }

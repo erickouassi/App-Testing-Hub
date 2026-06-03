@@ -8,6 +8,7 @@ const API_BASE_PAGE =
 const container = document.getElementById("app-page-container");
 const STORAGE_KEY = "testingHubState";
 
+// --- Theme Engine Hook Matrix ---
 function initThemeEngine() {
   const toggleBtn = document.getElementById("theme-toggle");
   if (!toggleBtn) return;
@@ -94,7 +95,9 @@ window.joinTestFlow = function(appJsonEscaped) {
 
 async function loadAppPage() {
   const yearElement = document.getElementById("year");
-  if (yearElement) yearElement.textContent = new Date().getFullYear();
+  if (yearElement) {
+    yearElement.textContent = new Date().getFullYear();
+  }
 
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("slug");
@@ -109,6 +112,7 @@ async function loadAppPage() {
   try {
     const API_URL = `${API_BASE_PAGE}/api/apps?t=${Date.now()}`;
     const res = await fetch(API_URL);
+
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
     const data = await res.json();
@@ -125,6 +129,7 @@ async function loadAppPage() {
     }
 
     const app = appsList.find((a) => a && a.slug === slug);
+    
     if (!app) {
       container.innerHTML = `
         <div class='empty' style="text-align: center; padding: 40px 20px;">
@@ -137,8 +142,8 @@ async function loadAppPage() {
 
     const escapedAppJson = encodeURIComponent(JSON.stringify(app));
 
-    // CONSUMES PARSED FIELD: Direct standalone target routing, with query tracking as a fallback.
-    const dynamicFeedUrl = app.feedUrl || `${API_BASE_PAGE}/api/feed.xml?slug=${app.slug}`;
+    // DECENTRALIZED FIX: Point directly to the untouched external feed source URL
+    const dynamicFeedUrl = app.feedSourceUrl || "#";
 
     const joinArray = (arr) => {
       if(!arr || arr.length === 0) return "Global / Unspecified";
@@ -167,8 +172,8 @@ async function loadAppPage() {
           ${statusBadge(app, slug)}
           ${isFlagged("saved", slug) ? '<span class="badge" style="background: #e6c200; color: #111; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">★ Favorited</span>' : ""}
           
-          <a href="${dynamicFeedUrl}" target="_blank" class="filter-chip" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 0.75rem; border-radius: 12px; text-decoration: none; font-weight: 500;">
-            📡 Follow App Feed XML
+          <a href="${app.title}" target="_blank" class="filter-chip" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 0.75rem; border-radius: 12px; text-decoration: none; font-weight: 500;">
+            📡 View Source Feed XML
           </a>
         </div>
 
@@ -187,30 +192,30 @@ async function loadAppPage() {
         </div>
 
         <div class="app-actions" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding-top: 12px; border-top: 1px solid var(--border);">
+          
           <button class="btn btn-ghost" style="border: 1px solid var(--border);" onclick='toggleFlag("saved", "${slug}")'>
             ${isFlagged("saved", slug) ? "★ Unsave" : "☆ Save Favorite"}
           </button>
+          
           <button class="btn btn-ghost" style="border: 1px solid var(--border);" onclick='toggleFlag("joined", "${slug}")'>
             ${isFlagged("joined", slug) ? "Unmark joined" : "Mark Joined"}
           </button>
+          
           <button class="btn btn-ghost" style="border: 1px solid var(--border);" onclick='toggleFlag("completed", "${slug}")'>
             ${isFlagged("completed", slug) ? "Undo completed" : "Mark Completed"}
           </button>
+          
           <span style="flex-grow: 1;"></span>
+          
           <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 500; font-size: 0.92rem;" onclick="joinTestFlow('${escapedAppJson}')">
             Join Test
           </button>
+
         </div>
       </article>
     `;
   } catch (err) {
     console.error("❌ Critical error loading app page details node:", err);
-    container.innerHTML = `
-      <div class='empty' style="text-align: center; padding: 40px 20px;">
-        <p>Failed to parse application index matrix dynamically.</p>
-        <a href="index.html" class="btn btn-ghost" style="margin-top:12px;">← Back to Directory</a>
-      </div>
-    `;
   }
 }
 
