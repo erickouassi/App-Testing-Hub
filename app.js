@@ -80,7 +80,35 @@ function getStatusBadgeMarkup(app, slug) {
   }
 }
 
-// 4. Automated Testing Flow Actions Matrix
+// 4. Action State Machine Resolver for Individual Cards
+function getActionCardButtonMarkup(app, slug, escapedAppJson) {
+  // Scenario A: App track is completely finished or marked manually as complete
+  if (isFlagged("completed", slug) || app.status === "testing-completed" || app.status === "production-live" || app.status === "expired") {
+    return `
+      <button class="btn" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; background: var(--border); color: var(--muted); cursor: not-allowed; border: 1px solid var(--border);" disabled>
+        Completed
+      </button>
+    `;
+  }
+
+  // Scenario B: User has registered and joined this track previously
+  if (isFlagged("joined", slug)) {
+    return `
+      <button class="btn" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; background: transparent; border: 1px solid var(--primary); color: var(--primary); font-weight: 500; cursor: pointer;" onclick="joinCardTestFlow('${escapedAppJson}')">
+        Open Links
+      </button>
+    `;
+  }
+
+  // Scenario C: Default untouched active testing track option open
+  return `
+    <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; cursor: pointer;" onclick="joinCardTestFlow('${escapedAppJson}')">
+      Join test
+    </button>
+  `;
+}
+
+// 5. Automated Testing Flow Actions Matrix
 window.joinCardTestFlow = function(appJsonEscaped) {
   try {
     const app = JSON.parse(decodeURIComponent(appJsonEscaped));
@@ -111,7 +139,7 @@ window.joinCardTestFlow = function(appJsonEscaped) {
   }
 };
 
-// 5. App Render Templates Engine
+// 6. App Render Templates Engine
 function renderApps() {
   if (!appsContainer) return;
 
@@ -137,8 +165,6 @@ function renderApps() {
     const slug = app.slug;
     const escapedAppJson = encodeURIComponent(JSON.stringify(app));
     const durationLabel = app.testingDuration ? `Day ${app.daysInTesting || 1} of ${app.testingDuration}` : `Day ${app.daysInTesting || 1} in testing`;
-
-    // DECENTRALIZED FIX: Point directly to the untouched external feed source URL
     const dynamicFeedUrl = app.feedSourceUrl || "#";
 
     return `
@@ -174,7 +200,7 @@ function renderApps() {
           <span style="color: var(--muted); font-weight: 500;">${durationLabel}</span>
           <div style="display: flex; gap: 6px;">
             <a href="app.html?slug=${slug}" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.8rem; border: 1px solid var(--border); text-decoration: none; border-radius: 6px; display: inline-block;">Details</a>
-            <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px;" onclick="joinCardTestFlow('${escapedAppJson}')">Join test</button>
+            ${getActionCardButtonMarkup(app, slug, escapedAppJson)}
           </div>
         </div>
       </div>
@@ -182,7 +208,7 @@ function renderApps() {
   }).join('');
 }
 
-// 6. Navigation Filters Registration Engine
+// 7. Navigation Filters Registration Engine
 function setupFilters() {
   if (!filterContainer) return;
 
@@ -198,7 +224,7 @@ function setupFilters() {
   });
 }
 
-// 7. Data Fetch Asynchronous Initialization
+// 8. Data Fetch Asynchronous Initialization
 async function loadApps() {
   console.log("🚀 [app.js] loadApps() started");
   
@@ -233,7 +259,7 @@ async function loadApps() {
   }
 }
 
-// 8. Dom Lifecycle Hook Deployments Execution
+// 9. Dom Lifecycle Hook Deployments Execution
 document.addEventListener("DOMContentLoaded", () => {
   initThemeEngine();
   setupFilters();

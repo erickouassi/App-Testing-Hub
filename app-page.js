@@ -63,6 +63,31 @@ function statusBadge(app, slug) {
   }
 }
 
+// Action State Machine Resolver for the Dedicated Details Page Button
+function getDetailPageActionButtonMarkup(app, slug, escapedAppJson) {
+  if (isFlagged("completed", slug) || app.status === "testing-completed" || app.status === "production-live" || app.status === "expired") {
+    return `
+      <button class="btn" style="padding: 10px 24px; font-weight: 500; font-size: 0.92rem; background: var(--border); color: var(--muted); cursor: not-allowed; border: 1px solid var(--border);" disabled>
+        Testing Period Completed
+      </button>
+    `;
+  }
+
+  if (isFlagged("joined", slug)) {
+    return `
+      <button class="btn" style="padding: 10px 24px; font-weight: 500; font-size: 0.92rem; background: transparent; border: 2px solid var(--primary); color: var(--primary); cursor: pointer;" onclick="joinTestFlow('${escapedAppJson}')">
+        Relaunch Track Links
+      </button>
+    `;
+  }
+
+  return `
+    <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 500; font-size: 0.92rem; cursor: pointer;" onclick="joinTestFlow('${escapedAppJson}')">
+      Join Test
+    </button>
+  `;
+}
+
 window.joinTestFlow = function(appJsonEscaped) {
   try {
     const app = JSON.parse(decodeURIComponent(appJsonEscaped));
@@ -141,8 +166,6 @@ async function loadAppPage() {
     }
 
     const escapedAppJson = encodeURIComponent(JSON.stringify(app));
-
-    // DECENTRALIZED FIX: Point directly to the untouched external feed source URL
     const dynamicFeedUrl = app.feedSourceUrl || "#";
 
     const joinArray = (arr) => {
@@ -182,10 +205,10 @@ async function loadAppPage() {
         </div>
 
         <div class="spec-blueprint-box">
-          <div><strong>Track Status:</strong> <span>${app.status === 'production-live' ? 'Live-Production' : 'Open-Testing'}</span></div>
+          <div><strong>Track Status:</strong> <span>${app.status === 'production-live' ? 'Live-Production' : app.status}</span></div>
           <div><strong>Days in testing:</strong> <span>${app.daysInTesting || 1}</span></div>
-          <div><strong>Days left:</strong> <span>${app.daysLeft !== undefined ? app.daysLeft : '5'}</span></div>
-          <div><strong>Total testing duration:</strong> <span>${app.testingDuration || '25'} days</span></div>
+          <div><strong>Days left:</strong> <span>${app.daysLeft !== undefined ? app.daysLeft : '0'}</span></div>
+          <div><strong>Total testing duration:</strong> <span>${app.testingDuration || '14'} days</span></div>
           <div><strong>Languages:</strong> <span>${joinArray(app.languages)}</span></div>
           <div><strong>Countries:</strong> <span>${joinArray(app.countries)}</span></div>
           <div><strong>Requirements:</strong> <span>${joinArray(app.requirements)}</span></div>
@@ -193,23 +216,21 @@ async function loadAppPage() {
 
         <div class="app-actions" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding-top: 12px; border-top: 1px solid var(--border);">
           
-          <button class="btn btn-ghost" style="border: 1px solid var(--border);" onclick='toggleFlag("saved", "${slug}")'>
+          <button class="btn btn-ghost" style="border: 1px solid var(--border); cursor: pointer;" onclick='toggleFlag("saved", "${slug}")'>
             ${isFlagged("saved", slug) ? "★ Unsave" : "☆ Save Favorite"}
           </button>
           
-          <button class="btn btn-ghost" style="border: 1px solid var(--border);" onclick='toggleFlag("joined", "${slug}")'>
+          <button class="btn btn-ghost" style="border: 1px solid var(--border); cursor: pointer;" onclick='toggleFlag("joined", "${slug}")'>
             ${isFlagged("joined", slug) ? "Unmark joined" : "Mark Joined"}
           </button>
           
-          <button class="btn btn-ghost" style="border: 1px solid var(--border);" onclick='toggleFlag("completed", "${slug}")'>
+          <button class="btn btn-ghost" style="border: 1px solid var(--border); cursor: pointer;" onclick='toggleFlag("completed", "${slug}")'>
             ${isFlagged("completed", slug) ? "Undo completed" : "Mark Completed"}
           </button>
           
           <span style="flex-grow: 1;"></span>
           
-          <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 500; font-size: 0.92rem;" onclick="joinTestFlow('${escapedAppJson}')">
-            Join Test
-          </button>
+          ${getDetailPageActionButtonMarkup(app, slug, escapedAppJson)}
 
         </div>
       </article>

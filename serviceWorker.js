@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-testing-hub-v1.6.1.2026.1";
+const CACHE_NAME = "app-testing-hub-v1.6.3.2026.1";
 console.log("Service Worker version:", CACHE_NAME);
 
 /* ---------------------------------------------------------
