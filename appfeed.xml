@@ -9,9 +9,9 @@
     <title>App Testing Hub — App Test Feed</title>
 
     <!-- Canonical feed URL (required for validators and crawlers) -->
-    <atom:link href="https://app-testing-hub.vercel.app/feed.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://app-testing-hub.adminhq.cf/appfeed.xml" rel="self" type="application/rss+xml" />
 
-    <link>https://app-testing-hub.vercel.app/</link>
+    <link>https://app-testing-hub.adminhq.cf/</link>
     <description>Beta testing information for the App Testing Hub platform.</description>
     <language>en</language>
     <lastBuildDate>Sat, 30 May 2026 09:00:00 -0500</lastBuildDate>
