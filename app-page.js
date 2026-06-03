@@ -172,7 +172,7 @@ async function loadAppPage() {
           ${statusBadge(app, slug)}
           ${isFlagged("saved", slug) ? '<span class="badge" style="background: #e6c200; color: #111; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">★ Favorited</span>' : ""}
           
-          <a href="${app.title}" target="_blank" class="filter-chip" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 0.75rem; border-radius: 12px; text-decoration: none; font-weight: 500;">
+          <a href="${dynamicFeedUrl}" target="_blank" class="filter-chip" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 0.75rem; border-radius: 12px; text-decoration: none; font-weight: 500;">
             📡 View Source Feed XML
           </a>
         </div>
