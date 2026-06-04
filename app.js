@@ -1,6 +1,5 @@
-console.log("🔥 app.js loaded");
+console.log("🚀 app.js: Universal Multi-Track Matrix Engine Loaded");
 
-// Configuration and state management
 const API_BASE =
   location.hostname === "127.0.0.1" || location.hostname === "localhost"
     ? "https://app-testing-hub.vercel.app"
@@ -13,34 +12,19 @@ const filterContainer = document.getElementById("filter-container");
 let allApps = [];
 let currentFilter = "all";
 
-// 1. Theme Engine Core System Sync Logic
-function initThemeEngine() {
-  const toggleBtn = document.getElementById("theme-toggle");
-  if (!toggleBtn) {
-    console.warn("⚠️ [Theme Engine] #theme-toggle button not found in current DOM.");
-    return;
-  }
-
-  const savedTheme = localStorage.getItem("theme") || "light";
-  document.documentElement.setAttribute("data-theme", savedTheme);
-
-  toggleBtn.onclick = () => {
-    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
-    const newTheme = currentTheme === "dark" ? "light" : "dark";
-    
-    document.documentElement.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
-    console.log(`🌓 [Theme Engine] Theme switched to: ${newTheme}`);
-  };
+// 1. Precise Hardware Platform Profiler
+function isAndroidDevice() {
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  return /android/i.test(userAgent);
 }
 
-// 2. Persisted Storage Utilities
+// 2. Persisted State Handlers
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : { favorites: {}, likes: {}, joined: {}, completed: {}, saved: {} };
+    return raw ? JSON.parse(raw) : { favorites: {}, joined: {}, completed: {}, saved: {} };
   } catch {
-    return { favorites: {}, likes: {}, joined: {}, completed: {}, saved: {} };
+    return { favorites: {}, joined: {}, completed: {}, saved: {} };
   }
 }
 
@@ -60,73 +44,115 @@ function isFlagged(collection, slug) {
   return !!userState[collection][slug];
 }
 
-// 3. Status Badge Generation
+// 3. Automated Timeline Safety & Multi-Track Badging Engine
 function getStatusBadgeMarkup(app, slug) {
-  if (isFlagged("completed", slug)) {
-    return `<span class="badge badge-status-completed" style="background-color: #f3e8ff; color: #6b21a8; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Completed</span>`;
+  const days = parseInt(app.daysInTesting || 1);
+  const duration = parseInt(app.testingDuration || 0);
+
+  // Auto-trip completion badge on day overflow or explicit tracking flags
+  if (isFlagged("completed", slug) || app.status === "testing-completed" || app.status === "completed" || (duration > 0 && days > duration)) {
+    return `<span class="badge badge-status-completed" style="background-color: #f3e8ff; color: #6b21a8; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">✓ Completed</span>`;
+  }
+  if (app.status === "pre-registration") {
+    return `<span class="badge badge-status-preregister" style="background-color: #fef3c7; color: #d97706; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">🗓️ Pre-Register</span>`;
   }
   if (isFlagged("joined", slug)) {
     return `<span class="badge badge-status-joined" style="background-color: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Joined Track</span>`;
   }
 
-  switch (app.status) {
-    case "testing-completed":
-    case "production-live":
-      return `<span class="badge badge-status-completed" style="background-color: #f3e8ff; color: #6b21a8; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">${app.status === 'production-live' ? '🚀 Live' : 'Completed'}</span>`;
-    case "expired":
-      return `<span class="badge badge-status-expired" style="background-color: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Expired</span>`;
-    default:
-      return `<span class="badge badge-status-active" style="background-color: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Open for testers</span>`;
-  }
+  // Dynamic Google Program Track Namespaces Map
+  const trackLabel = app.programType === "internal" ? "Internal Track" : app.programType === "open-beta" ? "Open Beta" : "Closed Track";
+  return `<span class="badge badge-status-active" style="background-color: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">🟢 ${trackLabel}</span>`;
 }
 
-// 4. Action State Machine Resolver for Individual Cards
+// 4. Platform Action Routing Matrix
 function getActionCardButtonMarkup(app, slug, escapedAppJson) {
-  // Scenario A: App track is completely finished or marked manually as complete
-  if (isFlagged("completed", slug) || app.status === "testing-completed" || app.status === "production-live" || app.status === "expired") {
+  const isAndroid = isAndroidDevice();
+  const testLink = app.testLink?.trim() || "#";
+  const days = parseInt(app.daysInTesting || 1);
+  const duration = parseInt(app.testingDuration || 0);
+  const isOverTime = duration > 0 && days > duration;
+
+  // STATE A: TESTING TRACK COMPLETED OR CYCLES EXCEEDED
+  if (isFlagged("completed", slug) || app.status === "testing-completed" || app.status === "completed" || isOverTime) {
+    if (isAndroid) {
+      return `
+        <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; background: #2563eb; color: #fff; border:none; cursor: pointer; font-weight:500;" onclick="window.open('${testLink}', '_blank')">
+          Launch URL
+        </button>
+      `;
+    } else {
+      return `
+        <button class="btn" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; background: #e5e7eb; color: #9ca3af; cursor: not-allowed; border: 1px solid #d1d5db;" disabled>
+          Completed
+        </button>
+      `;
+    }
+  }
+
+  // STATE B: GOOGLE PRE-REGISTRATION TRACK VARIATION
+  if (app.status === "pre-registration") {
     return `
-      <button class="btn" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; background: var(--border); color: var(--muted); cursor: not-allowed; border: 1px solid var(--border);" disabled>
-        Completed
+      <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; background: #2563eb; color: #fff; border:none; cursor: pointer; font-weight:500;" onclick="window.open('${testLink}', '_blank')">
+        Launch URL
       </button>
     `;
   }
 
-  // Scenario B: User has registered and joined this track previously
+  // STATE C: ACTIVE RE-ENGAGEMENT TRACKS (JOINED)
   if (isFlagged("joined", slug)) {
+    if (isAndroid) {
+      return `
+        <button class="btn" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; background: transparent; border: 1px solid #2563eb; color: #2563eb; font-weight: 500; cursor: pointer;" onclick="universalProgramJoinFlow('${escapedAppJson}')">
+          Open Links
+        </button>
+      `;
+    } else {
+      return `
+        <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; background: #2563eb; color: #fff; border:none; cursor: pointer; font-weight:500;" onclick="window.open('${testLink}', '_blank')">
+          Launch URL
+        </button>
+      `;
+    }
+  }
+
+  // STATE D: UNTOUCHED RECOGNITION DISCOVERY PIPELINES
+  if (isAndroid) {
     return `
-      <button class="btn" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; background: transparent; border: 1px solid var(--primary); color: var(--primary); font-weight: 500; cursor: pointer;" onclick="joinCardTestFlow('${escapedAppJson}')">
-        Open Links
+      <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; background: #2563eb; color:#fff; border:none; cursor: pointer; font-weight:500;" onclick="universalProgramJoinFlow('${escapedAppJson}')">
+        Join Test
+      </button>
+    `;
+  } else {
+    return `
+      <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; background: #2563eb; color:#fff; border:none; cursor: pointer; font-weight:500;" onclick="window.open('${testLink}', '_blank')">
+        Launch URL
       </button>
     `;
   }
-
-  // Scenario C: Default untouched active testing track option open
-  return `
-    <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; cursor: pointer;" onclick="joinCardTestFlow('${escapedAppJson}')">
-      Join test
-    </button>
-  `;
 }
 
-// 5. Automated Testing Flow Actions Matrix
-window.joinCardTestFlow = function(appJsonEscaped) {
+// 5. Intelligent Automated Google Registration Bridge
+window.universalProgramJoinFlow = function(appJsonEscaped) {
   try {
     const app = JSON.parse(decodeURIComponent(appJsonEscaped));
     const groupLink = app.groupLink?.trim();
     const testLink = app.testLink?.trim();
 
-    if (!groupLink) {
-      alert("This application requires joining a Google Group workspace framework first.");
-      return;
-    }
-
-    window.open(groupLink, "_blank");
-
-    if (testLink) {
-      setTimeout(() => {
-        const proceed = confirm("After joining the Google Group, click OK to open the testing pipeline link.");
-        if (proceed) window.open(testLink, "_blank");
-      }, 1200);
+    // Skip Group handshakes automatically for Open Betas / Track programs that don't use groups
+    if (!groupLink || app.programType === "open-beta") {
+      if (testLink) window.open(testLink, "_blank");
+    } else {
+      // Step 1: Fire Google Group membership page
+      window.open(groupLink, "_blank");
+      
+      // Step 2: Trigger opt-in page prompt sequence
+      if (testLink) {
+        setTimeout(() => {
+          const proceed = confirm("Google Group community page loaded. Click OK to advance to the official Google Play Testing Opt-in portal link.");
+          if (proceed) window.open(testLink, "_blank");
+        }, 1100);
+      }
     }
 
     if (app.slug) {
@@ -135,71 +161,75 @@ window.joinCardTestFlow = function(appJsonEscaped) {
       renderApps();
     }
   } catch(e) {
-    console.error("Error executing dynamic test stream routing:", e);
+    console.error("Universal Program Workflow Error:", e);
   }
 };
 
-// 6. App Render Templates Engine
+// 6. Template Presentation Grid Matrix Renderer
 function renderApps() {
   if (!appsContainer) return;
 
   const filteredApps = allApps.filter((app) => {
     if (!app || !app.slug) return false;
+    const days = parseInt(app.daysInTesting || 1);
+    const duration = parseInt(app.testingDuration || 0);
+    const isCompleted = isFlagged("completed", app.slug) || app.status === "testing-completed" || app.status === "completed" || (duration > 0 && days > duration);
+
     if (currentFilter === "all") return true;
-    if (currentFilter === "joined") return isFlagged("joined", app.slug);
-    if (currentFilter === "completed") return isFlagged("completed", app.slug) || app.status === "testing-completed" || app.status === "production-live";
+    if (currentFilter === "joined") return isFlagged("joined", app.slug) && !isCompleted;
+    if (currentFilter === "completed") return isCompleted;
     if (currentFilter === "saved") return isFlagged("saved", app.slug);
     return true;
   });
 
   if (filteredApps.length === 0) {
-    appsContainer.innerHTML = `
-      <div class="empty" style="text-align: center; padding: 40px var(--padding); grid-column: 1 / -1; color: var(--muted);">
-        No applications found matching the selected track criteria filters.
-      </div>
-    `;
+    appsContainer.innerHTML = `<div class="empty" style="text-align: center; padding: 40px; color: #9ca3af;">No program tracks found matching the criteria.</div>`;
     return;
   }
 
   appsContainer.innerHTML = filteredApps.map((app) => {
     const slug = app.slug;
     const escapedAppJson = encodeURIComponent(JSON.stringify(app));
-    const durationLabel = app.testingDuration ? `Day ${app.daysInTesting || 1} of ${app.testingDuration}` : `Day ${app.daysInTesting || 1} in testing`;
-    const dynamicFeedUrl = app.feedSourceUrl || "#";
+    
+    const days = parseInt(app.daysInTesting || 1);
+    const duration = parseInt(app.testingDuration || 0);
+    const timelineLabel = (duration > 0 && days > duration) ? `Ended (${duration}d total)` : app.status === "pre-registration" ? "Pre-Release Phase" : `Day ${days} of ${duration || 14}`;
+
+    // Density Target Counter Engine Scenario
+    const memberCount = parseInt(app.groupMembers || 0);
+    const densityIndicator = (memberCount < 20 && app.status !== "pre-registration") 
+      ? `<span style="background: #fee2e2; color: #ef4444; font-size: 0.72rem; padding: 2px 6px; border-radius: 6px; font-weight:600;">🔥 ${20 - memberCount} needed</span>` 
+      : `<span style="background: #d1fae5; color: #065f46; font-size:0.72rem; padding: 2px 6px; border-radius: 6px; font-weight:500;">✓ ${memberCount} testers</span>`;
 
     return `
-      <div class="app-card" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+      <div class="app-card" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
         <div>
           <div style="display: flex; gap: 12px; align-items: start; margin-bottom: 12px;">
             <img src="${app.icon || 'https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png'}" 
-                 alt="${app.title}" 
-                 style="width: 48px; height: 48px; border-radius: 10px; object-fit: cover; background: #0b4cb4; border: 1px solid var(--border);">
+                 alt="${app.title}" style="width: 48px; height: 48px; border-radius: 10px; object-fit: cover; border:1px solid #e5e7eb;">
             <div style="flex: 1;">
-              <h4 style="font-size: 1.1rem; font-weight: 600; margin: 0 0 2px 0; color: var(--text); line-height: 1.3;">${app.title}</h4>
-              <div style="font-size: 0.78rem; color: var(--muted);">
-                v${app.version || '1.0.0'} • <span style="color: var(--primary); font-weight: 500;">${app.category || 'General'}</span> • ${app.price || 'Free'}
+              <h4 style="font-size: 1.05rem; font-weight: 600; margin: 0 0 2px 0; color: #111827;">${app.title}</h4>
+              <div style="font-size: 0.78rem; color: #6b7280;">
+                v${app.version || '1.0.0'} • <span style="color: #2563eb; font-weight: 500; text-transform: capitalize;">${app.programType || 'Closed'} Track</span>
               </div>
             </div>
           </div>
 
           <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; align-items: center;">
             ${getStatusBadgeMarkup(app, slug)}
-            ${isFlagged("saved", slug) ? '<span class="badge" style="background: #e6c200; color: #111; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 500;">★ Favorite</span>' : ""}
-            
-            <a href="${dynamicFeedUrl}" target="_blank" title="Subscribe to original source feed XML directly from the developer" style="display: inline-flex; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; text-decoration: none; align-items: center; gap: 2px;">
-               📡 RSS
-            </a>
+            ${densityIndicator}
+            ${isFlagged("saved", slug) ? '<span style="background: #fef08a; color: #854d0e; padding: 2px 6px; border-radius: 6px; font-size: 0.72rem; font-weight: 500;">★</span>' : ""}
           </div>
 
-          <p style="font-size: 0.88rem; color: var(--text); opacity: 0.85; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 16px; margin-top: 4px;">
-            ${app.description || 'No additional deployment tracking criteria profiles provided.'}
+          <p style="font-size: 0.85rem; color: #4b5563; line-height: 1.45; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+            ${app.description || 'No operational release metadata mapped within tracking pipeline.'}
           </p>
         </div>
 
-        <div style="border-top: 1px solid var(--border); padding-top: 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem;">
-          <span style="color: var(--muted); font-weight: 500;">${durationLabel}</span>
+        <div style="border-top: 1px solid #e5e7eb; padding-top: 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 0.82rem;">
+          <span style="color: #6b7280; font-weight: 600;">${timelineLabel}</span>
           <div style="display: flex; gap: 6px;">
-            <a href="app.html?slug=${slug}" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.8rem; border: 1px solid var(--border); text-decoration: none; border-radius: 6px; display: inline-block;">Details</a>
+            <a href="app.html?slug=${slug}" style="padding: 6px 12px; font-size: 0.8rem; border: 1px solid #d1d5db; text-decoration: none; border-radius: 6px; color: #374151; font-weight:500; background:#fff;">Details</a>
             ${getActionCardButtonMarkup(app, slug, escapedAppJson)}
           </div>
         </div>
@@ -208,66 +238,30 @@ function renderApps() {
   }).join('');
 }
 
-// 7. Navigation Filters Registration Engine
 function setupFilters() {
   if (!filterContainer) return;
-
   filterContainer.addEventListener("click", (e) => {
-    const targetButton = e.target.closest(".filter-chip");
-    if (!targetButton) return;
-
-    filterContainer.querySelectorAll(".filter-chip").forEach((btn) => btn.classList.remove("active"));
-    targetButton.classList.add("active");
-    currentFilter = targetButton.getAttribute("data-filter") || "all";
-    
+    const btn = e.target.closest(".filter-chip");
+    if (!btn) return;
+    filterContainer.querySelectorAll(".filter-chip").forEach((c) => c.classList.remove("active"));
+    btn.classList.add("active");
+    currentFilter = btn.getAttribute("data-filter") || "all";
     renderApps();
   });
 }
 
-// 8. Data Fetch Asynchronous Initialization
 async function loadApps() {
-  console.log("🚀 [app.js] loadApps() started");
-  
-  const yearElement = document.getElementById("year");
-  if (yearElement) yearElement.textContent = new Date().getFullYear();
-
   try {
-    const API_URL = `${API_BASE}/api/apps?t=${Date.now()}`;
-    const res = await fetch(API_URL);
-
-    if (!res.ok) throw new Error(`HTTP error structure! Status context: ${res.status}`);
-
+    const res = await fetch(`${API_BASE}/api/apps?t=${Date.now()}`);
     const data = await res.json();
-    
-    if (data && Array.isArray(data.apps)) {
-      allApps = data.apps;
-    } else if (data && data.apps && Array.isArray(data.apps.apps)) {
-      allApps = data.apps.apps;
-    } else if (Array.isArray(data)) {
-      allApps = data;
-    } else if (data && typeof data === 'object' && data.apps) {
-      allApps = Array.isArray(data.apps.apps) ? data.apps.apps : [];
-    }
-
-    console.log(`✅ Successfully loaded ${allApps.length} apps`);
+    allApps = data.apps || data;
     renderApps();
   } catch (err) {
-    console.error("❌ Critical breakdown error processing apps array feed node stack:", err);
-    if (appsContainer) {
-      appsContainer.innerHTML = `<div class="empty" style="color: red;">Failed to safely parse platform architecture components. Please retry later.</div>`;
-    }
+    console.error("Critical Dash App Load Fetch Collapse:", err);
   }
 }
 
-// 9. Dom Lifecycle Hook Deployments Execution
 document.addEventListener("DOMContentLoaded", () => {
-  initThemeEngine();
   setupFilters();
   loadApps();
 });
-
-if (document.readyState === "interactive" || document.readyState === "complete") {
-  initThemeEngine();
-  setupFilters();
-  loadApps();
-}

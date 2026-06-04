@@ -1,4 +1,4 @@
-console.log("🔥 app-page.js loaded with Theme & App-RSS Sync engines");
+console.log("🚀 app-page.js: Universal Specification Component Engine Active");
 
 const API_BASE_PAGE =
   location.hostname === "127.0.0.1" || location.hostname === "localhost"
@@ -8,25 +8,17 @@ const API_BASE_PAGE =
 const container = document.getElementById("app-page-container");
 const STORAGE_KEY = "testingHubState";
 
-// --- Theme Engine Hook Matrix ---
-function initThemeEngine() {
-  const toggleBtn = document.getElementById("theme-toggle");
-  if (!toggleBtn) return;
-
-  toggleBtn.addEventListener("click", () => {
-    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
-    const newTheme = currentTheme === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
-  });
+function isAndroidDevice() {
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  return /android/i.test(userAgent);
 }
 
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : { favorites: {}, likes: {}, joined: {}, completed: {}, saved: {} };
+    return raw ? JSON.parse(raw) : { favorites: {}, joined: {}, completed: {}, saved: {} };
   } catch {
-    return { favorites: {}, likes: {}, joined: {}, completed: {}, saved: {} };
+    return { favorites: {}, joined: {}, completed: {}, saved: {} };
   }
 }
 
@@ -46,199 +38,166 @@ function isFlagged(collection, slug) {
   return !!userState[collection][slug];
 }
 
-function statusBadge(app, slug) {
-  if (isFlagged("completed", slug))
-    return `<span class="badge badge-status-completed" style="background-color: #f3e8ff; color: #6b21a8; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Completed</span>`;
-  if (isFlagged("joined", slug))
-    return `<span class="badge badge-status-joined" style="background-color: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Joined Track</span>`;
-
-  switch (app.status) {
-    case "testing-completed":
-    case "production-live":
-      return `<span class="badge badge-status-completed" style="background-color: #f3e8ff; color: #6b21a8; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">${app.status === 'production-live' ? '🚀 Live' : 'Completed'}</span>`;
-    case "expired":
-      return `<span class="badge badge-status-expired" style="background-color: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Expired</span>`;
-    default:
-      return `<span class="badge badge-status-active" style="background-color: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Open for testers</span>`;
-  }
-}
-
-// Action State Machine Resolver for the Dedicated Details Page Button
+// 1. Precise Detailed Screen Primary Action Switcher Matrix
 function getDetailPageActionButtonMarkup(app, slug, escapedAppJson) {
-  if (isFlagged("completed", slug) || app.status === "testing-completed" || app.status === "production-live" || app.status === "expired") {
+  const isAndroid = isAndroidDevice();
+  const testLink = app.testLink?.trim() || "#";
+  const days = parseInt(app.daysInTesting || 1);
+  const duration = parseInt(app.testingDuration || 0);
+
+  // STATE A: VERIFIED COMPLETIONS OR OVERFLOW CONSTRAINTS
+  if (isFlagged("completed", slug) || app.status === "testing-completed" || (duration > 0 && days > duration)) {
+    if (isAndroid) {
+      return `
+        <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 600; background: #2563eb; color: #fff; border:none; border-radius:6px; cursor: pointer;" onclick="window.open('${testLink}', '_blank')">
+          Launch URL Link
+        </button>
+      `;
+    } else {
+      return `
+        <button class="btn" style="padding: 10px 24px; font-weight: 600; background: #e5e7eb; color: #9ca3af; border-radius:6px; cursor: not-allowed; border: 1px solid #d1d5db;" disabled>
+          Completed
+        </button>
+      `;
+    }
+  }
+
+  // STATE B: DYNAMIC GOOGLE PRE-REGISTRATION PROGRAMS
+  if (app.status === "pre-registration") {
     return `
-      <button class="btn" style="padding: 10px 24px; font-weight: 500; font-size: 0.92rem; background: var(--border); color: var(--muted); cursor: not-allowed; border: 1px solid var(--border);" disabled>
-        Testing Period Completed
+      <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 600; background: #2563eb; color:#fff; border:none; border-radius:6px; cursor: pointer;" onclick="window.open('${testLink}', '_blank')">
+        Launch URL Link
       </button>
     `;
   }
 
+  // STATE C: COMMITTED RETURNING TRACKS (JOINED)
   if (isFlagged("joined", slug)) {
+    if (isAndroid) {
+      return `
+        <button class="btn" style="padding: 10px 24px; font-weight: 600; background: transparent; border: 2px solid #2563eb; color: #2563eb; border-radius:6px; cursor: pointer;" onclick="universalProgramJoinFlow('${escapedAppJson}')">
+          Relaunch Track Links
+        </button>
+      `;
+    } else {
+      return `
+        <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 600; background: #2563eb; color:#fff; border:none; border-radius:6px; cursor: pointer;" onclick="window.open('${testLink}', '_blank')">
+          Launch URL Link
+        </button>
+      `;
+    }
+  }
+
+  // STATE D: ORIGINAL BASE TRACK ACCESS DISCOVERY
+  if (isAndroid) {
     return `
-      <button class="btn" style="padding: 10px 24px; font-weight: 500; font-size: 0.92rem; background: transparent; border: 2px solid var(--primary); color: var(--primary); cursor: pointer;" onclick="joinTestFlow('${escapedAppJson}')">
-        Relaunch Track Links
+      <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 600; background: #2563eb; color:#fff; border:none; border-radius:6px; cursor: pointer;" onclick="universalProgramJoinFlow('${escapedAppJson}')">
+        Join Program Track
+      </button>
+    `;
+  } else {
+    return `
+      <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 600; background: #2563eb; color:#fff; border:none; border-radius:6px; cursor: pointer;" onclick="window.open('${testLink}', '_blank')">
+        Launch URL Link
       </button>
     `;
   }
-
-  return `
-    <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 500; font-size: 0.92rem; cursor: pointer;" onclick="joinTestFlow('${escapedAppJson}')">
-      Join Test
-    </button>
-  `;
 }
 
-window.joinTestFlow = function(appJsonEscaped) {
-  try {
-    const app = JSON.parse(decodeURIComponent(appJsonEscaped));
-    const groupLink = app.groupLink?.trim();
-    const testLink = app.testLink?.trim();
-
-    if (!groupLink) {
-      alert("This app requires joining the Google Group first.");
-      return;
-    }
-
-    window.open(groupLink, "_blank");
-
-    if (testLink) {
-      setTimeout(() => {
-        const proceed = confirm("After joining the Google Group, click OK to open the testing link.");
-        if (proceed) window.open(testLink, "_blank");
-      }, 1200);
-    }
-
-    if (app.slug) {
-      userState.joined[app.slug] = true;
-      saveState(userState);
-      loadAppPage();
-    }
-  } catch(e) {
-    console.error("Error launching joint flow structure:", e);
-  }
-};
-
+// 2. Full XML Payload Destructuring & Document Assembly
 async function loadAppPage() {
-  const yearElement = document.getElementById("year");
-  if (yearElement) {
-    yearElement.textContent = new Date().getFullYear();
-  }
-
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("slug");
-
-  if (!slug) {
-    if (container) container.innerHTML = "<div class='empty'>Error: No app slug provided in URL.</div>";
-    return;
-  }
-
-  if (!container) return;
+  if (!slug || !container) return;
 
   try {
-    const API_URL = `${API_BASE_PAGE}/api/apps?t=${Date.now()}`;
-    const res = await fetch(API_URL);
-
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
+    const res = await fetch(`${API_BASE_PAGE}/api/apps?t=${Date.now()}`);
     const data = await res.json();
-    let appsList = [];
-
-    if (data && Array.isArray(data.apps)) {
-      appsList = data.apps;
-    } else if (data && data.apps && Array.isArray(data.apps.apps)) {
-      appsList = data.apps.apps;
-    } else if (Array.isArray(data)) {
-      appsList = data;
-    } else if (data && typeof data === 'object' && data.apps) {
-      appsList = Array.isArray(data.apps.apps) ? data.apps.apps : [];
-    }
+    const appsList = data.apps || data;
 
     const app = appsList.find((a) => a && a.slug === slug);
-    
-    if (!app) {
-      container.innerHTML = `
-        <div class='empty' style="text-align: center; padding: 40px 20px;">
-          <h2>App listing was not found</h2>
-          <p style="margin-top:12px;"><a href="index.html" class="btn btn-ghost">← Back to Apps</a></p>
-        </div>
-      `;
-      return;
-    }
+    if (!app) return;
 
     const escapedAppJson = encodeURIComponent(JSON.stringify(app));
-    const dynamicFeedUrl = app.feedSourceUrl || "#";
 
-    const joinArray = (arr) => {
-      if(!arr || arr.length === 0) return "Global / Unspecified";
-      return arr.join(", ");
-    };
+    // Handle dynamic requirements array parsing safely out from XML namespaces
+    const reqArray = Array.isArray(app.requirements) ? app.requirements : typeof app.requirements === "string" ? app.requirements.split(",") : ["Android Phone Hardware Compatibility", "Google Play Account Authentication Authorization", "Continuous Track Installation"];
+    const geoArray = Array.isArray(app.countries) ? app.countries : typeof app.countries === "string" ? app.countries.split(",") : ["Global Track Release"];
+
+    const requirementsMarkup = reqArray.map(r => `<li style="margin-bottom:6px; color:#4b5563;">🔒 <strong>${r.trim()}</strong></li>`).join("");
+    
+    // Geo-Fence Trap Alert Guard scenario
+    const geoAlertBlock = geoArray.includes("All") || geoArray.includes("Global Track Release") 
+      ? `<div style="color:#059669; font-size:0.85rem; font-weight:500;">🌍 Open to all global region store profiles safely.</div>`
+      : `<div style="color:#dc2626; font-size:0.85rem; font-weight:500;">⚠️ Regional Constraint Alert: This track is geo-fenced to [${geoArray.join(", ")}]. Check store layout match before joining.</div>`;
 
     container.innerHTML = `
-      <article style="font-family: system-ui, -apple-system, sans-serif;">
-        
-        <div class="app-header" style="display: flex; gap: 16px; align-items: start; margin-bottom: 24px;">
-          <img src="${app.icon || 'https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png'}" 
-               alt="${app.title}" 
-               style="width: 72px; height: 72px; border-radius: 16px; object-fit: cover; background: #0b4cb4; border: 1px solid var(--border);">
-          <div style="flex: 1; padding-top: 2px;">
-            <div class="app-title" style="font-size: 1.75rem; font-weight: 600; color: var(--text); margin-bottom: 2px; letter-spacing: -0.02em; line-height: 1.2;">${app.title}</div>
-            <div class="app-meta" style="font-size: 0.875rem; color: var(--muted); margin-bottom: 2px;">
-              Category: ${app.category || 'General'} • Price: ${app.price || 'Free'}
-            </div>
-            <div style="font-size: 0.875rem; color: var(--muted);">
-              Android • v${app.version || '1.0.0'}
-            </div>
+      <article style="font-family: system-ui, sans-serif; max-width: 750px; margin: 20px auto; background:#fff; padding:24px; border-radius:12px; border:1px solid #e5e7eb;">
+        <div style="display: flex; gap: 16px; align-items: start; margin-bottom: 20px;">
+          <img src="${app.icon || 'https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png'}" alt="${app.title}" style="width: 64px; height: 64px; border-radius: 12px; object-fit: cover; border: 1px solid #e5e7eb;">
+          <div style="flex: 1;">
+            <h3 style="font-size: 1.5rem; font-weight: 600; color: #111827; margin:0 0 4px 0;">${app.title}</h3>
+            <div style="font-size: 0.85rem; color: #6b7280; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Program Type: ${app.programType || 'Closed Testing Track'}</div>
           </div>
         </div>
 
-        <div class="app-badges" style="margin-bottom: 24px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-          ${statusBadge(app, slug)}
-          ${isFlagged("saved", slug) ? '<span class="badge" style="background: #e6c200; color: #111; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">★ Favorited</span>' : ""}
-          
-          <a href="${dynamicFeedUrl}" target="_blank" class="filter-chip" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 0.75rem; border-radius: 12px; text-decoration: none; font-weight: 500;">
-            📡 View Source Feed XML
-          </a>
+        <p style="margin: 20px 0; color: #374151; line-height: 1.5; font-size:0.95rem;">${app.description || ''}</p>
+
+        <!-- Dynamic XML Specifications Context Box Block -->
+        <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+          <h5 style="margin: 0 0 12px 0; font-size: 0.95rem; color: #111827; font-weight:600; text-transform:uppercase;">Track Configuration Context</h5>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; font-size:0.85rem; margin-bottom:12px;">
+            <div><span style="color:#6b7280;">App Version:</span> <strong>${app.version || '1.0.0'}</strong></div>
+            <div><span style="color:#6b7280;">Price Profile:</span> <strong>${app.price || 'Free'}</strong></div>
+            <div><span style="color:#6b7280;">Days Run:</span> <strong>${app.daysInTesting || 1} Days Active</strong></div>
+            <div><span style="color:#6b7280;">Track Limit:</span> <strong>${app.testingDuration || 14} Days Total</strong></div>
+          </div>
+          <div style="padding-top:12px; border-top:1px solid #e5e7eb; font-size:0.85rem;">
+            <div style="font-weight:600; color:#374151; margin-bottom:6px;">Technical Requirements Checklist:</div>
+            <ul style="padding-left:0; list-style:none; margin:0 0 12px 0;">${requirementsMarkup}</ul>
+            ${geoAlertBlock}
+          </div>
         </div>
 
-        <div class="app-description" style="font-size: 1rem; line-height: 1.5; color: var(--text); opacity: 0.85; margin: 32px 0; text-align: center; padding: 0 16px;">
-          ${app.description || 'A profile tracking open metrics for this packaging instance setup.'}
-        </div>
-
-        <div class="spec-blueprint-box">
-          <div><strong>Track Status:</strong> <span>${app.status === 'production-live' ? 'Live-Production' : app.status}</span></div>
-          <div><strong>Days in testing:</strong> <span>${app.daysInTesting || 1}</span></div>
-          <div><strong>Days left:</strong> <span>${app.daysLeft !== undefined ? app.daysLeft : '0'}</span></div>
-          <div><strong>Total testing duration:</strong> <span>${app.testingDuration || '14'} days</span></div>
-          <div><strong>Languages:</strong> <span>${joinArray(app.languages)}</span></div>
-          <div><strong>Countries:</strong> <span>${joinArray(app.countries)}</span></div>
-          <div><strong>Requirements:</strong> <span>${joinArray(app.requirements)}</span></div>
-        </div>
-
-        <div class="app-actions" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding-top: 12px; border-top: 1px solid var(--border);">
-          
-          <button class="btn btn-ghost" style="border: 1px solid var(--border); cursor: pointer;" onclick='toggleFlag("saved", "${slug}")'>
-            ${isFlagged("saved", slug) ? "★ Unsave" : "☆ Save Favorite"}
+        <!-- Sync Control Actions Utility Deck -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; padding-top: 16px; border-top: 1px solid #e5e7eb; align-items:center;">
+          <button class="btn" style="padding: 8px 14px; font-size:0.82rem; border-radius:6px; background:#fff; border:1px solid #d1d5db; color:#374151; cursor:pointer;" onclick='toggleFlag("saved", "${slug}")'>
+            ${isFlagged("saved", slug) ? "★ Unsave" : "☆ Save Track"}
           </button>
-          
-          <button class="btn btn-ghost" style="border: 1px solid var(--border); cursor: pointer;" onclick='toggleFlag("joined", "${slug}")'>
-            ${isFlagged("joined", slug) ? "Unmark joined" : "Mark Joined"}
+          <button class="btn" style="padding: 8px 14px; font-size:0.82rem; border-radius:6px; background:#fff; border:1px solid #d1d5db; color:#374151; cursor:pointer;" onclick='toggleFlag("joined", "${slug}")'>
+            ${isFlagged("joined", slug) ? "Unmark Joined" : "Mark Joined State"}
           </button>
-          
-          <button class="btn btn-ghost" style="border: 1px solid var(--border); cursor: pointer;" onclick='toggleFlag("completed", "${slug}")'>
-            ${isFlagged("completed", slug) ? "Undo completed" : "Mark Completed"}
+          <button class="btn" style="padding: 8px 14px; font-size:0.82rem; border-radius:6px; background:#fff; border:1px solid #d1d5db; color:#374151; cursor:pointer;" onclick='toggleFlag("completed", "${slug}")'>
+            ${isFlagged("completed", slug) ? "Undo Complete" : "Mark Completed"}
           </button>
-          
           <span style="flex-grow: 1;"></span>
-          
           ${getDetailPageActionButtonMarkup(app, slug, escapedAppJson)}
-
         </div>
       </article>
     `;
   } catch (err) {
-    console.error("❌ Critical error loading app page details node:", err);
+    console.error("Page Architecture Render Exception:", err);
   }
 }
 
-initThemeEngine();
-loadAppPage();
+// 3. Fallback Cross-Execution Setup Bridge
+window.universalProgramJoinFlow = window.universalProgramJoinFlow || function(appJsonEscaped) {
+  try {
+    const app = JSON.parse(decodeURIComponent(appJsonEscaped));
+    if (!app.groupLink || app.programType === "open-beta") {
+      window.open(app.testLink, "_blank");
+    } else {
+      window.open(app.groupLink, "_blank");
+      setTimeout(() => {
+        if(confirm("Advance pipeline to target testing slot confirmation link?")) {
+          window.open(app.testLink, "_blank");
+        }
+      }, 1000);
+    }
+    userState.joined[app.slug] = true;
+    saveState(userState);
+    loadAppPage();
+  } catch(e){ console.error(e); }
+};
+
+document.addEventListener("DOMContentLoaded", loadAppPage);
