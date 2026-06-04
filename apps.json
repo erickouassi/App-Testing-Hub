@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-06-03T03:27:55.169Z",
+  "generatedAt": "2026-06-04T03:20:52.180Z",
   "apps": {
-    "generatedAt": "2026-06-03T03:27:55.169Z",
+    "generatedAt": "2026-06-04T03:20:52.180Z",
     "apps": [
       {
         "slug": "daily-rosary",
@@ -13,8 +13,8 @@
         "testLink": "https://play.google.com/apps/testing/com.erickouassi.dailyrosary",
         "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
         "testingDuration": 25,
-        "daysInTesting": 20,
-        "daysLeft": 5,
+        "daysInTesting": 21,
+        "daysLeft": 4,
         "status": "open-testing",
         "category": "General",
         "price": "Free",
@@ -32,7 +32,8 @@
           "Android phone",
           "Google account",
           "Keep installed 14 days +"
-        ]
+        ],
+        "feedSourceUrl": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/refs/heads/main/appfeed.xml"
       },
       {
         "slug": "le-rosaire-du-jour",
@@ -44,8 +45,8 @@
         "testLink": "https://play.google.com/apps/testing/com.erickouassi.lerosaire.dailyrosary",
         "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
         "testingDuration": 25,
-        "daysInTesting": 20,
-        "daysLeft": 5,
+        "daysInTesting": 21,
+        "daysLeft": 4,
         "status": "open-testing",
         "category": "General",
         "price": "Free",
@@ -62,20 +63,21 @@
         "requirements": [
           "Connexion Internet",
           "Navigateur moderne"
-        ]
+        ],
+        "feedSourceUrl": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Meditation-du-Rosaire/refs/heads/main/le-rosaire-app.xml"
       },
       {
-        "slug": "app-testing-hub",
-        "title": "App Testing Hub",
+        "slug": "app-testing-hub-version-1-0-0-testing",
+        "title": "App Testing Hub — Version 1.0.0 (Testing)",
         "description": "A centralized hub for managing, discovering, and testing Android apps built with Trusted Web Activity.",
         "platform": "Android",
         "version": "1.0.0",
-        "groupLink": "https://groups.google.com/g/app-testing-hub-beta-testers",
-        "testLink": "https://play.google.com/apps/testing/cf.adminhq.app_testing_hub.twa",
+        "groupLink": "",
+        "testLink": "",
         "pubDate": "Sat, 30 May 2026 09:00:00 -0500",
         "testingDuration": 12,
-        "daysInTesting": 5,
-        "daysLeft": 7,
+        "daysInTesting": 6,
+        "daysLeft": 6,
         "status": "open-testing",
         "category": "Lifestyle",
         "price": "Free",
@@ -90,7 +92,8 @@
           "Android phone",
           "Google account",
           "Keep installed 14 days +"
-        ]
+        ],
+        "feedSourceUrl": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/refs/heads/main/appfeed.xml"
       }
     ]
   }
