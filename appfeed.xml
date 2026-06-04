@@ -8,20 +8,19 @@
   <channel>
     <title>App Testing Hub — App Test Feed</title>
 
-    <!-- Canonical feed URL (required for validators and crawlers) -->
+    <!-- Canonical feed track URL link -->
     <atom:link href="https://app-testing-hub.adminhq.cf/appfeed.xml" rel="self" type="application/rss+xml" />
 
     <link>https://app-testing-hub.adminhq.cf/</link>
-    <description>Beta testing information for the App Testing Hub platform.</description>
+    <description>Beta testing track deployment configurations for App Testing Hub platform.</description>
     <language>en</language>
     <lastBuildDate>Sat, 30 May 2026 09:00:00 -0500</lastBuildDate>
 
-    <!-- Developer Metadata -->
+    <!-- Developer Channel Information -->
     <dev:developer>
       <dev:name>Eric Kouassi</dev:name>
       <dev:email>hello@erickouassi.com</dev:email>
       <dev:website>https://app-testing-hub.adminhq.cf/</dev:website>
-
       <social:links>
         <social:reddit>https://www.reddit.com/user/By_EK/</social:reddit>
         <social:github>https://github.com/erickouassi</social:github>
@@ -30,11 +29,10 @@
       </social:links>
     </dev:developer>
 
-    <!-- ===================================================== -->
-    <!-- 1) TESTING RELEASE                                    -->
-    <!-- ===================================================== -->
+    <!-- Isolated App Platform Node: App Testing Hub -->
     <item>
       <title>App Testing Hub — Version 1.0.0 (Testing)</title>
+      <link>https://app-testing-hub.adminhq.cf/apps/app-testing-hub</link>
       <guid isPermaLink="false">cf.adminhq.app_testing_hub.twa-1.0.0</guid>
 
       <pubDate>Sat, 30 May 2026 09:00:00 -0500</pubDate>
@@ -46,9 +44,12 @@
       <app:price>Free</app:price>
       <app:icon>https://www.image2url.com/r2/default/files/1780167872022-71fedbd1-7aa6-4f03-88e4-e9a4ad38b97d.png</app:icon>
 
+      <!-- Universal Testing Program Context Configuration -->
       <app:status>open-testing</app:status>
+      <app:programType>closed-track</app:programType>
       <app:testingDuration>12</app:testingDuration>
 
+      <!-- Track Communication Gateways -->
       <app:testing>
         <app:testLink>https://play.google.com/apps/testing/cf.adminhq.app_testing_hub.twa</app:testLink>
         <app:groupLink>https://groups.google.com/g/app-testing-hub-beta-testers</app:groupLink>
@@ -59,6 +60,7 @@
         A centralized hub for managing, discovering, and testing Android apps built with Trusted Web Activity.
       </description>
 
+      <!-- Technical Requirements Mapping -->
       <app:requirements>
         <app:requirement>Android phone</app:requirement>
         <app:requirement>Google account</app:requirement>
@@ -69,9 +71,21 @@
         <app:language>English</app:language>
       </app:languages>
 
+      <!-- Targeted Regional Releases -->
       <app:countries>
         <app:country>United States</app:country>
       </app:countries>
+
+      <!-- Embedded Localized Google Play Deployment Release Notes Block -->
+      <app:releaseNotes>
+        <en-US>
+• Added native runtime support for all Google Testing Programs (including Closed Tracks, Internal Tracks, Open Beta, and Pre-Registration campaigns).
+• Implemented an intelligent Hardware Profiler Matrix: users on Android devices can instantly launch testing tracks or live apps, while non-Android visitors see clean, streamlined status pages.
+• Refined the "Completed" testing track state to safely lock workspace navigation while providing Android users with a direct "Launch URL" link to keep interacting with the application.
+• Added localized density alert tags to dynamically flag tracks requiring immediate testing reinforcement to clear Google's 20-tester minimums.
+• Resolved timeline calculation overflows to ensure active counters accurately represent track limits without scaling errors.
+        </en-US>
+      </app:releaseNotes>
     </item>
 
   </channel>
