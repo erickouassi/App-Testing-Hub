@@ -1,4 +1,4 @@
-console.log("🚀 app-page.js: Universal Specification Component Engine Active");
+console.log("🚀 app-page.js: Universal Specification Component Engine Active with Feed Sync");
 
 const API_BASE_PAGE =
   location.hostname === "127.0.0.1" || location.hostname === "localhost"
@@ -13,29 +13,53 @@ function isAndroidDevice() {
   return /android/i.test(userAgent);
 }
 
+// Persisted State Handlers with Deep Object Instantiation Safety
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : { favorites: {}, joined: {}, completed: {}, saved: {} };
-  } catch {
+    const parsed = raw ? JSON.parse(raw) : {};
+    return {
+      favorites: parsed.favorites || {},
+      joined: parsed.joined || {},
+      completed: parsed.completed || {},
+      saved: parsed.saved || {}
+    };
+  } catch (err) {
     return { favorites: {}, joined: {}, completed: {}, saved: {} };
   }
 }
 
 function saveState(state) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (err) {
+    console.error("❌ Failed to commit state tracking layout to localStorage:", err);
+  }
 }
 
 let userState = loadState();
 
+// Global bridge handler with nested object validation checks
 window.toggleFlag = function (collection, slug) {
+  if (!userState[collection]) userState[collection] = {};
+  
   userState[collection][slug] = !userState[collection][slug];
+  
+  // Mirror 'saved' and 'favorites' states safely across shared directory boards
+  if (collection === "saved") {
+    if (!userState.favorites) userState.favorites = {};
+    userState.favorites[slug] = userState.saved[slug];
+  } else if (collection === "favorites") {
+    if (!userState.saved) userState.saved = {};
+    userState.saved[slug] = userState.favorites[slug];
+  }
+
   saveState(userState);
   loadAppPage();
 };
 
 function isFlagged(collection, slug) {
-  return !!userState[collection][slug];
+  return !!(userState[collection] && userState[collection][slug]);
 }
 
 // 1. Precise Detailed Screen Primary Action Switcher Matrix
@@ -46,7 +70,7 @@ function getDetailPageActionButtonMarkup(app, slug, escapedAppJson) {
   const duration = parseInt(app.testingDuration || 0);
 
   // STATE A: VERIFIED COMPLETIONS OR OVERFLOW CONSTRAINTS
-  if (isFlagged("completed", slug) || app.status === "testing-completed" || (duration > 0 && days > duration)) {
+  if (isFlagged("completed", slug) || app.status === "testing-completed" || app.status === "completed" || (duration > 0 && days > duration)) {
     if (isAndroid) {
       return `
         <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 600; background: #2563eb; color: #fff; border:none; border-radius:6px; cursor: pointer;" onclick="window.open('${testLink}', '_blank')">
@@ -75,7 +99,7 @@ function getDetailPageActionButtonMarkup(app, slug, escapedAppJson) {
   if (isFlagged("joined", slug)) {
     if (isAndroid) {
       return `
-        <button class="btn" style="padding: 10px 24px; font-weight: 600; background: transparent; border: 2px solid #2563eb; color: #2563eb; border-radius:6px; cursor: pointer;" onclick="universalProgramJoinFlow('${escapedAppJson}')">
+        <button class="btn" style="padding: 10px 24px; font-weight: 600; background: transparent; border: 2px solid #2563eb; color: #2563eb; border-radius:6px; cursor: pointer;" onclick="window.universalProgramJoinFlow('${escapedAppJson}')">
           Relaunch Track Links
         </button>
       `;
@@ -91,7 +115,7 @@ function getDetailPageActionButtonMarkup(app, slug, escapedAppJson) {
   // STATE D: ORIGINAL BASE TRACK ACCESS DISCOVERY
   if (isAndroid) {
     return `
-      <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 600; background: #2563eb; color:#fff; border:none; border-radius:6px; cursor: pointer;" onclick="universalProgramJoinFlow('${escapedAppJson}')">
+      <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 600; background: #2563eb; color:#fff; border:none; border-radius:6px; cursor: pointer;" onclick="window.universalProgramJoinFlow('${escapedAppJson}')">
         Join Program Track
       </button>
     `;
@@ -104,46 +128,99 @@ function getDetailPageActionButtonMarkup(app, slug, escapedAppJson) {
   }
 }
 
-// 2. Full XML Payload Destructuring & Document Assembly
+// 2. Automated Tracking State Badging Engine
+function statusBadge(app, slug) {
+  const days = parseInt(app.daysInTesting || 1);
+  const duration = parseInt(app.testingDuration || 0);
+
+  if (isFlagged("completed", slug) || app.status === "testing-completed" || app.status === "completed" || (duration > 0 && days > duration)) {
+    return `<span class="badge badge-status-completed" style="background-color: #f3e8ff; color: #6b21a8; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">✓ Completed</span>`;
+  }
+  if (app.status === "pre-registration") {
+    return `<span class="badge badge-status-preregister" style="background-color: #fef3c7; color: #d97706; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">🗓️ Pre-Register</span>`;
+  }
+  if (isFlagged("joined", slug)) {
+    return `<span class="badge badge-status-joined" style="background-color: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Joined Track</span>`;
+  }
+
+  const trackLabel = app.programType === "internal" ? "Internal Track" : app.programType === "open-beta" ? "Open Beta" : "Closed Track";
+  return `<span class="badge badge-status-active" style="background-color: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">🟢 ${trackLabel}</span>`;
+}
+
+// 3. Full Payload Destructuring & Document Assembly
 async function loadAppPage() {
   const params = new URLSearchParams(window.location.search);
-  const slug = params.get("slug");
-  if (!slug || !container) return;
+  const rawSlug = params.get("slug");
+  if (!rawSlug || !container) return;
 
   try {
     const res = await fetch(`${API_BASE_PAGE}/api/apps?t=${Date.now()}`);
+    if (!res.ok) throw new Error(`HTTP status code mismatch error: ${res.status}`);
+    
     const data = await res.json();
-    const appsList = data.apps || data;
+    let appsList = [];
 
-    const app = appsList.find((a) => a && a.slug === slug);
-    if (!app) return;
+    // Map through fallback API data structural permutations safely
+    if (data && Array.isArray(data.apps)) {
+      appsList = data.apps;
+    } else if (data && data.apps && Array.isArray(data.apps.apps)) {
+      appsList = data.apps.apps;
+    } else if (Array.isArray(data)) {
+      appsList = data;
+    } else if (data && typeof data === 'object' && data.apps) {
+      appsList = Array.isArray(data.apps.apps) ? data.apps.apps : [];
+    }
 
+    // Advanced Normalization Substring Layer (Prevents tracking ID, hash, or version mismatches)
+    const app = appsList.find((a) => {
+      if (!a || !a.slug) return false;
+      return rawSlug === a.slug || rawSlug.startsWith(a.slug) || a.slug.startsWith(rawSlug);
+    });
+
+    if (!app) {
+      container.innerHTML = `<div class="empty" style="color: #6b7280; text-align: center; padding: 40px;">Application specification profile not found.</div>`;
+      return;
+    }
+
+    const slug = app.slug;
     const escapedAppJson = encodeURIComponent(JSON.stringify(app));
+    
+    // Normalized dynamic routing context URL definition tracking fallback
+    const dynamicFeedUrl = app.feedUrl || app.feedSourceUrl || `${API_BASE_PAGE}/api/feed.xml?slug=${slug}`;
 
-    // Handle dynamic requirements array parsing safely out from XML namespaces
     const reqArray = Array.isArray(app.requirements) ? app.requirements : typeof app.requirements === "string" ? app.requirements.split(",") : ["Android Phone Hardware Compatibility", "Google Play Account Authentication Authorization", "Continuous Track Installation"];
     const geoArray = Array.isArray(app.countries) ? app.countries : typeof app.countries === "string" ? app.countries.split(",") : ["Global Track Release"];
 
     const requirementsMarkup = reqArray.map(r => `<li style="margin-bottom:6px; color:#4b5563;">🔒 <strong>${r.trim()}</strong></li>`).join("");
     
-    // Geo-Fence Trap Alert Guard scenario
     const geoAlertBlock = geoArray.includes("All") || geoArray.includes("Global Track Release") 
       ? `<div style="color:#059669; font-size:0.85rem; font-weight:500;">🌍 Open to all global region store profiles safely.</div>`
       : `<div style="color:#dc2626; font-size:0.85rem; font-weight:500;">⚠️ Regional Constraint Alert: This track is geo-fenced to [${geoArray.join(", ")}]. Check store layout match before joining.</div>`;
 
     container.innerHTML = `
       <article style="font-family: system-ui, sans-serif; max-width: 750px; margin: 20px auto; background:#fff; padding:24px; border-radius:12px; border:1px solid #e5e7eb;">
+        
         <div style="display: flex; gap: 16px; align-items: start; margin-bottom: 20px;">
           <img src="${app.icon || 'https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png'}" alt="${app.title}" style="width: 64px; height: 64px; border-radius: 12px; object-fit: cover; border: 1px solid #e5e7eb;">
           <div style="flex: 1;">
             <h3 style="font-size: 1.5rem; font-weight: 600; color: #111827; margin:0 0 4px 0;">${app.title}</h3>
-            <div style="font-size: 0.85rem; color: #6b7280; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Program Type: ${app.programType || 'Closed Testing Track'}</div>
+            <div style="font-size: 0.85rem; color: #6b7280; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">
+              Category: ${app.category || 'General'} • Price: ${app.price || 'Free'}
+            </div>
           </div>
+        </div>
+
+        <div class="app-badges" style="margin-bottom: 24px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+          ${statusBadge(app, slug)}
+          ${isFlagged("saved", slug) ? '<span class="badge" style="background: #fef08a; color: #854d0e; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">★ Favorited</span>' : ""}
+          
+          <a href="${dynamicFeedUrl}" target="_blank" class="filter-chip" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-size: 0.75rem; border-radius: 12px; text-decoration: none; font-weight: 500; background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb;">
+            📡 Follow App Feed XML
+          </a>
         </div>
 
         <p style="margin: 20px 0; color: #374151; line-height: 1.5; font-size:0.95rem;">${app.description || ''}</p>
 
-        <!-- Dynamic XML Specifications Context Box Block -->
         <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
           <h5 style="margin: 0 0 12px 0; font-size: 0.95rem; color: #111827; font-weight:600; text-transform:uppercase;">Track Configuration Context</h5>
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; font-size:0.85rem; margin-bottom:12px;">
@@ -159,15 +236,14 @@ async function loadAppPage() {
           </div>
         </div>
 
-        <!-- Sync Control Actions Utility Deck -->
         <div style="display: flex; gap: 8px; flex-wrap: wrap; padding-top: 16px; border-top: 1px solid #e5e7eb; align-items:center;">
-          <button class="btn" style="padding: 8px 14px; font-size:0.82rem; border-radius:6px; background:#fff; border:1px solid #d1d5db; color:#374151; cursor:pointer;" onclick='toggleFlag("saved", "${slug}")'>
+          <button class="btn" style="padding: 8px 14px; font-size:0.82rem; border-radius:6px; background:#fff; border:1px solid #d1d5db; color:#374151; cursor:pointer;" onclick='window.toggleFlag("saved", "${slug}")'>
             ${isFlagged("saved", slug) ? "★ Unsave" : "☆ Save Track"}
           </button>
-          <button class="btn" style="padding: 8px 14px; font-size:0.82rem; border-radius:6px; background:#fff; border:1px solid #d1d5db; color:#374151; cursor:pointer;" onclick='toggleFlag("joined", "${slug}")'>
+          <button class="btn" style="padding: 8px 14px; font-size:0.82rem; border-radius:6px; background:#fff; border:1px solid #d1d5db; color:#374151; cursor:pointer;" onclick='window.toggleFlag("joined", "${slug}")'>
             ${isFlagged("joined", slug) ? "Unmark Joined" : "Mark Joined State"}
           </button>
-          <button class="btn" style="padding: 8px 14px; font-size:0.82rem; border-radius:6px; background:#fff; border:1px solid #d1d5db; color:#374151; cursor:pointer;" onclick='toggleFlag("completed", "${slug}")'>
+          <button class="btn" style="padding: 8px 14px; font-size:0.82rem; border-radius:6px; background:#fff; border:1px solid #d1d5db; color:#374151; cursor:pointer;" onclick='window.toggleFlag("completed", "${slug}")'>
             ${isFlagged("completed", slug) ? "Undo Complete" : "Mark Completed"}
           </button>
           <span style="flex-grow: 1;"></span>
@@ -176,28 +252,47 @@ async function loadAppPage() {
       </article>
     `;
   } catch (err) {
-    console.error("Page Architecture Render Exception:", err);
+    console.error("❌ Critical layout setup trace caught failure:", err);
+    if (container) {
+      container.innerHTML = `<div class="empty" style="color: #dc2626; text-align: center; padding: 20px;">Failed to safely compile dashboard.</div>`;
+    }
   }
 }
 
-// 3. Fallback Cross-Execution Setup Bridge
+// 4. Fallback Cross-Execution Setup Bridge
 window.universalProgramJoinFlow = window.universalProgramJoinFlow || function(appJsonEscaped) {
   try {
     const app = JSON.parse(decodeURIComponent(appJsonEscaped));
-    if (!app.groupLink || app.programType === "open-beta") {
-      window.open(app.testLink, "_blank");
+    const groupLink = app.groupLink?.trim();
+    const testLink = app.testLink?.trim();
+
+    if (!groupLink || app.programType === "open-beta") {
+      if (testLink) window.open(testLink, "_blank");
     } else {
-      window.open(app.groupLink, "_blank");
-      setTimeout(() => {
-        if(confirm("Advance pipeline to target testing slot confirmation link?")) {
-          window.open(app.testLink, "_blank");
-        }
-      }, 1000);
+      window.open(groupLink, "_blank");
+      if (testLink) {
+        setTimeout(() => {
+          if (confirm("Google Group community page loaded. Click OK to advance to the official Google Play Testing Opt-in portal link.")) {
+            window.open(testLink, "_blank");
+          }
+        }, 1100);
+      }
     }
-    userState.joined[app.slug] = true;
-    saveState(userState);
-    loadAppPage();
-  } catch(e){ console.error(e); }
+    
+    if (app.slug) {
+      if (!userState.joined) userState.joined = {};
+      userState.joined[app.slug] = true;
+      saveState(userState);
+      loadAppPage();
+    }
+  } catch(e) { 
+    console.error("Workflow Engine Exception:", e); 
+  }
 };
 
-document.addEventListener("DOMContentLoaded", loadAppPage);
+// 5. Execution Initializer Lifecycle Core
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", loadAppPage);
+} else {
+  loadAppPage();
+}

@@ -14,7 +14,7 @@
     <link>https://app-testing-hub.adminhq.cf/</link>
     <description>Beta testing track deployment configurations for App Testing Hub platform.</description>
     <language>en</language>
-    <lastBuildDate>Sat, 30 May 2026 09:00:00 -0500</lastBuildDate>
+    <lastBuildDate>Thu, 04 Jun 2026 22:56:00 -0500</lastBuildDate>
 
     <!-- Developer Channel Information -->
     <dev:developer>
@@ -29,7 +29,66 @@
       </social:links>
     </dev:developer>
 
-    <!-- Isolated App Platform Node: App Testing Hub -->
+    <!-- Isolated App Platform Node: App Testing Hub Build Fix (NEW ITEM) -->
+    <item>
+      <title>App Testing Hub — Version 1.0.1 (Stable Build Patch)</title>
+      <link>https://app-testing-hub.adminhq.cf/apps/app-testing-hub</link>
+      <guid isPermaLink="false">cf.adminhq.app_testing_hub.twa-1.0.1</guid>
+
+      <pubDate>Thu, 04 Jun 2026 22:56:00 -0500</pubDate>
+      <app:lastUpdated>Thu, 04 Jun 2026 22:56:00 -0500</app:lastUpdated>
+
+      <app:platform>Android</app:platform>
+      <app:version>1.0.1</app:version>
+      <app:category>Lifestyle</app:category>
+      <app:price>Free</app:price>
+      <app:icon>https://www.image2url.com/r2/default/files/1780167872022-71fedbd1-7aa6-4f03-88e4-e9a4ad38b97d.png</app:icon>
+
+      <!-- Universal Testing Program Context Configuration -->
+      <app:status>open-testing</app:status>
+      <app:programType>closed-track</app:programType>
+      <app:testingDuration>14</app:testingDuration>
+
+      <!-- Track Communication Gateways -->
+      <app:testing>
+        <app:testLink>https://play.google.com/apps/testing/cf.adminhq.app_testing_hub.twa</app:testLink>
+        <app:groupLink>https://groups.google.com/g/app-testing-hub-beta-testers</app:groupLink>
+        <app:groupMembers>15</app:groupMembers>
+      </app:testing>
+
+      <description>
+        Production Hotfix Patch: Resolves local collection state-mutations, runtime parsing failures, and implements an advanced normalization layer for multi-track slug matching.
+      </description>
+
+      <!-- Technical Requirements Mapping -->
+      <app:requirements>
+        <app:requirement>Android phone</app:requirement>
+        <app:requirement>Google account</app:requirement>
+        <app:requirement>Keep installed 14 days +</app:requirement>
+      </app:requirements>
+
+      <app:languages>
+        <app:language>English</app:language>
+        <app:language>French</app:language>
+      </app:languages>
+
+      <!-- Targeted Regional Releases -->
+      <app:countries>
+        <app:country>Global Track Release</app:country>
+      </app:countries>
+
+      <!-- Embedded Localized Google Play Deployment Release Notes Block -->
+      <app:releaseNotes>
+        <en-US>
+• Fixed a critical state engine bug where legacy or uninitialized localStorage profiles threw a TypeError when mutating favorites or saved states.
+• Explicitly bound action handlers to window-level scope, preventing ReferenceError failures on dynamic layout compilation buttons.
+• Introduced an invariant substring matching mechanism (.startsWith) to parse app slug identifiers accurately despite tracking strings or version hashes.
+• Standardized dynamic RSS/XML query string contexts to fallback reliably to alternate data payloads during high-traffic feed indexing.
+        </en-US>
+      </app:releaseNotes>
+    </item>
+
+    <!-- Isolated App Platform Node: App Testing Hub (Previous Build) -->
     <item>
       <title>App Testing Hub — Version 1.0.0 (Testing)</title>
       <link>https://app-testing-hub.adminhq.cf/apps/app-testing-hub</link>
