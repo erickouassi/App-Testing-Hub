@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-06-04T03:20:52.180Z",
+  "generatedAt": "2026-06-06T03:45:42.104Z",
   "apps": {
-    "generatedAt": "2026-06-04T03:20:52.180Z",
+    "generatedAt": "2026-06-06T03:45:42.104Z",
     "apps": [
       {
         "slug": "daily-rosary",
@@ -13,8 +13,8 @@
         "testLink": "https://play.google.com/apps/testing/com.erickouassi.dailyrosary",
         "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
         "testingDuration": 25,
-        "daysInTesting": 21,
-        "daysLeft": 4,
+        "daysInTesting": 23,
+        "daysLeft": 2,
         "status": "open-testing",
         "category": "General",
         "price": "Free",
@@ -45,8 +45,8 @@
         "testLink": "https://play.google.com/apps/testing/com.erickouassi.lerosaire.dailyrosary",
         "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
         "testingDuration": 25,
-        "daysInTesting": 21,
-        "daysLeft": 4,
+        "daysInTesting": 23,
+        "daysLeft": 2,
         "status": "open-testing",
         "category": "General",
         "price": "Free",
@@ -67,6 +67,36 @@
         "feedSourceUrl": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Meditation-du-Rosaire/refs/heads/main/le-rosaire-app.xml"
       },
       {
+        "slug": "app-testing-hub-version-1-0-1-stable-build-patch",
+        "title": "App Testing Hub — Version 1.0.1 (Stable Build Patch)",
+        "description": "Production Hotfix Patch: Resolves local collection state-mutations, runtime parsing failures, and implements an advanced normalization layer for multi-track slug matching.",
+        "platform": "Android",
+        "version": "1.0.1",
+        "groupLink": "",
+        "testLink": "",
+        "pubDate": "Thu, 04 Jun 2026 22:56:00 -0500",
+        "testingDuration": 14,
+        "daysInTesting": 2,
+        "daysLeft": 12,
+        "status": "open-testing",
+        "category": "Lifestyle",
+        "price": "Free",
+        "icon": "https://www.image2url.com/r2/default/files/1780167872022-71fedbd1-7aa6-4f03-88e4-e9a4ad38b97d.png",
+        "languages": [
+          "English",
+          "French"
+        ],
+        "countries": [
+          "Global Track Release"
+        ],
+        "requirements": [
+          "Android phone",
+          "Google account",
+          "Keep installed 14 days +"
+        ],
+        "feedSourceUrl": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/refs/heads/main/appfeed.xml"
+      },
+      {
         "slug": "app-testing-hub-version-1-0-0-testing",
         "title": "App Testing Hub — Version 1.0.0 (Testing)",
         "description": "A centralized hub for managing, discovering, and testing Android apps built with Trusted Web Activity.",
@@ -76,8 +106,8 @@
         "testLink": "",
         "pubDate": "Sat, 30 May 2026 09:00:00 -0500",
         "testingDuration": 12,
-        "daysInTesting": 6,
-        "daysLeft": 6,
+        "daysInTesting": 8,
+        "daysLeft": 4,
         "status": "open-testing",
         "category": "Lifestyle",
         "price": "Free",
