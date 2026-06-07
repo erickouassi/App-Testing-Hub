@@ -69,27 +69,29 @@ function getStatusBadgeMarkup(app, slug) {
     return `<span class="badge badge-status-joined" style="background-color: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Joined Track</span>`;
   }
 
-  switch (app.status) {
-    case "testing-completed":
-    case "production-live":
-      return `<span class="badge badge-status-completed" style="background-color: #f3e8ff; color: #6b21a8; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">${app.status === 'production-live' ? '🚀 Live' : 'Completed'}</span>`;
-    case "expired":
-      return `<span class="badge badge-status-expired" style="background-color: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Expired</span>`;
-    default:
-      return `<span class="badge badge-status-active" style="background-color: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Open for testers</span>`;
+  const normalizedStatus = (app.status || "").toLowerCase().trim();
+  if (normalizedStatus === "testing-completed" || normalizedStatus === "production-live" || normalizedStatus === "production" || normalizedStatus === "stable") {
+    return `<span class="badge badge-status-completed" style="background-color: #f3e8ff; color: #6b21a8; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">${normalizedStatus.includes('production') || normalizedStatus === 'stable' ? '🚀 Live' : 'Completed'}</span>`;
   }
+  if (normalizedStatus === "expired") {
+    return `<span class="badge badge-status-expired" style="background-color: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Expired</span>`;
+  }
+  
+  return `<span class="badge badge-status-active" style="background-color: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Open for testers</span>`;
 }
 
 // 5. Precise Button State Machine Logic Matcher
 function getActionCardButtonMarkup(app, slug, escapedAppJson) {
   const isAndroid = isAndroidDevice();
   const testLink = app.testLink?.trim() || "#";
+  const normalizedStatus = (app.status || "").toLowerCase().trim();
 
-  // STATE 1: TRACK COMPLETED
-  if (isFlagged("completed", slug) || app.status === "testing-completed" || app.status === "production-live" || app.status === "expired") {
+  // STATE 1: TRACK COMPLETED / STABLE PRODUCTION
+  if (isFlagged("completed", slug) || normalizedStatus === "testing-completed" || normalizedStatus === "production-live" || normalizedStatus === "production" || normalizedStatus === "stable" || normalizedStatus === "expired") {
     if (isAndroid) {
+      const prodTarget = app.storeLink || app.fallbackUrl || testLink;
       return `
-        <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; cursor: pointer;" onclick="window.open('${testLink}', '_blank')">
+        <button class="btn btn-primary" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 6px; cursor: pointer;" onclick="window.open('${prodTarget}', '_blank')">
           Open App
         </button>
       `;
@@ -135,25 +137,39 @@ function getActionCardButtonMarkup(app, slug, escapedAppJson) {
   }
 }
 
-// 6. Automated Group + Install Sequence (Android-specific)
+// 6. Automated Group / Invite + Install Sequence (Android-specific)
 window.joinCardTestFlow = function(appJsonEscaped) {
   try {
     const app = JSON.parse(decodeURIComponent(appJsonEscaped));
     const groupLink = app.groupLink?.trim();
     const testLink = app.testLink?.trim();
+    const devEmail = app.developerEmail || app.email?.trim();
 
-    if (!groupLink) {
-      alert("This application requires joining a Google Group workspace framework first.");
-      return;
-    }
-
-    window.open(groupLink, "_blank");
-
-    if (testLink) {
-      setTimeout(() => {
-        const proceed = confirm("After joining the Google Group, click OK to open the testing pipeline link.");
-        if (proceed) window.open(testLink, "_blank");
-      }, 1200);
+    // Contextual evaluation prioritizing community gateways first
+    if (groupLink && groupLink.includes("groups.google.com")) {
+      window.open(groupLink, "_blank");
+      if (testLink) {
+        setTimeout(() => {
+          const proceed = confirm("After joining the Google Group community framework, click OK to open the official testing track link.");
+          if (proceed) window.open(testLink, "_blank");
+        }, 1200);
+      }
+    } else if (devEmail || groupLink) {
+      const targetEmail = devEmail || groupLink;
+      const mailSubject = encodeURIComponent(`[App Testing Hub] Request Invite: ${app.title || "App"}`);
+      const mailBody = encodeURIComponent(`Hello,\n\nI would love to participate in the testing track for ${app.title || "your application"}. Please register my Google account to your list of testers.\n\nThank you!`);
+      
+      window.open(`mailto:${targetEmail}?subject=${mailSubject}&body=${mailBody}`, "_self");
+      
+      if (testLink) {
+        setTimeout(() => {
+          const proceed = confirm("Once you have sent your registration email invite request, click OK to preview the testing track access portal link.");
+          if (proceed) window.open(testLink, "_blank");
+        }, 1200);
+      }
+    } else {
+      // Direct access backup path if no group onboarding parameters exist
+      if (testLink) window.open(testLink, "_blank");
     }
 
     if (app.slug) {
@@ -174,7 +190,7 @@ function renderApps() {
     if (!app || !app.slug) return false;
     if (currentFilter === "all") return true;
     if (currentFilter === "joined") return isFlagged("joined", app.slug);
-    if (currentFilter === "completed") return isFlagged("completed", app.slug) || app.status === "testing-completed" || app.status === "production-live";
+    if (currentFilter === "completed") return isFlagged("completed", app.slug) || app.status === "testing-completed" || app.status === "production-live" || app.status === "production" || app.status === "stable";
     if (currentFilter === "saved") return isFlagged("saved", app.slug);
     return true;
   });
@@ -193,7 +209,6 @@ function renderApps() {
     const escapedAppJson = encodeURIComponent(JSON.stringify(app));
     const durationLabel = app.testingDuration ? `Day ${app.daysInTesting || 1} of ${app.testingDuration}` : `Day ${app.daysInTesting || 1} in testing`;
     
-    // Normalized dynamic routing context URL definition tracking fallback
     const dynamicFeedUrl = app.feedUrl || app.feedSourceUrl || `${API_BASE}/api/feed.xml?slug=${app.slug}`;
 
     return `
@@ -253,7 +268,8 @@ function setupFilters() {
   });
 }
 
-// 9. Data Loading Initializer
+// 9. Data Loading Initializer (Deduplicated Structure)
+// 9. Data Loading Initializer (Status & Feed Aware Deduplication)
 async function loadApps() {
   const yearElement = document.getElementById("year");
   if (yearElement) yearElement.textContent = new Date().getFullYear();
@@ -264,18 +280,61 @@ async function loadApps() {
     if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
 
     const data = await res.json();
-    
+    let rawAppsList = [];
+
+    // 1. Safely extract the raw payload variants from your API
     if (data && Array.isArray(data.apps)) {
-      allApps = data.apps;
+      rawAppsList = data.apps;
     } else if (data && data.apps && Array.isArray(data.apps.apps)) {
-      allApps = data.apps.apps;
+      rawAppsList = data.apps.apps;
     } else if (Array.isArray(data)) {
-      allApps = data;
+      rawAppsList = data;
     } else if (data && typeof data === 'object' && data.apps) {
-      allApps = Array.isArray(data.apps.apps) ? data.apps.apps : [];
+      rawAppsList = Array.isArray(data.apps.apps) ? data.apps.apps : [];
     }
 
+    // 2. STATUS & CHANNEL FILTER ENGINE
+    const uniqueAppsMap = new Map();
+    
+    rawAppsList.forEach(app => {
+      if (!app || !app.slug) return;
+
+      const cleanSlug = app.slug.trim().toLowerCase();
+      const normalizedStatus = (app.status || "").toLowerCase().trim();
+
+      // Skip historical items or updates that shouldn't show up on the main channel tracker
+      if (
+        normalizedStatus === "hidden" || 
+        normalizedStatus === "draft" || 
+        normalizedStatus === "archived"
+      ) {
+        return;
+      }
+
+      // If an entry for this app already exists, prioritize the one with an active testing track configuration
+      if (uniqueAppsMap.has(cleanSlug)) {
+        const existingApp = uniqueAppsMap.get(cleanSlug);
+        const existingStatus = (existingApp.status || "").toLowerCase().trim();
+
+        // If the new item has a higher-priority testing status than the old duplicate item, overwrite it
+        if (
+          (normalizedStatus === "open-testing" || normalizedStatus === "closed-testing" || normalizedStatus === "testing") &&
+          !(existingStatus === "open-testing" || existingStatus === "closed-testing" || existingStatus === "testing")
+        ) {
+          uniqueAppsMap.set(cleanSlug, app);
+        }
+      } else {
+        // First time seeing this slug, add it directly
+        uniqueAppsMap.set(cleanSlug, app);
+      }
+    });
+
+    // 3. Commit exactly the unique, channel-valid tracks back to the UI pipeline
+    allApps = Array.from(uniqueAppsMap.values());
+
+    console.log(`🎯 Filtered deduplication complete. Rendering exactly ${allApps.length} live track apps.`);
     renderApps();
+
   } catch (err) {
     console.error("❌ Critical breakdown error processing apps feed:", err);
     if (appsContainer) {

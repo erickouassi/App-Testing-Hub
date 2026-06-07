@@ -68,13 +68,15 @@ function getDetailPageActionButtonMarkup(app, slug, escapedAppJson) {
   const testLink = app.testLink?.trim() || "#";
   const days = parseInt(app.daysInTesting || 1);
   const duration = parseInt(app.testingDuration || 0);
+  const normalizedStatus = (app.status || "").toLowerCase().trim();
 
   // STATE A: VERIFIED COMPLETIONS OR OVERFLOW CONSTRAINTS
-  if (isFlagged("completed", slug) || app.status === "testing-completed" || app.status === "completed" || (duration > 0 && days > duration)) {
+  if (isFlagged("completed", slug) || normalizedStatus === "testing-completed" || normalizedStatus === "completed" || normalizedStatus === "production" || normalizedStatus === "stable" || (duration > 0 && days > duration)) {
     if (isAndroid) {
+      const prodTarget = app.storeLink || app.fallbackUrl || testLink;
       return `
-        <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 600; background: #2563eb; color: #fff; border:none; border-radius:6px; cursor: pointer;" onclick="window.open('${testLink}', '_blank')">
-          Launch URL Link
+        <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 600; background: #2563eb; color: #fff; border:none; border-radius:6px; cursor: pointer;" onclick="window.open('${prodTarget}', '_blank')">
+          Launch Live App
         </button>
       `;
     } else {
@@ -87,36 +89,20 @@ function getDetailPageActionButtonMarkup(app, slug, escapedAppJson) {
   }
 
   // STATE B: DYNAMIC GOOGLE PRE-REGISTRATION PROGRAMS
-  if (app.status === "pre-registration") {
+  if (normalizedStatus === "pre-registration") {
     return `
       <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 600; background: #2563eb; color:#fff; border:none; border-radius:6px; cursor: pointer;" onclick="window.open('${testLink}', '_blank')">
-        Launch URL Link
+        Pre-Register Here
       </button>
     `;
   }
 
-  // STATE C: COMMITTED RETURNING TRACKS (JOINED)
-  if (isFlagged("joined", slug)) {
-    if (isAndroid) {
-      return `
-        <button class="btn" style="padding: 10px 24px; font-weight: 600; background: transparent; border: 2px solid #2563eb; color: #2563eb; border-radius:6px; cursor: pointer;" onclick="window.universalProgramJoinFlow('${escapedAppJson}')">
-          Relaunch Track Links
-        </button>
-      `;
-    } else {
-      return `
-        <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 600; background: #2563eb; color:#fff; border:none; border-radius:6px; cursor: pointer;" onclick="window.open('${testLink}', '_blank')">
-          Launch URL Link
-        </button>
-      `;
-    }
-  }
-
-  // STATE D: ORIGINAL BASE TRACK ACCESS DISCOVERY
+  // STATE C: COMMITTED RETURNING TRACKS (JOINED) / BASE DISCOVERY CHANNELS
   if (isAndroid) {
+    const label = isFlagged("joined", slug) ? "Relaunch Track Links" : "Join Program Track";
     return `
       <button class="btn btn-primary" style="padding: 10px 24px; font-weight: 600; background: #2563eb; color:#fff; border:none; border-radius:6px; cursor: pointer;" onclick="window.universalProgramJoinFlow('${escapedAppJson}')">
-        Join Program Track
+        ${label}
       </button>
     `;
   } else {
@@ -132,18 +118,23 @@ function getDetailPageActionButtonMarkup(app, slug, escapedAppJson) {
 function statusBadge(app, slug) {
   const days = parseInt(app.daysInTesting || 1);
   const duration = parseInt(app.testingDuration || 0);
+  const normalizedStatus = (app.status || "").toLowerCase().trim();
 
-  if (isFlagged("completed", slug) || app.status === "testing-completed" || app.status === "completed" || (duration > 0 && days > duration)) {
+  if (isFlagged("completed", slug) || normalizedStatus === "testing-completed" || normalizedStatus === "completed" || normalizedStatus === "production" || normalizedStatus === "stable" || (duration > 0 && days > duration)) {
     return `<span class="badge badge-status-completed" style="background-color: #f3e8ff; color: #6b21a8; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">✓ Completed</span>`;
   }
-  if (app.status === "pre-registration") {
+  if (normalizedStatus === "pre-registration") {
     return `<span class="badge badge-status-preregister" style="background-color: #fef3c7; color: #d97706; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">🗓️ Pre-Register</span>`;
   }
   if (isFlagged("joined", slug)) {
     return `<span class="badge badge-status-joined" style="background-color: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">Joined Track</span>`;
   }
 
-  const trackLabel = app.programType === "internal" ? "Internal Track" : app.programType === "open-beta" ? "Open Beta" : "Closed Track";
+  let trackLabel = "Testing Track";
+  if (app.programType === "internal") trackLabel = "Internal Track";
+  else if (app.programType === "open-beta" || normalizedStatus === "open-testing" || normalizedStatus === "testing") trackLabel = "Open Beta";
+  else if (app.programType === "closed" || normalizedStatus === "closed-testing") trackLabel = "Closed Track";
+
   return `<span class="badge badge-status-active" style="background-color: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 500;">🟢 ${trackLabel}</span>`;
 }
 
@@ -160,7 +151,6 @@ async function loadAppPage() {
     const data = await res.json();
     let appsList = [];
 
-    // Map through fallback API data structural permutations safely
     if (data && Array.isArray(data.apps)) {
       appsList = data.apps;
     } else if (data && data.apps && Array.isArray(data.apps.apps)) {
@@ -171,7 +161,6 @@ async function loadAppPage() {
       appsList = Array.isArray(data.apps.apps) ? data.apps.apps : [];
     }
 
-    // Advanced Normalization Substring Layer (Prevents tracking ID, hash, or version mismatches)
     const app = appsList.find((a) => {
       if (!a || !a.slug) return false;
       return rawSlug === a.slug || rawSlug.startsWith(a.slug) || a.slug.startsWith(rawSlug);
@@ -185,7 +174,6 @@ async function loadAppPage() {
     const slug = app.slug;
     const escapedAppJson = encodeURIComponent(JSON.stringify(app));
     
-    // Normalized dynamic routing context URL definition tracking fallback
     const dynamicFeedUrl = app.feedUrl || app.feedSourceUrl || `${API_BASE_PAGE}/api/feed.xml?slug=${slug}`;
 
     const reqArray = Array.isArray(app.requirements) ? app.requirements : typeof app.requirements === "string" ? app.requirements.split(",") : ["Android Phone Hardware Compatibility", "Google Play Account Authentication Authorization", "Continuous Track Installation"];
@@ -265,10 +253,10 @@ window.universalProgramJoinFlow = window.universalProgramJoinFlow || function(ap
     const app = JSON.parse(decodeURIComponent(appJsonEscaped));
     const groupLink = app.groupLink?.trim();
     const testLink = app.testLink?.trim();
+    const devEmail = app.developerEmail || app.email?.trim();
 
-    if (!groupLink || app.programType === "open-beta") {
-      if (testLink) window.open(testLink, "_blank");
-    } else {
+    // Force exact community check requirements for all open and testing tracks uniform with closed ones
+    if (groupLink && groupLink.includes("groups.google.com")) {
       window.open(groupLink, "_blank");
       if (testLink) {
         setTimeout(() => {
@@ -277,6 +265,22 @@ window.universalProgramJoinFlow = window.universalProgramJoinFlow || function(ap
           }
         }, 1100);
       }
+    } else if (devEmail || groupLink) {
+      const targetEmail = devEmail || groupLink;
+      const mailSubject = encodeURIComponent(`[App Testing Hub] Request Invite: ${app.title || "App"}`);
+      const mailBody = encodeURIComponent(`Hello,\n\nI would love to participate in the testing track for ${app.title || "your application"}. Please register my Google account to your list of testers.\n\nThank you!`);
+      
+      window.open(`mailto:${targetEmail}?subject=${mailSubject}&body=${mailBody}`, "_self");
+      
+      if (testLink) {
+        setTimeout(() => {
+          if (confirm("Onboarding invite request sent. Click OK to advance to the official Google Play Testing portal link.")) {
+            window.open(testLink, "_blank");
+          }
+        }, 1100);
+      }
+    } else {
+      if (testLink) window.open(testLink, "_blank");
     }
     
     if (app.slug) {
