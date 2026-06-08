@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recently Added Channels — Testing Hub</title>
+  <style>
+    :root {
+      --bg-color: #fafafa;
+      --card-bg: #ffffff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --primary: #2563eb;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+      background: linear-gradient(180deg, #ffffff 0%, var(--bg-color) 100%);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    header p {
+      margin: 0.5rem 0 0 0;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 3rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .recent-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .app-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .app-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 20px rgba(0,0,0,0.06);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .app-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: #f3f4f6;
+      flex-shrink: 0;
+    }
+
+    .header-info {
+      flex: 1;
+    }
+
+    .title-badge-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .app-title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .platform-tag {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Status Badges */
+    .status-pill {
+      text-transform: capitalize;
+      font-weight: 600;
+      font-size: 0.68rem;
+      padding: 3px 8px;
+      border-radius: 20px;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+    .status-open-testing, .status-testing { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    .status-closed-testing { background: #fef3c7; color: #d97706; border-color: #fde68a; }
+    .status-production, .status-stable { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+    .status-testing-completed { background: #f3f4f6; color: #4b5563; border-color: #e5e7eb; }
+
+    .card-body {
+      flex: 1;
+      font-size: 0.88rem;
+      color: #4b5563;
+      line-height: 1.45;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Dynamic Action Links Layout Row */
+    .action-tray {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      width: 100%;
+      padding: 0.55rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      text-align: center;
+      box-sizing: border-box;
+      transition: background 0.15s ease;
+    }
+
+    .btn-primary { background: var(--primary); color: #ffffff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #f3f4f6; color: #374151; border: 1px solid var(--border-color); }
+    .btn-secondary:hover { background: #e5e7eb; }
+
+    .card-footer {
+      border-top: 1px dashed var(--border-color);
+      padding-top: 0.75rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .feed-link {
+      color: var(--primary);
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .feed-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Newly Registered Channels</h1>
+    <p>Discover the latest applications based on their absolute newest track parameters.</p>
+  </header>
+
+  <main class="container">
+    <div class="recent-grid" id="recentlyAddedGrid">
+      <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Scanning platform network registry...</p>
+    </div>
+  </main>
+
+  <footer>
+    <small>© 2026 App Testing Hub — Engineering Deployment Logs</small>
+  </footer>
+
+  <script src="recently-added.js"></script>
+</body>
+</html>

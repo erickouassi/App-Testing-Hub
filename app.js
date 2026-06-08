@@ -1,4 +1,4 @@
-console.log("🔥 app.js — Stable synced version");
+console.log("🔥 app.js — Stable synced version with debugging logs");
 
 const STORAGE_KEY = "testingHubState";
 const appsContainer = document.getElementById("apps-container");
@@ -100,6 +100,8 @@ window.joinCardTestFlow = function(escaped) {
 function renderApps() {
   if (!appsContainer) return;
 
+  console.log(`📊 Current Filter: "${currentFilter}" | Total Apps Loaded: ${allApps.length}`);
+
   const filtered = allApps.filter(app => {
     if (!app?.slug) return false;
     if (currentFilter === "all") return true;
@@ -109,7 +111,13 @@ function renderApps() {
     return true;
   });
 
-  // Keep your original card style (no more design changes)
+  console.log(`✅ Filtered Apps (${filtered.length}):`, filtered.map(a => ({ 
+    title: a.title, 
+    slug: a.slug, 
+    status: a.status,
+    isCompleted: isProductionStatus(a.status) || isFlagged("completed", a.slug)
+  })));
+
   appsContainer.innerHTML = filtered.map(app => {
     const slug = app.slug;
     const escaped = encodeURIComponent(JSON.stringify(app));
@@ -154,10 +162,12 @@ function renderApps() {
 }
 
 async function loadApps() {
-  // Your original XML parsing logic (kept stable)
   try {
+    console.log("🔍 Fetching feeds.json...");
     const feedsRes = await fetch("https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/refs/heads/main/feeds.json");
     const feeds = await feedsRes.json();
+    console.log("📋 Approved feeds count:", feeds.approvedFeeds?.length || 0);
+
     const map = new Map();
 
     for (const url of feeds.approvedFeeds || []) {
@@ -212,9 +222,10 @@ async function loadApps() {
     }
 
     allApps = Array.from(map.values());
+    console.log(`🎯 Final Apps Loaded: ${allApps.length}`, allApps.map(a => ({title: a.title, status: a.status})));
     renderApps();
   } catch(e) {
-    console.error(e);
+    console.error("❌ Load error:", e);
   }
 }
 
@@ -226,6 +237,7 @@ function setupFilters() {
     filterContainer.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
     chip.classList.add("active");
     currentFilter = chip.dataset.filter || "all";
+    console.log(`🔄 Filter changed to: ${currentFilter}`);
     renderApps();
   });
 }

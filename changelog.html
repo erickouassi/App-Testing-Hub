@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Platform Changelog & Deployment Tracks</title>
+  <style>
+    :root {
+      --bg-color: #fafafa;
+      --card-bg: #ffffff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border-color: #e5e7eb;
+      --primary: #2563eb;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      text-align: center;
+      padding: 3rem 1rem 1.5rem;
+      background: linear-gradient(180deg, #ffffff 0%, var(--bg-color) 100%);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    header p {
+      margin: 0.5rem 0 0 0;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .changelog-container {
+      max-width: 800px;
+      margin: 2.5rem auto;
+      padding: 0 1rem;
+    }
+
+    /* Global Search / Filter Row */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .filter-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover {
+      background: #f3f4f6;
+    }
+
+    .filter-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    /* Timeline Cards */
+    .timeline {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .changelog-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .changelog-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .app-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: #e5e7eb;
+      flex-shrink: 0;
+    }
+
+    .header-details {
+      flex: 1;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .app-title {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .meta-row {
+      margin: 4px 0 0 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .feed-link {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .feed-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Status Badges */
+    .status-pill {
+      text-transform: capitalize;
+      font-weight: 600;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+
+    .status-open-testing, .status-testing { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+    .status-closed-testing { background: #fef3c7; color: #d97706; border-color: #fde68a; }
+    .status-production, .status-stable { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+    .status-testing-completed { background: #f3f4f6; color: #4b5563; border-color: #e5e7eb; }
+
+    .update-summary {
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: #374151;
+      margin: 0.5rem 0 0 0;
+    }
+
+    /* Release Notes Code Block Style */
+    .release-notes-block {
+      margin-top: 1rem;
+      background: #f9fafb;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .release-notes-block strong {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .release-notes-block pre {
+      margin: 0.5rem 0 0 0;
+      white-space: pre-wrap;
+      font-family: inherit;
+      font-size: 0.88rem;
+      color: #374151;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border-color);
+      margin-top: 4rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Global Deployment Tracks</h1>
+    <p>Real-time cross-feed structural verification and release log history.</p>
+  </header>
+
+  <main class="changelog-container">
+    <div class="filter-bar" id="filterBar">
+      <button class="filter-btn active" data-filter="all">All Tracks</button>
+      <button class="filter-btn" data-filter="open-testing">Open Testing</button>
+      <button class="filter-btn" data-filter="closed-testing">Closed Testing</button>
+      <button class="filter-btn" data-filter="production">Production</button>
+    </div>
+
+    <div class="timeline" id="changelogTimeline">
+      <p style="text-align: center; color: var(--text-muted);">Syncing release matrix channels...</p>
+    </div>
+  </main>
+
+  <footer>
+    <small>© 2026 App Testing Hub — Engineering Deployment Logs</small>
+  </footer>
+
+  <script src="changelog.js"></script>
+</body>
+</html>
