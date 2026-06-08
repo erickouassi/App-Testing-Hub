@@ -1,51 +1,80 @@
 [
-  "Try changing your phone's font size in Android settings to see if the text inside app buttons wraps neatly or clips.",
-  "Switch between Light and Dark mode on a detail screen to make sure text colors remain perfectly readable.",
-  "Type a super long string or special emojis into a text input to verify the layout scales gracefully.",
-  "Try opening the app in split-screen mode to check if the user interface remains responsive and fully scrollable.",
-  "Rotate your phone to landscape mode on a scrollable page to see if your scroll position stays in the right place.",
-  "Check if any text elements overlap or become unreadable when your Android display scaling is set to 'Largest'.",
-  "Look closely at the screen edges on devices with rounded corners or camera notches to ensure no buttons are cut off.",
-  "Open a page with images, rotate the screen quickly, and see if the images reload from scratch or scale instantly.",
-  "Check if the keyboard covers up the text input field when you tap it, or if the layout scrolls up to keep it visible.",
-  "Tap a button or list item and swipe away mid-tap to see if the app cancels the touch highlight state gracefully.",
-  "Lock your phone screen while inside an app, wait a few seconds, and unlock it to see if your progress state is preserved.",
-  "Minimize the app while a process is running, open your camera app to consume RAM, and resume the app to see if it recovers.",
-  "While on a detail view, simulate a phone call interruption by minimizing the app and returning to check if it reloads correctly.",
-  "Open an app page, lower your phone's battery into battery-saver mode, and verify that animations scale back cleanly.",
-  "Pull down your Android notification drawer halfway while a video or animation is playing to check for stuttering.",
-  "Start typing inside an input field, switch to a different app to copy text, and return to ensure your input wasn't wiped out.",
-  "Clear your phone's recent background apps, cold-boot this app, and check if the initial loading screen is seamless.",
-  "Launch the app from a native home screen shortcut icon and check if it lands on the exact same spot as the app drawer.",
-  "Minimize the app, toggle Airplane Mode on, and open it back up to see how gracefully it handles offline fallbacks.",
-  "Toggle your Wi-Fi off rapidly while the app is actively loading a data feed to see if it displays a clean retry button.",
-  "Connect to a very weak public Wi-Fi hotspot and verify that image assets degrade gracefully instead of crashing.",
-  "Launch the app entirely offline to ensure that cached layouts render fine instead of displaying a completely blank white screen.",
-  "While offline, tap an action button like a favorite or save toggle to see if the app queues the action or alerts you cleanly.",
-  "Switch from Wi-Fi to mobile data right in the middle of a form submission to see if the network handoff is seamless.",
-  "Open a popup or menu overlay and tap your Android device's physical BACK button; it should close the menu, not exit the page.",
-  "Go deep into a sub-menu navigation stack and use the native Android back gesture repeatedly to check for broken page loops.",
-  "Try using the 'Pull to Refresh' gesture multiple times rapidly to see if the app handles stacked layout requests safely.",
-  "Tap a tab bar icon that you are already viewing to see if it scrolls you smoothly back up to the very top of the page.",
-  "Fling a long scroll view down aggressively to see if the lazy-loading of list assets keeps up with your scrolling speed.",
-  "Double-tap a standard navigation or sub-menu link quickly to make sure it doesn't open up two duplicate copies of the same page.",
-  "Long-press on card items or images to see if any hidden contextual menus pop up, or if it safely ignores the hold gesture.",
-  "Try pasting a massive paragraph of text into a simple field meant for short inputs to see if it handles boundaries gracefully.",
-  "Type special symbols and script characters (like <, >, /, or quotes) into search inputs to test if query filters handle edge inputs.",
-  "Leave a required form text field completely empty and press submit to see if a clear, accessible error message highlights the field.",
-  "Type space characters before and after your text input entry to make sure the app trims hidden white spaces automatically.",
-  "Check if input fields automatically surface the correct mobile keyboard layout (e.g., bringing up the number pad for numeric entries).",
-  "Navigate through 5 or 6 different app screens consecutively, then check if your device starts feeling noticeably warm or slow.",
-  "Keep the app open on a static detailed view for 5 minutes straight to observe if there are any background memory leaks.",
-  "Tap on a feature item that requires loading, and count the seconds. Anything under 2 seconds is an excellent UX benchmark!",
-  "Clear the browser/app cache entirely from your settings, relaunch, and verify that the initial asset downloading sequence is smooth.",
-  "Turn on your phone's native Android TalkBack accessibility reader and navigate the app to see if buttons have clear descriptive labels.",
-  "Check if color choices are distinct enough that you can still read everything perfectly with your device's brightness turned all the way down.",
-  "Test if interactive elements and tap targets are large enough to press easily with your thumb while holding your phone with one hand.",
-  "Check if the app functions properly when launched directly out of alternative web browsers like Firefox Mobile or Samsung Internet.",
-  "Inspect if custom app badges or banner alerts show up correctly without overlapping your system's top status bar.",
-  "Launch the app, use it for a bit, minimize it, and check your phone's storage settings to make sure the local cache remains lightweight.",
-  "Try interacting with the app using a Bluetooth keyboard or external mouse to check if focus rings wrap around selected elements.",
-  "Clear your internet cookies, reload the hub app, and check if your saved local states persist reliably.",
-  "Try opening the app on an older Android operating system version if you have a backup device to verify backward compatibility."
+  {
+    "category": "Layout & Visuals",
+    "tips": [
+      "Try changing your phone's font size in Android settings to see if the text inside app buttons wraps neatly or clips.",
+      "Switch between Light and Dark mode on a detail screen to make sure text colors remain perfectly readable.",
+      "Rotate your phone to landscape mode on a scrollable page to see if your scroll position stays in the right place.",
+      "Check if any text elements overlap or become unreadable when your Android display scaling is set to 'Largest'.",
+      "Look closely at the screen edges on devices with rounded corners or camera notches to ensure no buttons are cut off.",
+      "Open a page with images, rotate the screen quickly, and see if the images reload from scratch or scale instantly.",
+      "Pull down your Android notification drawer halfway while a video or animation is playing to check for stuttering.",
+      "Inspect if custom app badges or banner alerts show up correctly without overlapping your system's top status bar."
+    ]
+  },
+  {
+    "category": "Text Fields & Keyboard",
+    "tips": [
+      "Check if the keyboard covers up the text input field when you tap it, or if the layout scrolls up to keep it visible.",
+      "Type a super long string or special emojis into a text input to verify the layout scales gracefully.",
+      "Try pasting a massive paragraph of text into a simple field meant for short inputs to see if it handles boundaries gracefully.",
+      "Type special symbols and script characters (like <, >, /, or quotes) into search inputs to test if query filters handle edge inputs.",
+      "Leave a required form text field completely empty and press submit to see if a clear, accessible error message highlights the field.",
+      "Type space characters before and after your text input entry to make sure the app trims hidden white spaces automatically.",
+      "Check if input fields automatically surface the correct mobile keyboard layout (e.g., bringing up the number pad for numeric entries)."
+    ]
+  },
+  {
+    "category": "Interruptions & App State",
+    "tips": [
+      "Lock your phone screen while inside an app, wait a few seconds, and unlock it to see if your progress state is preserved.",
+      "Start typing inside an input field, switch to a different app to copy text, and return to ensure your input wasn't wiped out.",
+      "Minimize the app while a process is running, open your camera app to consume RAM, and resume the app to see if it recovers.",
+      "While on a detail view, simulate a phone call interruption by minimizing the app and returning to check if it reloads correctly.",
+      "Open an app page, lower your phone's battery into battery-saver mode, and verify that animations scale back cleanly.",
+      "Clear your phone's recent background apps, cold-boot this app, and check if the initial loading screen is seamless.",
+      "Launch the app from a native home screen shortcut icon and check if it lands on the exact same spot as the app drawer.",
+      "Check if the app functions properly when launched directly out of alternative web browsers like Firefox Mobile or Samsung Internet."
+    ]
+  },
+  {
+    "category": "Connectivity & Network",
+    "tips": [
+      "Launch the app entirely offline to ensure that cached layouts render fine instead of displaying a completely blank white screen.",
+      "Minimize the app, toggle Airplane Mode on, and open it back up to see how gracefully it handles offline fallbacks.",
+      "Toggle your Wi-Fi off rapidly while the app is actively loading a data feed to see if it displays a clean retry button.",
+      "Connect to a very weak public Wi-Fi hotspot and verify that image assets degrade gracefully instead of crashing.",
+      "Switch from Wi-Fi to mobile data right in the middle of a form submission to see if the network handoff is seamless.",
+      "While offline, tap an action button like a favorite or save toggle to see if the app queues the action or alerts you cleanly."
+    ]
+  },
+  {
+    "category": "Navigation & Gestures",
+    "tips": [
+      "Open a popup or menu overlay and tap your Android device's physical BACK button; it should close the menu, not exit the page.",
+      "Go deep into a sub-menu navigation stack and use the native Android back gesture repeatedly to check for broken page loops.",
+      "Tap a button or list item and swipe away mid-tap to see if the app cancels the touch highlight state gracefully.",
+      "Try using the 'Pull to Refresh' gesture multiple times rapidly to see if the app handles stacked layout requests safely.",
+      "Tap a tab bar icon that you are already viewing to see if it scrolls you smoothly back up to the very top of the page.",
+      "Fling a long scroll view down aggressively to see if the lazy-loading of list assets keeps up with your scrolling speed.",
+      "Double-tap a standard navigation or sub-menu link quickly to make sure it doesn't open up two duplicate copies of the same page.",
+      "Long-press on card items or images to see if any hidden contextual menus pop up, or if it safely ignores the hold gesture."
+    ]
+  },
+  {
+    "category": "Performance & Accessibility",
+    "tips": [
+      "Tap on a feature item that requires loading, and count the seconds. Anything under 2 seconds is an excellent UX benchmark!",
+      "Navigate through 5 or 6 different app screens consecutively, then check if your device starts feeling noticeably warm or slow.",
+      "Keep the app open on a static detailed view for 5 minutes straight to observe if there are any background memory leaks.",
+      "Launch the app, use it for a bit, minimize it, and check your phone's storage settings to make sure the local cache remains lightweight.",
+      "Clear the browser/app cache entirely from your settings, relaunch, and verify that the initial asset downloading sequence is smooth.",
+      "Clear your internet cookies, reload the hub app, and check if your saved local states persist reliably.",
+      "Turn on your phone's native Android TalkBack accessibility reader and navigate the app to see if buttons have clear descriptive labels.",
+      "Check if color choices are distinct enough that you can still read everything perfectly with your device's brightness turned all the way down.",
+      "Test if interactive elements and tap targets are large enough to press easily with your thumb while holding your phone with one hand.",
+      "Try interacting with the app using a Bluetooth keyboard or external mouse to check if focus rings wrap around selected elements.",
+      "Try opening the app on an older Android operating system version if you have a backup device to verify backward compatibility."
+    ]
+  }
 ]

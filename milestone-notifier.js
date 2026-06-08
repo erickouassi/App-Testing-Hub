@@ -90,7 +90,7 @@
       
       if (Array.isArray(data) && data.length > 0) {
         cachedProTips = data;
-        console.log(`🎯 [MilestoneNotifier] Loaded ${cachedProTips.length} tips from JSON file.`);
+        console.log("🎯 [MilestoneNotifier] Loaded updated structured JSON file.");
       }
     } catch (e) {
       console.warn("⚠️ [MilestoneNotifier] Using offline local PWA fallbacks:", e.message);
@@ -112,12 +112,24 @@
 
       // Convert the seed into a reliable index boundary math wrap
       const targetHashValue = hashStringToInt(deterministicSeed);
-      const tipIndex = targetHashValue % cachedProTips.length;
 
-      return cachedProTips[tipIndex];
+      // 🛠️ FIX: Flatten the structured category JSON into a simple list of tip strings
+      let flatTipsList = [];
+      if (cachedProTips[0] && typeof cachedProTips[0] === 'object' && cachedProTips[0].tips) {
+        // Extract strings from the new layout structure
+        flatTipsList = cachedProTips.flatMap(categoryObj => categoryObj.tips || []);
+      } else {
+        // Fallback to traditional flat array behavior if needed
+        flatTipsList = cachedProTips;
+      }
+
+      if (flatTipsList.length === 0) return "Keep testing and helping indie developers scale structural layouts!";
+
+      const tipIndex = targetHashValue % flatTipsList.length;
+      return flatTipsList[tipIndex];
     } catch (err) {
       // Emergency absolute fallback safety calculation index
-      return cachedProTips[0];
+      return typeof cachedProTips[0] === 'object' ? "Explore user interface components freely!" : cachedProTips[0];
     }
   }
 
