@@ -1,71 +1,8 @@
 {
-  "generatedAt": "2026-06-07T03:35:39.022Z",
+  "generatedAt": "2026-06-09T03:16:08.350Z",
   "apps": {
-    "generatedAt": "2026-06-07T03:35:39.022Z",
+    "generatedAt": "2026-06-09T03:16:08.350Z",
     "apps": [
-      {
-        "slug": "daily-rosary",
-        "title": "Daily Rosary",
-        "description": "A peaceful Rosary prayer app seeking Android testers for a 14‑day install requirement.",
-        "platform": "Android",
-        "version": "1.0.0",
-        "groupLink": "https://groups.google.com/g/daily-rosary-beta-testers",
-        "testLink": "https://play.google.com/apps/testing/com.erickouassi.dailyrosary",
-        "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
-        "testingDuration": 25,
-        "daysInTesting": 24,
-        "daysLeft": 1,
-        "status": "open-testing",
-        "category": "General",
-        "price": "Free",
-        "icon": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png",
-        "languages": [
-          "English",
-          "French"
-        ],
-        "countries": [
-          "United States",
-          "Canada",
-          "France"
-        ],
-        "requirements": [
-          "Android phone",
-          "Google account",
-          "Keep installed 14 days +"
-        ],
-        "feedSourceUrl": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/refs/heads/main/appfeed.xml"
-      },
-      {
-        "slug": "le-rosaire-du-jour",
-        "title": "Le Rosaire du Jour",
-        "description": "Version française du Rosaire quotidien, avec audio, mystère du jour automatique et suivi de prière.",
-        "platform": "Android",
-        "version": "1.0.0",
-        "groupLink": "https://groups.google.com/g/le-rosaire-du-jour-beta-testers",
-        "testLink": "https://play.google.com/apps/testing/com.erickouassi.lerosaire.dailyrosary",
-        "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
-        "testingDuration": 25,
-        "daysInTesting": 24,
-        "daysLeft": 1,
-        "status": "open-testing",
-        "category": "General",
-        "price": "Free",
-        "icon": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/main/img/apple-touch-icon.png",
-        "languages": [
-          "French"
-        ],
-        "countries": [
-          "Cote D'Ivoire",
-          "France",
-          "Canada",
-          "United States"
-        ],
-        "requirements": [
-          "Connexion Internet",
-          "Navigateur moderne"
-        ],
-        "feedSourceUrl": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Meditation-du-Rosaire/refs/heads/main/le-rosaire-app.xml"
-      },
       {
         "slug": "app-testing-hub-version-1-0-1-stable-build-patch",
         "title": "App Testing Hub — Version 1.0.1 (Stable Build Patch)",
@@ -76,8 +13,8 @@
         "testLink": "",
         "pubDate": "Thu, 04 Jun 2026 22:56:00 -0500",
         "testingDuration": 14,
-        "daysInTesting": 3,
-        "daysLeft": 11,
+        "daysInTesting": 5,
+        "daysLeft": 9,
         "status": "open-testing",
         "category": "Lifestyle",
         "price": "Free",
@@ -94,7 +31,7 @@
           "Google account",
           "Keep installed 14 days +"
         ],
-        "feedSourceUrl": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/refs/heads/main/appfeed.xml"
+        "feedSourceUrl": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/refs/heads/main/appfeed-app-testing-hub.xml"
       },
       {
         "slug": "app-testing-hub-version-1-0-0-testing",
@@ -104,10 +41,10 @@
         "version": "1.0.0",
         "groupLink": "",
         "testLink": "",
-        "pubDate": "Sat, 30 May 2026 09:00:00 -0500",
+        "pubDate": "Thu, 04 Jun 2026 22:56:00 -0500",
         "testingDuration": 12,
-        "daysInTesting": 9,
-        "daysLeft": 3,
+        "daysInTesting": 5,
+        "daysLeft": 7,
         "status": "open-testing",
         "category": "Lifestyle",
         "price": "Free",
@@ -123,7 +60,157 @@
           "Google account",
           "Keep installed 14 days +"
         ],
-        "feedSourceUrl": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/refs/heads/main/appfeed.xml"
+        "feedSourceUrl": "https://raw.githubusercontent.com/erickouassi/App-Testing-Hub/refs/heads/main/appfeed-app-testing-hub.xml"
+      },
+      {
+        "slug": "daily-rosary-version-1-0-0-testing",
+        "title": "Daily Rosary — Version 1.0.0 (Testing)",
+        "description": "Initial beta release of Daily Rosary. Seeking Android testers for a 14‑day install requirement.",
+        "platform": "Android",
+        "version": "1.0.0",
+        "groupLink": "",
+        "testLink": "",
+        "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
+        "testingDuration": 25,
+        "daysInTesting": 26,
+        "daysLeft": 0,
+        "status": "open-testing",
+        "category": "Lifestyle",
+        "price": "Free",
+        "icon": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/main/assets/images/android-chrome-512x512.png",
+        "languages": [
+          "English",
+          "French"
+        ],
+        "countries": [
+          "United States",
+          "Canada",
+          "France"
+        ],
+        "requirements": [
+          "Android phone",
+          "Google account",
+          "Keep installed 14 days"
+        ],
+        "feedSourceUrl": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/refs/heads/main/appfeed-dailyrosary.xml"
+      },
+      {
+        "slug": "daily-rosary-version-1-0-1-testing-completed",
+        "title": "Daily Rosary — Version 1.0.1 (Testing Completed)",
+        "description": "First production-ready build of Daily Rosary, with improved audio stability and UI refinements.",
+        "platform": "Android",
+        "version": "1.0.1",
+        "groupLink": "",
+        "testLink": "",
+        "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
+        "testingDuration": 25,
+        "daysInTesting": 26,
+        "daysLeft": 0,
+        "status": "testing-completed",
+        "category": "Lifestyle",
+        "price": "Free",
+        "icon": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/main/assets/images/android-chrome-512x512.png",
+        "languages": [
+          "English",
+          "French"
+        ],
+        "countries": [
+          "United States",
+          "Canada",
+          "France"
+        ],
+        "requirements": [
+          "Android phone",
+          "Google account"
+        ],
+        "feedSourceUrl": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/refs/heads/main/appfeed-dailyrosary.xml"
+      },
+      {
+        "slug": "daily-rosary-version-1-0-2-production",
+        "title": "Daily Rosary — Version 1.0.2 (Production)",
+        "description": "Official production release of Daily Rosary. Stable, polished, and ready for all users.",
+        "platform": "Android",
+        "version": "1.0.2",
+        "groupLink": "",
+        "testLink": "",
+        "pubDate": "Sat, 30 May 2026 12:00:00 -0500",
+        "testingDuration": 14,
+        "daysInTesting": 11,
+        "daysLeft": 3,
+        "status": "production",
+        "category": "Lifestyle",
+        "price": "Free",
+        "icon": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/main/assets/images/android-chrome-512x512.png",
+        "languages": [
+          "English"
+        ],
+        "countries": [
+          "Global Track Release"
+        ],
+        "requirements": [
+          "Android phone",
+          "Google account"
+        ],
+        "feedSourceUrl": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Daily-Rosary/refs/heads/main/appfeed-dailyrosary.xml"
+      },
+      {
+        "slug": "le-rosaire-du-jour-version-1-0-0-test",
+        "title": "Le Rosaire du Jour — Version 1.0.0 (Test)",
+        "description": "Version française du Rosaire quotidien, avec audio, mystère du jour automatique et suivi de prière.",
+        "platform": "Android",
+        "version": "1.0.0",
+        "groupLink": "",
+        "testLink": "",
+        "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
+        "testingDuration": 25,
+        "daysInTesting": 26,
+        "daysLeft": 0,
+        "status": "open-testing",
+        "category": "Lifestyle",
+        "price": "Free",
+        "icon": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Meditation-du-Rosaire/main/assets/android-chrome-512x512.png",
+        "languages": [
+          "French"
+        ],
+        "countries": [
+          "Cote D'Ivoire",
+          "France",
+          "Canada",
+          "United States"
+        ],
+        "requirements": [
+          "Connexion Internet",
+          "Navigateur moderne"
+        ],
+        "feedSourceUrl": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Meditation-du-Rosaire/refs/heads/main/app-rss-feed-le-rosaire.xml"
+      },
+      {
+        "slug": "le-rosaire-du-jour-version-1-0-1-testing-completed",
+        "title": "Le Rosaire du Jour — Version 1.0.1 (Testing Completed)",
+        "description": "Première version de production du Rosaire du Jour, avec une meilleure stabilité audio et une interface plus fluide.",
+        "platform": "Android",
+        "version": "1.0.1",
+        "groupLink": "",
+        "testLink": "",
+        "pubDate": "Fri, 15 May 2026 09:00:00 -0500",
+        "testingDuration": 25,
+        "daysInTesting": 26,
+        "daysLeft": 0,
+        "status": "open-testing",
+        "category": "Lifestyle",
+        "price": "Free",
+        "icon": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Meditation-du-Rosaire/main/assets/android-chrome-512x512.png",
+        "languages": [
+          "French"
+        ],
+        "countries": [
+          "Global Track Release"
+        ],
+        "requirements": [
+          "Connexion Internet",
+          "Navigateur moderne"
+        ],
+        "feedSourceUrl": "https://raw.githubusercontent.com/XP-DEVOTION/playlist-Meditation-du-Rosaire/refs/heads/main/app-rss-feed-le-rosaire.xml"
       }
     ]
   }
